@@ -1,0 +1,114 @@
+package com.gulfcam.fuelcoupon.user.service;
+
+import com.gulfcam.fuelcoupon.user.dto.EmailDto;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring5.SpringTemplateEngine;
+
+import javax.mail.internet.MimeMessage;
+import java.nio.charset.StandardCharsets;
+
+@Service
+@Slf4j
+public class EmailServiceImpl implements IEmailService {
+
+	@Autowired
+	private JavaMailSender emailSender;
+
+	@Autowired
+	private SpringTemplateEngine templateEngine;
+
+	@Override
+	public void sendEmail(EmailDto emailDto) {
+		try {
+			MimeMessage mimeMessage = emailSender.createMimeMessage();
+			MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage,
+					MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, StandardCharsets.UTF_8.name());
+
+			Context context = new Context();
+	        context.setVariables(emailDto.getProps());
+			String html = templateEngine.process(emailDto.getBody(), context);
+
+			mimeMessageHelper.setFrom(emailDto.getFrom(), emailDto.getSenderName());
+			mimeMessageHelper.setTo(emailDto.getTo());
+			mimeMessageHelper.setSubject(emailDto.getSubject());
+			mimeMessageHelper.setReplyTo(emailDto.getReplyTo(),emailDto.getReplyToName());
+			mimeMessageHelper.setText(html, true);
+			mimeMessageHelper.addInline("mail", new ClassPathResource("static/mail.png"));
+			mimeMessageHelper.addInline("facebook", new ClassPathResource("static/facebook.png"));
+			mimeMessageHelper.addInline("linkedin", new ClassPathResource("static/linkedin.png"));
+			mimeMessageHelper.addInline("instagram", new ClassPathResource("static/instagram.png"));
+			mimeMessageHelper.addInline("youtube", new ClassPathResource("static/youtube.png"));
+			mimeMessageHelper.addInline("logo", new ClassPathResource("static/logo_jobetrouve_no_text.png"));
+			mimeMessageHelper.addInline("cover", new ClassPathResource("static/mail_cover.png"));
+			emailSender.send(mimeMessage);
+			log.info("Email Successful send to {}", emailDto.getTo());
+		} catch (Exception ex) {
+			log.error("Email send fail to {} error occurred {}", emailDto.getTo(), ex.getLocalizedMessage());
+		}
+	}
+
+	@Override
+	public void sendEmailToEmployer(EmailDto emailDto) {
+		try {
+			MimeMessage mimeMessage = emailSender.createMimeMessage();
+			MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage,
+					MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, StandardCharsets.UTF_8.name());
+
+			Context context = new Context();
+			context.setVariables(emailDto.getProps());
+			String html = templateEngine.process(emailDto.getBody(), context);
+
+			mimeMessageHelper.setFrom(emailDto.getFrom(), emailDto.getSenderName());
+			mimeMessageHelper.setTo(emailDto.getTo());
+			mimeMessageHelper.setSubject(emailDto.getSubject());
+			mimeMessageHelper.setReplyTo(emailDto.getReplyTo(),emailDto.getReplyToName());
+			mimeMessageHelper.setText(html, true);
+			if (emailDto.getFiles() != null) {
+				for (MultipartFile files : emailDto.getFiles()) {
+					mimeMessageHelper.addAttachment(files.getOriginalFilename(), files);
+				}
+			}
+			emailSender.send(mimeMessage);
+			log.info("Email Successful send to {}", emailDto.getTo());
+		} catch (Exception ex) {
+			log.error("Email send fail to {} error occurred {}", emailDto.getTo(), ex.getLocalizedMessage());
+		}
+	}
+
+	@Override
+	public void sendEmailTestLaguage(EmailDto emailDto) {
+		try {
+			MimeMessage mimeMessage = emailSender.createMimeMessage();
+			MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage,
+					MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, StandardCharsets.UTF_8.name());
+
+			Context context = new Context();
+	        context.setVariables(emailDto.getProps());
+			String html = templateEngine.process(emailDto.getBody(), context);
+
+			mimeMessageHelper.setFrom(emailDto.getFrom(), emailDto.getSenderName());
+			mimeMessageHelper.setTo(emailDto.getTo());
+			mimeMessageHelper.setSubject(emailDto.getSubject());
+			mimeMessageHelper.setReplyTo(emailDto.getReplyTo(),emailDto.getReplyToName());
+			mimeMessageHelper.setText(html, true);
+			mimeMessageHelper.addInline("logo", new ClassPathResource("static/logo_jobetrouve_no_text.png"));
+			mimeMessageHelper.addInline("cover-image", new ClassPathResource("static/cover-image.png"));
+			mimeMessageHelper.addInline("facebook2", new ClassPathResource("static/facebook@2x.png"));
+			mimeMessageHelper.addInline("linkedin2", new ClassPathResource("static/linkedin@2x.png"));
+			mimeMessageHelper.addInline("instagram2", new ClassPathResource("static/instagram@2x.png"));
+			mimeMessageHelper.addInline("youtube2", new ClassPathResource("static/youtube@2x.png"));
+			emailSender.send(mimeMessage);
+			log.info("Email Successful send to {}", emailDto.getTo());
+		} catch (Exception ex) {
+			log.error("Email send fail to {} error occurred {}", emailDto.getTo(), ex.getLocalizedMessage());
+		}
+	}
+
+}
