@@ -9,7 +9,6 @@ import javax.validation.constraints.Pattern;
 public class ResetOtpCodeDto {
     @NotNull(message = "${appProvider.required}")
     private String appProvider;
-    @NotNull(message = "${phone.required}")
-    @Pattern(regexp = "^[0-9+\\(\\)#\\.\\s\\/ext-]+$", message = "{phone.number}")
-    private String tel;
+    @NotNull(message = "${email.required}")
+    private String email;
 }

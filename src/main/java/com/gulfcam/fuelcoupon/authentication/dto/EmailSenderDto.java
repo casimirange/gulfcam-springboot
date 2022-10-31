@@ -17,7 +17,7 @@ public class EmailSenderDto implements Serializable {
     private String message;
     private String template;
     private String code;
-    private String idGulfcam;
+    private Long internalReference;
     private String completName;
     private String linkConnection;
     private String password;

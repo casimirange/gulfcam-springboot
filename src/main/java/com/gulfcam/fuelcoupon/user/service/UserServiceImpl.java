@@ -3,10 +3,7 @@ package com.gulfcam.fuelcoupon.user.service;
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.user.dto.UserEditPasswordDto;
 import com.gulfcam.fuelcoupon.user.entity.*;
-import com.gulfcam.fuelcoupon.user.repository.IOldPasswordRepo;
-import com.gulfcam.fuelcoupon.user.repository.IRoleUserRepo;
-import com.gulfcam.fuelcoupon.user.repository.IStatusUserRepo;
-import com.gulfcam.fuelcoupon.user.repository.IUserRepo;
+import com.gulfcam.fuelcoupon.user.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +40,9 @@ public class UserServiceImpl implements IUserService {
 	private IOldPasswordRepo oldPasswordRepo;
 
 	@Autowired
+	ITypeAccountRepository typeAccountRepo;
+
+	@Autowired
     PasswordEncoder encoder;
 
 	@Autowired
@@ -54,23 +54,23 @@ public class UserServiceImpl implements IUserService {
 	@Override
 	@Transactional
 	public Map<String, Object> add(Users u) {
-		String password = RandomStringUtils.random(15, 35, 125, true, true, null, new SecureRandom());
-		Users user = new Users(u.getInternalReference(), u.getEmail(), encoder.encode(password));
-		Set<RoleUser> rolesList = u.getRoleNames().stream()
-				.map(roleName -> roleRepo.findByName(roleName)
-						.orElseThrow(() -> new ResourceNotFoundException("Role name " + roleName + " not found")))
-				.collect(Collectors.toSet());
-		user.setRoles(rolesList);
+		Users user = new Users(u.getInternalReference(), u.getEmail(), u.getPassword());
+		Set<RoleUser> roles = new HashSet<>();
+		RoleUser rolesUser = roleRepo.findByName(ERole.ROLE_AGENT).orElseThrow(()-> new ResourceNotFoundException("Role:  "  +  ERole.ROLE_AGENT.name() +  "  not found"));
+		roles.add(rolesUser);
+		user.setRoles(roles);
+		TypeAccount typeAccount = typeAccountRepo.findByName(ETypeAccount.MANAGER_COUPON).orElseThrow(()-> new ResourceNotFoundException("Type de compte:  "  +  ETypeAccount.MANAGER_COUPON.name() +  "  not found"));
+		user.setTypeAccount(typeAccount);
 		StatusUser status = statusRepo.findByName(EStatusUser.USER_ENABLED);
 		user.setStatus(status);
 		user.setTokenAuth(null);
 		user.setCreatedDate(LocalDateTime.now());
-		OldPassword oldPassword = oldPasswordRepo.save(new OldPassword(encoder.encode(password)));
+		OldPassword oldPassword = oldPasswordRepo.save(new OldPassword(u.getPassword()));
 		user.setOldPasswords(Arrays.asList(oldPassword));
 		userRepo.save(user);
 		Map<String, Object> userAndPasswordNotEncoded = new HashMap<>();
 		userAndPasswordNotEncoded.put("user", user);
-		userAndPasswordNotEncoded.put("password", password);
+		userAndPasswordNotEncoded.put("password", u.getPassword());
 		return userAndPasswordNotEncoded;
 	}
 
@@ -153,7 +153,7 @@ public class UserServiceImpl implements IUserService {
 
 	@Override
 	public Optional<Users> getUserByUniqueConstraints(Users u) {
-		Optional<Users> user = userRepo.findByInternalReferenceIgnoreCase(u.getInternalReference());
+		Optional<Users> user = userRepo.findByInternalReference(u.getInternalReference());
 		if(user.isPresent()) {
 			return user;
 		}

@@ -108,6 +108,10 @@ public class Users extends Auditable<String> {
 
 	private boolean phoneverify;
 
+	@Schema(description = "ID du Magasin", example = "Développeur")
+	@Column(name = "id_store")
+	private Long idStore;
+
 	@JsonSerialize(using = LocalDateTimeSerializer.class)
 	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
 	private LocalDateTime dateLastLogin;

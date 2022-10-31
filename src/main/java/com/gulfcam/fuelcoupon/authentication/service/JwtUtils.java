@@ -111,6 +111,11 @@ public class JwtUtils {
 		return null;
 	}
 
+	public Long generateInternalReference() {
+		Long jobetrouveId =  Long.parseLong((100 + new Random().nextInt(900)) + RandomStringUtils.random(4, 35, 125, false, true, null, new SecureRandom()));
+		return jobetrouveId;
+	}
+
 	public String refreshToken(String token) throws Exception {
 		String username = getIdGulfcamFromJwtToken(token, secretRefreshToken);
 		if (username.isEmpty()) {

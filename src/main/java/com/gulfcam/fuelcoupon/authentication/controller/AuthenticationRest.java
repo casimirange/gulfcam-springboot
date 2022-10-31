@@ -27,6 +27,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,11 +43,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -73,6 +76,9 @@ public class AuthenticationRest {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    PasswordEncoder encoder;
 
     @Autowired
     IUtilitieService utilitieService;
@@ -217,7 +223,7 @@ public class AuthenticationRest {
 
 
     @Operation(summary = "Inscription sur l'application", tags = "users", responses = {
-            @ApiResponse(responseCode = "201", description = "User crée avec succès", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = UserResDto.class)))),
+            @ApiResponse(responseCode = "201", description = "Utilisateur crée avec succès", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = UserResDto.class)))),
             @ApiResponse(responseCode = "400", description = "Erreur: Ce nom d'utilisateur est déjà utilisé/Erreur: Cet email est déjà utilisé", content = @Content(mediaType = "Application/Json")),})
     @PostMapping("/sign-up")
     public ResponseEntity<Object> add(@Valid @RequestBody UserReqDto userAddDto, HttpServletRequest request) {
@@ -235,26 +241,42 @@ public class AuthenticationRest {
         }
         Users u = modelMapper.map(userAddDto, Users.class);
         u.setUsing2FA(true);
-        u.setFirstName(userAddDto.get());
+        u.setFirstName(userAddDto.getFirstName());
         u.setLastName(userAddDto.getLastName());
+        u.setInternalReference(jwtUtils.generateInternalReference());
+        u.setPosition(userAddDto.getPosition());
+        u.setPassword(encoder.encode(userAddDto.getPassword()));
+        u.setIdStore(userAddDto.getIdStore());
         u.setCreatedDate(LocalDateTime.now());
         String token = "";
         Users user = new Users();
+        Map<String, Object> userAndPasswordNotEncoded = new HashMap<>();
 
-        user = userService.save(u);
+        userAndPasswordNotEncoded = userService.add(u);
+        UserResDto userResDto = modelMapper.map(u, UserResDto.class);
+        if (user.getEmail() != null) {
 
-        token = tokenProvider.createTokenRefresh(user, true);
-        userService.updateAuthToken(user.getUserId(), token);
-        EmailVerificationDto emailVerificationDto = new EmailVerificationDto();
-        emailVerificationDto.setCode(urlConfirmAccount + token);
-        emailVerificationDto.setTo(user.getEmail());
-        emailVerificationDto.setObject(ApplicationConstant.SUBJECT_EMAIL_VERIF);
-        emailVerificationDto.setTemplate(ApplicationConstant.TEMPLATE_EMAIL_VERIF);
-        jmsTemplate.convertAndSend(ApplicationConstant.PRODUCER_EMAIL_VERIFICATION,emailVerificationDto);
+            String code = String.valueOf(jwtUtils.generateOtpCode());
+            Users userUpdate = updateExistingUser(user.getEmail(), code);
+            String telephone = userUpdate.getTelephone() != null ? userUpdate.getTelephone() : String.valueOf(userUpdate.getTelephone());
+            String email = userUpdate.getEmail() != null ? userUpdate.getEmail() : String.valueOf(userUpdate.getEmail());
+            String bearerToken = jwtUtils.generateJwtToken(user.getEmail(),
+                    jwtUtils.getExpirationBearerToken(), jwtUtils.getSecretBearerToken(), false);
 
-        // sendingMailService.sendVerificationMail(user.getEmail(), ApplicationConstant.getSiteURL(request) + "/api/v1.0/auth/user/confirm-account?code=" + token);
-        UserResDto userResDto = modelMapper.map(user, UserResDto.class);
+            Map<String, Object> emailProps = new HashMap<>();
+            emailProps.put("code", code);
+            emailProps.put("telephone", telephone);
+            emailProps.put("email", email);
 
+            List<SettingProperties> settingProperties = utilitieService.findSettingPropByKey(ESettingPropertie.SUBSCRIPTION.name());
+            String replytolist = settingProperties.stream().map(s -> s.getValue()).collect(Collectors.joining(","));
+            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, email, replytolist, emailProps, ApplicationConstant.SUBJECT_EMAIL_OPT, ApplicationConstant.TEMPLATE_EMAIL_ENTREPRISE_MEMBRE));
+            log.info("Email  send successfull for user: " + email);
+            log.info("Code OTP : " + code);
+
+            return ResponseEntity.ok().body(new SignUpResponse(true, messageSource.getMessage("messages.code-otp", null, LocaleContextHolder.getLocale()), bearerToken, false));
+
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(userResDto);
     }
 
@@ -293,7 +315,7 @@ public class AuthenticationRest {
             @ApiResponse(responseCode = "400", description = "BAD REQUEST", content = @Content(mediaType = "Application/Json"))})
     @PostMapping("/resetOtpCode")
     public ResponseEntity<?> resetCodeConfirmAccount(@Valid @RequestBody ResetOtpCodeDto resetOtpCodeDto) {
-        Optional<Users> users = userService.getByTelephone(resetOtpCodeDto.getTel());
+        Optional<Users> users = userService.getByEmail(resetOtpCodeDto.getEmail());
         if (users.get().getStatus().getName().equals(EStatusUser.USER_ENABLED)) {
             return ResponseEntity.ok().body(new MessageResponseDto(HttpStatus.OK, " your account has already been activated !"));
         }

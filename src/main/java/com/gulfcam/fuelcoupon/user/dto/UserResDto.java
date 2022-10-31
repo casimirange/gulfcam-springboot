@@ -22,8 +22,14 @@ public class UserResDto{
 	private int pinCode;
 
 	private String email;
-	
+
 	private String telephone;
+
+	private String lastName;
+
+	private String firstName;
+
+	private String position;
 
 	private List<RoleUser> roles;
 

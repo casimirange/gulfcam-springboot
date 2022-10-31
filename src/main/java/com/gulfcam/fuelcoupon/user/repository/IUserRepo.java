@@ -13,7 +13,7 @@ import java.util.Optional;
 
 public interface IUserRepo extends IUserBaseRepo<Users> {
 	
-	Optional<Users> findByInternalReferenceIgnoreCase(Long internalReference);
+	Optional<Users> findByInternalReference(Long internalReference);
 
 	Optional<Users> findByPinCode(int pinCode);
 
