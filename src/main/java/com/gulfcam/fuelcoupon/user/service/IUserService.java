@@ -14,19 +14,19 @@ public interface IUserService {
 	
 	boolean existsByEmail(String email, Long id);
 	
-	boolean existsByIdGulfcam(String idGulfcam, Long id);
+	boolean existsByInternalReference(Long internalReference, Long id);
 	
 	Users getById(Long id);
 	
 	Optional<Users> getByTel(String tel);
-	
+
 	Optional<Users> getByEmail(String email);
+
+	Optional<Users> getByPinCode(int pinCode);
 	
 	Users editToken(Long id, String token);
 	
 	Users editEmail(Long id, String email);
-
-	Users editCountry(Long id,String country_code);
 
 	
 	Users editStatus(Long id, Long statusID);
@@ -42,10 +42,6 @@ public interface IUserService {
 	Users updateAuthToken(Long id, String token);
 
 	Users updateOtpCode(Long id, String code);
-
-   Users  addCarriere(List<String> carriere, Long user_id);
-
-   Users  addCarriereImport(List<Long> carriere, Long user_id);
 
 	Users editUser(Long userId, Users u);
 
@@ -70,10 +66,6 @@ public interface IUserService {
 	void updateDateLastLoginUser(Long id_user);
 
 	void updateFistLogin(Long user_id);
-
-	Users updateImageUrl(Long id_user, String imageUrl);
-
-   void checkIfUserSignContract(Long users_id);
 
 	Users lockAndUnlockUsers(Long id_user, boolean status);
 }

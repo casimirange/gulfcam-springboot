@@ -20,8 +20,6 @@ public class SupportDtoJms implements Serializable {
 
     private String completName;
 
-    private String jobetrouveId;
-
     private MultipartFile[] files;
 
     private String template;

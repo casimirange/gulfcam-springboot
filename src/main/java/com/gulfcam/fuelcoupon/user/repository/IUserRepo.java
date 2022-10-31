@@ -13,36 +13,25 @@ import java.util.Optional;
 
 public interface IUserRepo extends IUserBaseRepo<Users> {
 	
-	Optional<Users> findByIdJobEtrouveIgnoreCase(String idJobEtrouve);
-	
-	Optional<Users> findByIdJobEtrouve(String idJobEtrouve);
+	Optional<Users> findByInternalReferenceIgnoreCase(Long internalReference);
+
+	Optional<Users> findByPinCode(int pinCode);
 
 	Optional<Users> findByEmail(String email);
 	
-	Optional<Users> findByTel1(String tel);
-	
-	Optional<Users> findByTel2(String tel2);
-
-	boolean existsByIdJobEtrouve(String idJobEtrouve);
+	Optional<Users> findByTelephone(String tel);
 
 	boolean existsByEmail(String email);
 
+	boolean existsByInternalReference(Long internalReference);
+
 	Page<Users> findDistinctByRolesIn(List<RoleUser> rolesManagers, Pageable p);
-
-
-
-
-	Page<Users> findDistinctByRolesNotIn(List<RoleUser> rolesManagers, Pageable p);
 
 	Optional<Users> findByOtpCode(String code);
 
 	Optional<Users> findByTokenAuth(String code);
 
 	Page<Users> findTop20ByStatus(StatusUser status, Pageable p);
-
-
-	List<Users> findByDateLastLoginIsAfterOrderByDateLastLoginDesc(LocalDateTime localDateTime);
-
 
 
 }

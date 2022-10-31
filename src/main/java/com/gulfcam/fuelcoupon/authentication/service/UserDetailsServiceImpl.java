@@ -21,7 +21,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	@Override
 	@Transactional
 	public UserDetails loadUserByUsername(String username) {
-		Users user = userRepo.findByIdJobEtrouveIgnoreCase(username)
+		Users user = userRepo.findByEmail(username)
 				.orElseThrow(() -> new UsernameNotFoundException("l'utilisateur " + username + " n'a pas été trouvé"));
 		return UserDetailsImpl.build(user);
 	}

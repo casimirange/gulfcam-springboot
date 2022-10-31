@@ -9,11 +9,9 @@ import com.gulfcam.fuelcoupon.user.dto.UserEditPasswordDto;
 import com.gulfcam.fuelcoupon.user.dto.UserResDto;
 import com.gulfcam.fuelcoupon.user.dto.UserResetPassword;
 import com.gulfcam.fuelcoupon.user.entity.EStatusUser;
-import com.gulfcam.fuelcoupon.user.entity.Mode;
 import com.gulfcam.fuelcoupon.user.entity.OldPassword;
 import com.gulfcam.fuelcoupon.user.entity.Users;
 import com.gulfcam.fuelcoupon.user.repository.IUserRepo;
-import com.gulfcam.fuelcoupon.user.service.IModeService;
 import com.gulfcam.fuelcoupon.user.service.IUserService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -46,13 +44,12 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@OpenAPIDefinition(info = @Info(title = "API JOBETROUVE V2.0", description = "Documentation de l'API", version = "1.0"))
+@OpenAPIDefinition(info = @Info(title = "API GULFCAM V1.0", description = "Documentation de l'API", version = "1.0"))
 @RestController
 @Tag(name = "authentification")
 @RequestMapping("/api/v1.0/auth")
@@ -77,9 +74,6 @@ public class AuthenticationRest {
     @Autowired
     IAuthorizationService authorizationService;
 
-    @Autowired
-    IModeService modeService;
-
 
     @Autowired
     private ResourceBundleMessageSource messageSource;
@@ -88,15 +82,10 @@ public class AuthenticationRest {
     String urlResetPasswordPage;
     @Value("${app.api-confirm-account-url}")
     String urlConfirmAccount;
-    @Value("${app.link-redirect-to-payment}")
-    String urlPayementRedirect;
     @Value("${app.front-singIn}")
     String signInUrl;
     @Value("${app.api-confirm-code-url}")
     String urlConfirmCode;
-
-    @Value("${app.front.base-url}")
-    private String baseUrlFront;
 
 
     @Parameters(@Parameter(name = "tel", required = true))
@@ -160,7 +149,6 @@ public class AuthenticationRest {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(messageSource.getMessage("messages.code_expired", null, LocaleContextHolder.getLocale()));
         }
-        Mode mode = modeService.findById(1L);
         newUrl = "";
         return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).header(HttpHeaders.LOCATION, newUrl).build();
     }
@@ -176,16 +164,18 @@ public class AuthenticationRest {
         if (userAuthDto.getLogin().contains("@")) {
             Optional<Users> user2 = userService.getByEmail(userAuthDto.getLogin());
             if (user2.isPresent()) {
-                user = new Users(user2.get().getIdGulfcam(), userAuthDto.getPassword());
+                user = new Users(user2.get().getEmail(), userAuthDto.getPassword());
             }
+        }else{
+
         }
 
         Optional<Users> user2 = userService.getByTel(userAuthDto.getLogin());
         if (user2.isPresent()) {
-            user = new Users(user2.get().getIdGulfcam(), userAuthDto.getPassword());
+            user = new Users(user2.get().getEmail(), userAuthDto.getPassword());
         }
         Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(user.getIdGulfcam(), user.getPassword()));
+                .authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
         if (userPrincipal.getStatus().getName() == EStatusUser.USER_ENABLED) {
@@ -247,17 +237,17 @@ public class AuthenticationRest {
         Users users = authorizationService.getUserInContextApp();
         log.info("user_otp_code" + users.getOtpCode() + "otpCodeCreatedAt:" + users.getOtpCodeCreatedAT());
         if (code.equals(users.getOtpCode()) && ChronoUnit.MINUTES.between(users.getOtpCodeCreatedAT(), LocalDateTime.now()) < 5) {
-            String bearerToken = jwtUtils.generateJwtToken(users.getIdGulfcam(),
+            String bearerToken = jwtUtils.generateJwtToken(users.getEmail(),
                     jwtUtils.getExpirationBearerToken(), jwtUtils.getSecretBearerToken(), true);
-            String refreshToken = jwtUtils.generateJwtToken(users.getIdGulfcam(),
+            String refreshToken = jwtUtils.generateJwtToken(users.getEmail(),
                     jwtUtils.getExpirationRefreshToken(), jwtUtils.getSecretRefreshToken(), true);
             userService.editToken(users.getUserId(), refreshToken);
             List<String> roles = users.getRoles().stream().map(item -> item.getName().name())
                     .collect(Collectors.toList());
-            updateExistingUser(users.getIdGulfcam(), null);
+            updateExistingUser(users.getEmail(), null);
             userService.updateDateLastLoginUser(users.getUserId());
             userService.updateFistLogin(users.getUserId());
-            log.info("user " + users.getIdGulfcam() + " authenticated");
+            log.info("user " + users.getOtpCode() + " authenticated");
             return ResponseEntity.ok(new AuthSignInResDto(bearerToken, refreshToken, "Bearer", roles, true));
 
         } else {
@@ -277,7 +267,7 @@ public class AuthenticationRest {
             return ResponseEntity.ok().body(new MessageResponseDto(HttpStatus.OK, " your account has already been activated !"));
         }
         String code = String.valueOf(jwtUtils.generateOtpCode());
-        Users userUpdate = updateExistingUser(users.get().getIdGulfcam(), code);
+        Users userUpdate = updateExistingUser(users.get().getEmail(), code);
         String tel1 = userUpdate.getTelephone() != null ? userUpdate.getTelephone() : String.valueOf(userUpdate.getTelephone());
         OtpCodeDto otpCodeDto = new OtpCodeDto();
         otpCodeDto.setCode(code);
@@ -322,7 +312,7 @@ public class AuthenticationRest {
             EmailResetPasswordDto emailVerificationDto = new EmailResetPasswordDto();
             emailVerificationDto.setCode(urlConfirmCode + user.getTokenAuth());
             emailVerificationDto.setTo(user.getEmail());
-            emailVerificationDto.setUsername(user.getIdGulfcam());
+            emailVerificationDto.setUsername(user.getEmail());
             emailVerificationDto.setObject(ApplicationConstant.SUBJECT_PASSWORD_RESET);
             emailVerificationDto.setTemplate(ApplicationConstant.TEMPLATE_PASSWORD_RESET);
 //            jmsTemplate.convertAndSend(ApplicationConstant.PRODUCER_EMAIL_RESET_PASSWORD, emailVerificationDto);
@@ -444,7 +434,7 @@ public class AuthenticationRest {
     }
 
     private Users getUser(String token, String secret) {
-        String email = jwtUtils.getIdJobEtrouveFromJwtToken(token, secret);
+        String email = jwtUtils.getIdGulfcamFromJwtToken(token, secret);
         return userService.getByEmail(email).get();
     }
 

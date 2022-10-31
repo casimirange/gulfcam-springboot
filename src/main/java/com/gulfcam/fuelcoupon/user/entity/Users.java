@@ -38,10 +38,10 @@ public class Users extends Auditable<String> {
 	@Setter(AccessLevel.NONE)
 	private Long userId;
 
-	@Schema(description = "nom d'utilisateur", example = "Arnold")
+	@Schema(description = "Reférence interne", example = "0987698")
 	@NotNull
 	@Column(unique = true)
-	private String idGulfcam;
+	private Long internalReference;
 
 	@Column(unique = true,nullable = false)
 	@Email
@@ -52,8 +52,13 @@ public class Users extends Auditable<String> {
 	@JsonIgnore
 	private String password;
 
+	@Schema(description = "Téléphone de l'utilisateur", example = "690362808?")
 	@Column(nullable = true, unique = true)
 	private String telephone;
+
+	@Schema(description = "Code pin de l'utilisateur", example = "0000?")
+	@Column(nullable = true, unique = true, name = "pin_code")
+	private int pinCode;
 
 	@Column(name = "USING_2FA")
 	private boolean using2FA ;
@@ -85,6 +90,16 @@ public class Users extends Auditable<String> {
 
 	private String otpCode;
 
+	@Column(name = "first_name")
+	private String firstName;
+
+	@Column(name = "last_name")
+	private String lastName;
+
+	@Schema(description = "Poste occupé par l'utilisateur", example = "Développeur")
+	@Column(name = "position")
+	private String position;
+
 	@JsonSerialize(using = LocalDateTimeSerializer.class)
 	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
 	private LocalDateTime otpCodeCreatedAT;
@@ -97,29 +112,33 @@ public class Users extends Auditable<String> {
 	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
 	private LocalDateTime dateLastLogin;
 
-	private String imageUrl;
-
 	private boolean isFirstConnection;
 
    private LocalDate createdDate;
 
 	private boolean isDelete = false;
-	public Users(String idGulfcam, String email, String password) {
-		this.idGulfcam = idGulfcam;
+	public Users(Long internalReference, String email, String password) {
+		this.internalReference = internalReference;
 		this.email = email;
 		this.password = password;
 	}
 	
-	public Users(String idGulfcam, String email, String telephone, String password) {
-		this.idGulfcam = idGulfcam;
+	public Users(Long internalReference, String email, String telephone, String password) {
+		this.internalReference = internalReference;
 		this.email = email;
 		this.password = password;
 		this.telephone = telephone;
 	}
 
-	public Users(String idGulfcam, String password) {
+	public Users(String email, String password) {
 		super();
-		this.idGulfcam = idGulfcam;
+		this.email = email;
+		this.password = password;
+	}
+
+	public Users(int pinCode, String password) {
+		super();
+		this.pinCode = pinCode;
 		this.password = password;
 	}
 }

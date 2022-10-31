@@ -74,22 +74,8 @@ public class JwtUtils {
 	public String geerateIdTransaction() {
 				return "IMEM" +"-"+ LocalDate.now().toString().replace("-","")  +"-"+ RandomStringUtils.random(4, 35, 125, true, true, null, new SecureRandom()) +"-"+ (100 + new Random().nextInt(900)) +"-"+ RandomStringUtils.random(4, 35, 125, true, true, null, new SecureRandom());
 	}
-
-	public String gerateReferenceOfferJob(String idjobetrouveOrganization,String offerTitle) {
-		String offerConcat = offerTitle.replaceAll("[^A-Za-z0-9]","").substring(0,3).toUpperCase();
-				return "JOB" +"-"+ LocalDate.now().getYear()+"-"+LocalDate.now().getMonthValue()+LocalDate.now().getDayOfMonth()+"-"+ idjobetrouveOrganization+"-"+offerConcat+"-"+ RandomStringUtils.random(5, 35, 125, true, true, null, new SecureRandom()) ;
-	}
-
-	public String generateIdJobEtrouve(String code_country) {
-      String jobetrouveId =  code_country +"-" + (100 + new Random().nextInt(900)) +"-"+ RandomStringUtils.random(4, 35, 125, true, true, null, new SecureRandom());
-		return    jobetrouveId.toUpperCase();
-	}
-	public String generateIdJobEtrouveEntreprise(String code_country,String orgname) {
-		String orgConcat = orgname.replaceAll("[^A-Za-z0-9]","").substring(0,3);
-      return    orgConcat.toUpperCase() +"-"+  code_country +"-" + (100 + new Random().nextInt(900)) +"-"+ RandomStringUtils.random(4, 35, 125, true, true, null, new SecureRandom());
-	}
 	
-	public String getIdJobEtrouveFromJwtToken(String token, String secret) {
+	public String getIdGulfcamFromJwtToken(String token, String secret) {
 		return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getSubject();
 	}
 
@@ -109,15 +95,6 @@ public class JwtUtils {
 		return claims.get(AUTHENTICATED, Boolean.class);
 	}
 
-	public Long getIdJobEtrouveFromToken(String token) {
-		Claims claims = Jwts.parser()
-				.setSigningKey(secretRefreshToken)
-				.parseClaimsJws(token)
-				.getBody();
-
-		return Long.parseLong(claims.getSubject());
-	}
-
 	public String parseJwt(HttpServletRequest request) {
 		String prefixAndToken = request.getHeader(header);
 		if (prefixAndToken != null) {
@@ -135,7 +112,7 @@ public class JwtUtils {
 	}
 
 	public String refreshToken(String token) throws Exception {
-		String username = getIdJobEtrouveFromJwtToken(token, secretRefreshToken);
+		String username = getIdGulfcamFromJwtToken(token, secretRefreshToken);
 		if (username.isEmpty()) {
 			throw new AuthorizationServiceException("Invalid token claims");
 		}

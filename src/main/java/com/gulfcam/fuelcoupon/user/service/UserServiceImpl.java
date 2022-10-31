@@ -19,8 +19,6 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.validation.Valid;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -53,22 +51,11 @@ public class UserServiceImpl implements IUserService {
 	@Autowired
 	private ResourceBundleMessageSource messageSource;
 
-//	@Override
-//	public Optional<Users> getByIdJobEtrouve(String username) {
-//		Optional<Users> users = userRepo.findByIdJobEtrouve(username);
-//		if(users.isPresent()) {
-//			if(users.get().getClass().equals(Particular.class)) {
-//				checkIfUserSignContract(users.get().getUserId());
-//			}
-//		}
-//		return userRepo.findByIdJobEtrouve(username);
-//	}
-	
 	@Override
 	@Transactional
 	public Map<String, Object> add(Users u) {
 		String password = RandomStringUtils.random(15, 35, 125, true, true, null, new SecureRandom());
-		Users user = new Users(u.getIdGulfcam(), u.getEmail(), encoder.encode(password));
+		Users user = new Users(u.getInternalReference(), u.getEmail(), encoder.encode(password));
 		Set<RoleUser> rolesList = u.getRoleNames().stream()
 				.map(roleName -> roleRepo.findByName(roleName)
 						.orElseThrow(() -> new ResourceNotFoundException("Role name " + roleName + " not found")))
@@ -101,11 +88,13 @@ public class UserServiceImpl implements IUserService {
 	}
 
 	@Override
+	public Optional<Users> getByPinCode(int code) {
+		return userRepo.findByPinCode(code);
+	}
+
+	@Override
 	public Optional<Users> getByTel(String tel) {
-		Optional<Users> user = userRepo.findByTel1(tel);
-		if (user.isEmpty()) {
-			return userRepo.findByTel2(tel);
-		}
+		Optional<Users> user = userRepo.findByTelephone(tel);
 		return user;
 	}
 
@@ -163,13 +152,8 @@ public class UserServiceImpl implements IUserService {
 	}
 
 	@Override
-	public Users editCountry(Long id, String country_code) {
-		return null;
-	}
-
-	@Override
 	public Optional<Users> getUserByUniqueConstraints(Users u) {
-		Optional<Users> user = userRepo.findByIdJobEtrouveIgnoreCase(u.getIdGulfcam());
+		Optional<Users> user = userRepo.findByInternalReferenceIgnoreCase(u.getInternalReference());
 		if(user.isPresent()) {
 			return user;
 		}
@@ -180,7 +164,7 @@ public class UserServiceImpl implements IUserService {
 			}
 		}
 		if(u.getTelephone() != null) {
-			user = userRepo.findByTel1("+" + u.getTelephone());
+			user = userRepo.findByTelephone("+" + u.getTelephone());
 			if(user.isPresent()) {
 				return user;
 			}
@@ -197,9 +181,8 @@ public class UserServiceImpl implements IUserService {
 	}
 
 	@Override
-	public boolean existsByIdGulfcam(String username, Long id) {
-		Optional<Users> user = userRepo.findByIdJobEtrouveIgnoreCase(username);
-		return checkOwnerIdentity(id, user);
+	public boolean existsByInternalReference(Long internalReference, Long id) {
+		return userRepo.existsByInternalReference(internalReference);
 	}
 
 	@Override
@@ -207,10 +190,7 @@ public class UserServiceImpl implements IUserService {
 		if (tel == null || tel.isEmpty()) {
 			return false;
 		}
-		Optional<Users> user = userRepo.findByTel1(tel);
-		if (user.isEmpty()) {
-			user = userRepo.findByTel2(tel);
-		}
+		Optional<Users> user = userRepo.findByTelephone(tel);
 		return checkOwnerIdentity(id, user);
 	}
 
@@ -221,7 +201,7 @@ public class UserServiceImpl implements IUserService {
 		if (login.contains("@")) {
 			user = userRepo.findByEmail(login).orElseThrow(() -> new ResourceNotFoundException(
 					messageSource.getMessage("messages.user_not_found", null, LocaleContextHolder.getLocale())));
-			String token = jwtUtils.generateJwtToken(user.getIdGulfcam(), jwtUtils.getExpirationEmailResetPassword(),
+			String token = jwtUtils.generateJwtToken(user.getEmail(), jwtUtils.getExpirationEmailResetPassword(),
 					jwtUtils.getSecretBearerToken(),true);
 			user.setTokenAuth(token);
 		} else {
@@ -323,7 +303,7 @@ public class UserServiceImpl implements IUserService {
 
 		} else {
 			user = userRepo.findByEmail(login);
-			String token = jwtUtils.generateJwtToken(user.get().getIdGulfcam(), jwtUtils.getExpirationEmailVerifToken(),
+			String token = jwtUtils.generateJwtToken(user.get().getEmail(), jwtUtils.getExpirationEmailVerifToken(),
 					jwtUtils.getSecretBearerToken(),true);
 			user.get().setTokenAuth(token);
 		}
@@ -353,18 +333,6 @@ public class UserServiceImpl implements IUserService {
 		 userRepo.save(u);
 	}
 
-	@Override
-	public Users updateImageUrl(Long id_user, String imageUrl) {
-		Users u = getById(id_user);
-		u.setImageUrl(imageUrl);
-		return userRepo.save(u);
-	}
-
-	@Override
-	public void checkIfUserSignContract(Long users_id) {
-
-	}
-
 
 	@Override
 	public Users updateAuthToken(Long id, String token) {
@@ -386,17 +354,6 @@ public class UserServiceImpl implements IUserService {
 		users.get().setOtpCodeCreatedAT(LocalDateTime.now());
 		return userRepo.save(users.get());
 	}
-
-	@Override
-	public Users addCarriere(List<String> carriere, Long user_id) {
-		return null;
-	}
-
-	@Override
-	public Users addCarriereImport(List<Long> carriere, Long user_id) {
-		return null;
-	}
-
 	@Override
 	public void updateFistLogin(Long user_id) {
 		Users u = userRepo.getById(user_id);

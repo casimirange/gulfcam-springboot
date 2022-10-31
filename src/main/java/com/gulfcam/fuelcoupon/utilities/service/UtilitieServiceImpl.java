@@ -1,7 +1,5 @@
 package com.gulfcam.fuelcoupon.utilities.service;
 
-import com.gulfcam.fuelcoupon.user.entity.DocumentCategorie;
-import com.gulfcam.fuelcoupon.user.repository.IDocumentCategorieRepo;
 import com.gulfcam.fuelcoupon.utilities.entity.SettingProperties;
 import com.gulfcam.fuelcoupon.utilities.repository.ISettingPropertieRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +14,6 @@ public class UtilitieServiceImpl implements IUtilitieService{
 
     @Autowired
     ISettingPropertieRepo settingPropertieRepo;
-
-    @Autowired
-    IDocumentCategorieRepo documentCategorieRepo;
 
     @Override
     public SettingProperties createSetting(SettingProperties settingProperties) {
@@ -52,11 +47,5 @@ public class UtilitieServiceImpl implements IUtilitieService{
            SettingProperties settingProperties = getOneSetting(settingId);
            settingPropertieRepo.delete(settingProperties);
     }
-
-    @Override
-    public List<DocumentCategorie> getAllDocumentCategorie() {
-        return documentCategorieRepo.findAll();
-    }
-
 
 }

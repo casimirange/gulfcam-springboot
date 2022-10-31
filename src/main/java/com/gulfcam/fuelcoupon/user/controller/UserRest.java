@@ -28,54 +28,6 @@ public class UserRest {
 	@Autowired
 	private ResourceBundleMessageSource messageSource;
 
-	@Value("${api.base-url}")
-	private String apiBaseUrl;
-
-	/*
-        @Autowired
-        private IEntrepriseService entrepriseService;
-
-        @Autowired
-        private IActivityCategoryRepository activityCatRepo;
-
-        @Autowired
-        private IEmailPublisher emailPublisher;
-
-        @Autowired
-        private IVueProfileRepo vueProfilRepo;
-
-        @Autowired
-        private INotificationService notificationService;
-
-        @Autowired
-        private IPermissionRepo permissionRepo;
-
-        @Hidden
-        @Operation(summary = "Création de compte des gestionnaires/admin", tags = "users", responses = {
-                @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = UserResDto.class)))),
-                @ApiResponse(responseCode = "400", description = "Erreur: Ce nom d'utilisateur est déjà utilisé/Erreur: Cet email est déjà utilisé", content = @Content(mediaType = "Application/Json")), })
-        @PreAuthorize("hasRole('ADMIN')")
-        @PostMapping
-        public ResponseEntity<Object> add(@Valid @RequestBody AddUserDto addUserDto, HttpServletRequest request) {
-            if (userService.existsByEmail(addUserDto.getEmail(), null)) {
-                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
-                        messageSource.getMessage("messages.email_exists", null, LocaleContextHolder.getLocale())));
-            }
-            if (userService.existsByUsername(addUserDto.getUsername(), null)) {
-                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
-                        messageSource.getMessage("messages.username_exists", null, LocaleContextHolder.getLocale())));
-            }
-            User u = modelMapper.map(addUserDto, User.class);
-            Map<String, Object> userAndPasswordNotEncoded = userService.add(u);
-            User user = (User) userAndPasswordNotEncoded.get("user");
-            userAndPasswordNotEncoded.put("username", user.getUsername());
-            emailPublisher.sendEmail(new EmailDto(user.getEmail(), userAndPasswordNotEncoded, "Infos Account",
-                    ApplicationConstant.TEMPLATE_INFOS_ACCOUNT));
-            UserResDto userResDto = modelMapper.map(user, UserResDto.class);
-            return ResponseEntity.status(HttpStatus.CREATED).body(userResDto);
-        }
- */
-
 	@Operation(summary = "Recupérer un utilisateur général  à partir de son id", tags = "users", responses = {
 			@ApiResponse(responseCode = "404", description = "L'utilisateur n'existe pas dans la BD", content = @Content(mediaType = "Application/Json")),
 			@ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),

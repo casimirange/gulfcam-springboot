@@ -62,12 +62,12 @@ public class CustomLocaleResolver extends AcceptHeaderLocaleResolver implements 
     }
 
     /**  configuration des messages de validation d'api dans les fichiers de propriétés.  **/
-    @Bean
-    public LocalValidatorFactoryBean getValidator() {
-        LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
-        bean.setValidationMessageSource(messageSource());
-        return bean;
-    }
+//    @Bean
+//    public LocalValidatorFactoryBean getValidator() {
+//        LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
+//        bean.setValidationMessageSource(messageSource());
+//        return bean;
+//    }
 
     @Bean
     public MessageSource messageSource() {

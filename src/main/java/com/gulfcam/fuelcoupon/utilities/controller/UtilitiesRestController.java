@@ -1,9 +1,6 @@
 package com.gulfcam.fuelcoupon.utilities.controller;
 
 import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
-import com.gulfcam.fuelcoupon.user.entity.DocumentCategorie;
-import com.gulfcam.fuelcoupon.user.repository.IDocumentCategorieRepo;
-import com.gulfcam.fuelcoupon.user.service.IDocumentService;
 import com.gulfcam.fuelcoupon.user.service.IEmailService;
 import com.gulfcam.fuelcoupon.utilities.dto.*;
 import com.gulfcam.fuelcoupon.utilities.entity.SettingProperties;
@@ -21,7 +18,6 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -44,12 +40,6 @@ public class UtilitiesRestController {
     private ResourceBundleMessageSource messageSource;
 
     @Autowired
-    IDocumentService documentService;
-
-    @Autowired
-    IDocumentCategorieRepo documentCategorieRepo;
-
-    @Autowired
     IEmailService emailService;
 
     @Operation(summary = "Liste complet de tous les niveaux d'expérience", tags = "utilities", responses = {
@@ -61,21 +51,6 @@ public class UtilitiesRestController {
         BonjourMessage message = new BonjourMessage();
         message.setMessage("Bonjour!!");
         return ResponseEntity.ok(message);
-    }
-
-    @Operation(summary = "Création d'une Catégorie de document", tags = "utilities", responses = {
-            @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = AddDocumentCategorieDto.class)))),
-            @ApiResponse(responseCode = "400", description = "Erreur: bad request", content = @Content(mediaType = "Application/Json")),})
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/documentCategorie")
-    public ResponseEntity<Object> addDocumentCat(@RequestBody AddDocumentCategorieDto documentCategorieDto) {
-        if (documentCategorieRepo.findByNameFrIgnoreCaseAndNameEnIgnoreCaseAndNameEsIgnoreCase(documentCategorieDto.getNameFr(), documentCategorieDto.getNameEn(), documentCategorieDto.getNameEs()) != null) {
-            return ResponseEntity.badRequest()
-                    .body(new MessageResponseDto(HttpStatus.BAD_REQUEST, "This name already use"));
-        }
-        DocumentCategorie c = modelMapper.map(documentCategorieDto, DocumentCategorie.class);
-        DocumentCategorie doc = documentCategorieRepo.save(c);
-        return ResponseEntity.status(HttpStatus.CREATED).body(doc);
     }
 
     @Operation(summary = "Création d'un parametre système", tags = "utilities", responses = {
@@ -123,14 +98,5 @@ public class UtilitiesRestController {
                 messageSource.getMessage("request_successful-delete", null, LocaleContextHolder.getLocale())));
     }
 
-    @Operation(summary = "Liste de tous les catégories de document", tags = "utilities", responses = {
-            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json")),
-            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
-            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
-    @GetMapping("/documentCategorie")
-    public ResponseEntity<?> getAllDocumentCategorie() {
-        List<DocumentCategorie> documentCategorieList = documentService.listcategorieDoc();
-        return ResponseEntity.ok(new DocumentCategorieResp(documentCategorieList));
-    }
 
 }

@@ -1,6 +1,5 @@
 package com.gulfcam.fuelcoupon.utilities.service;
 
-import com.gulfcam.fuelcoupon.user.entity.DocumentCategorie;
 import com.gulfcam.fuelcoupon.utilities.entity.SettingProperties;
 
 import java.util.List;
@@ -16,7 +15,5 @@ public interface IUtilitieService {
     void deleteSettingProperties(Long settingId);
 
     List<SettingProperties> findSettingPropByKey(String key);
-
-    List<DocumentCategorie> getAllDocumentCategorie();
 
 }

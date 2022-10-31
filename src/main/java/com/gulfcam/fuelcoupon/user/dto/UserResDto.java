@@ -17,7 +17,7 @@ public class UserResDto{
 	
 	private Long userId;
 	
-	private String idJobEtrouve;
+	private String idGulfcam;
 
 	private String email;
 	
