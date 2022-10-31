@@ -7,9 +7,4 @@ public interface IEmailService {
 
 	void sendEmail(EmailDto emailDto);
 
-
-	void sendEmailToEmployer(EmailDto emailDto);
-
-	void sendEmailTestLaguage(EmailDto emailDto);
-
 }

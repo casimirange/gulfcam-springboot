@@ -16,15 +16,5 @@ public class UserReqDtoImport {
     @NotNull(message = "email.required")
     private String email;
     @NotNull(message = "{phone.required}")
-    private String tel1;
-
-    private String tel2;
-
-    private String question;
-    @NotNull(message = "{postalCode.required}")
-    private String postalCode;
-    @NotNull(message = "{postalcode3.required}")
-    private String countryCode3;
-    @NotNull(message = "{career.required}")
-    private List<Long> Idcareer = new ArrayList<>();
+    private String telephone;
 }

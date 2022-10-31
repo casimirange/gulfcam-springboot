@@ -64,7 +64,7 @@ public class UserServiceImpl implements IUserService {
 		StatusUser status = statusRepo.findByName(EStatusUser.USER_ENABLED);
 		user.setStatus(status);
 		user.setTokenAuth(null);
-		user.setCreatedDate(LocalDate.now());
+		user.setCreatedDate(LocalDateTime.now());
 		OldPassword oldPassword = oldPasswordRepo.save(new OldPassword(encoder.encode(password)));
 		user.setOldPasswords(Arrays.asList(oldPassword));
 		userRepo.save(user);
@@ -93,7 +93,7 @@ public class UserServiceImpl implements IUserService {
 	}
 
 	@Override
-	public Optional<Users> getByTel(String tel) {
+	public Optional<Users> getByTelephone(String tel) {
 		Optional<Users> user = userRepo.findByTelephone(tel);
 		return user;
 	}
@@ -185,8 +185,14 @@ public class UserServiceImpl implements IUserService {
 		return userRepo.existsByInternalReference(internalReference);
 	}
 
+
 	@Override
-	public boolean existsByTel(String tel, Long id) {
+	public boolean existsByPinCode(int pinCode, Long id) {
+		return userRepo.existsByPinCode(pinCode);
+	}
+
+	@Override
+	public boolean existsByTelephone(String tel, Long id) {
 		if (tel == null || tel.isEmpty()) {
 			return false;
 		}
@@ -205,7 +211,7 @@ public class UserServiceImpl implements IUserService {
 					jwtUtils.getSecretBearerToken(),true);
 			user.setTokenAuth(token);
 		} else {
-			user = getByTel(login).orElseThrow(() -> new ResourceNotFoundException(
+			user = getByPinCode(Integer.parseInt(login)).orElseThrow(() -> new ResourceNotFoundException(
 					messageSource.getMessage("messages.user_not_found", null, LocaleContextHolder.getLocale())));
 			String codeOtp = String.valueOf(jwtUtils.generateOtpCode());
 			user.setOtpCode(codeOtp);
@@ -295,7 +301,7 @@ public class UserServiceImpl implements IUserService {
 	@Override
 	@Transactional
 	public Users getNewCodeVerificationAccount(String login) {
-		Optional<Users> user = getByTel(login);
+		Optional<Users> user = getByEmail(login);
 		if (user.isPresent()) {
 			String otpCode = String.valueOf(jwtUtils.generateOtpCode());
 			user.get().setOtpCode(otpCode);
@@ -357,7 +363,7 @@ public class UserServiceImpl implements IUserService {
 	@Override
 	public void updateFistLogin(Long user_id) {
 		Users u = userRepo.getById(user_id);
-		if(u.getOldPasswords().size() <=1 && u.getCreatedDate().isAfter(LocalDate.of(2021, Month.AUGUST,01))) {
+		if(u.getOldPasswords().size() <=1 && u.getCreatedDate().isAfter(LocalDateTime.of(2022, Month.NOVEMBER,01, 23, 01, 01))) {
 			u.setFirstConnection(true);
 		} else  {
 			u.setFirstConnection(false);

@@ -11,14 +11,16 @@ import java.util.Optional;
 public interface IUserService {
 	
 	Map<String, Object> add(Users user);
-	
+
 	boolean existsByEmail(String email, Long id);
+
+	boolean existsByPinCode(int code, Long id);
 	
 	boolean existsByInternalReference(Long internalReference, Long id);
 	
 	Users getById(Long id);
-	
-	Optional<Users> getByTel(String tel);
+
+	Optional<Users> getByTelephone(String tel);
 
 	Optional<Users> getByEmail(String email);
 
@@ -33,7 +35,7 @@ public interface IUserService {
 	
 	String editPassword(Users user, UserEditPasswordDto userEditPasswordDto);
 
-	boolean existsByTel(String tel, Long id);
+	boolean existsByTelephone(String tel, Long id);
 
 	Users editProfil(Users user, Long updateRoleId, Long addRoleId);
 

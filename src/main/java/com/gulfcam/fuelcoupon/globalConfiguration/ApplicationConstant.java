@@ -4,13 +4,19 @@ import javax.servlet.http.HttpServletRequest;
 
 public class ApplicationConstant {
 
+    public static final String ENTREPRISE_NAME = "GULFCAM";
+
     public static final String SUBJECT_EMAIL_PAY = "GulfCam - Accès espace membres";
+
+    public static final String SUBJECT_EMAIL_OPT = "GulfCam - Code OTP";
 
     public static final String SUBJECT_EMAIL_PAY_TEMPORAIRE = "GulfCam - Accès Temporaire";
 
     public static final String SUBJECT_EMAIL_VILID_PROFIL = "GulfCam - Validation de profil ";
 
     public static final String SUBJECT_EMAIL_VILID_PROFIL_NOT_VALIDE = "GulfCam - Profil non valide";
+
+    public static final String TEMPLATE_EMAIL_ENTREPRISE_MEMBRE = "entreprise-access-membre";
 
     public static final String SUBJECT_EMAIL_PAY_SERVICE_ABONNEMENT = "nouveau membre";
 
@@ -45,8 +51,6 @@ public class ApplicationConstant {
     public static final String TEMPLATE_EMAIL_ENTREPRISE = "entreprise-access";
 
     public static final String TEMPLATE_EMAIL_ENTREPRISE_EMPLOYE = "employe-access";
-
-    public static final String TEMPLATE_EMAIL_ENTREPRISE_MEMBRE = "entreprise-access-membre";
 
     public static final String TEMPLATE_EMAIL_NEW_ENTREPRISE = "information-new-entreprise";
 

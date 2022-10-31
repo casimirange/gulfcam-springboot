@@ -21,6 +21,8 @@ public class UserDetailsImpl implements UserDetails {
 
 	private Long id;
 
+	private Long internalReference;
+
 	private String username;
 
 	private String email;
@@ -33,14 +35,12 @@ public class UserDetailsImpl implements UserDetails {
 
 	@JsonIgnore
 	private String password;
-	
-	private boolean using2FA;
 
 	public static UserDetailsImpl build(Users user) {
 		List<GrantedAuthority> roles = user.getRoles().stream()
 				.map(role -> new SimpleGrantedAuthority(role.getName().name())).collect(Collectors.toList());
-		return new UserDetailsImpl(user.getUserId(), user.getIdGulfcam(), user.getEmail(), roles, user.getStatus(),
-				user.getTokenAuth(), user.getPassword(),user.isUsing2FA());
+		return new UserDetailsImpl(user.getUserId(), user.getInternalReference(), user.getEmail(),  user.getEmail(), roles, user.getStatus(),
+				user.getTokenAuth(), user.getPassword());
 	}
 
 	@Override

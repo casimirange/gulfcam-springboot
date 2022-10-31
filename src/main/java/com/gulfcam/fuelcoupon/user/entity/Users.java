@@ -114,7 +114,7 @@ public class Users extends Auditable<String> {
 
 	private boolean isFirstConnection;
 
-   private LocalDate createdDate;
+   private LocalDateTime createdDate;
 
 	private boolean isDelete = false;
 	public Users(Long internalReference, String email, String password) {

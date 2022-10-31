@@ -16,14 +16,14 @@ import java.util.List;
 public class UserResDto{
 	
 	private Long userId;
-	
-	private String idGulfcam;
+
+	private Long internalReference;
+
+	private int pinCode;
 
 	private String email;
 	
-	private String tel1;
-
-	private String tel2;
+	private String telephone;
 
 	private List<RoleUser> roles;
 

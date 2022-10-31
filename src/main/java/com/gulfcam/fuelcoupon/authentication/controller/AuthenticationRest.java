@@ -5,14 +5,16 @@ import com.gulfcam.fuelcoupon.authentication.service.IAuthorizationService;
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.authentication.service.UserDetailsImpl;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
-import com.gulfcam.fuelcoupon.user.dto.UserEditPasswordDto;
-import com.gulfcam.fuelcoupon.user.dto.UserResDto;
-import com.gulfcam.fuelcoupon.user.dto.UserResetPassword;
+import com.gulfcam.fuelcoupon.user.dto.*;
 import com.gulfcam.fuelcoupon.user.entity.EStatusUser;
 import com.gulfcam.fuelcoupon.user.entity.OldPassword;
 import com.gulfcam.fuelcoupon.user.entity.Users;
 import com.gulfcam.fuelcoupon.user.repository.IUserRepo;
+import com.gulfcam.fuelcoupon.user.service.IEmailService;
 import com.gulfcam.fuelcoupon.user.service.IUserService;
+import com.gulfcam.fuelcoupon.utilities.entity.ESettingPropertie;
+import com.gulfcam.fuelcoupon.utilities.entity.SettingProperties;
+import com.gulfcam.fuelcoupon.utilities.service.IUtilitieService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,6 +44,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
@@ -72,6 +75,12 @@ public class AuthenticationRest {
     private ModelMapper modelMapper;
 
     @Autowired
+    IUtilitieService utilitieService;
+
+    @Autowired
+    IEmailService emailService;
+
+    @Autowired
     IAuthorizationService authorizationService;
 
 
@@ -86,6 +95,8 @@ public class AuthenticationRest {
     String signInUrl;
     @Value("${app.api-confirm-code-url}")
     String urlConfirmCode;
+    @Value("${mail.from[0]}")
+    String mailFrom;
 
 
     @Parameters(@Parameter(name = "tel", required = true))
@@ -100,7 +111,7 @@ public class AuthenticationRest {
         Users user;
         String newUrl = null;
         if (code.length() == 6) {
-            user = userService.getByTel(tel).orElseThrow(() -> new ResourceNotFoundException(
+            user = userService.getByTelephone(tel).orElseThrow(() -> new ResourceNotFoundException(
                     messageSource.getMessage("messages.user_not_found", null, LocaleContextHolder.getLocale())));
             if (ChronoUnit.HOURS.between(user.getOtpCodeCreatedAT(), LocalDateTime.now()) > 1) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -167,66 +178,86 @@ public class AuthenticationRest {
                 user = new Users(user2.get().getEmail(), userAuthDto.getPassword());
             }
         }else{
-
+            Optional<Users> user2 = userService.getByPinCode(Integer.parseInt(userAuthDto.getLogin()));
+            if (user2.isPresent()) {
+                user = new Users(user2.get().getEmail(), userAuthDto.getPassword());
+            }
         }
 
-        Optional<Users> user2 = userService.getByTel(userAuthDto.getLogin());
-        if (user2.isPresent()) {
-            user = new Users(user2.get().getEmail(), userAuthDto.getPassword());
-        }
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
         if (userPrincipal.getStatus().getName() == EStatusUser.USER_ENABLED) {
-            boolean isusing2FA = userPrincipal.isUsing2FA();
-            if (isusing2FA == false) {
-                String refreshToken = null;
-                if (userPrincipal.getToken() != null) {
-                    try {
-                        if (jwtUtils.validateJwtToken(userPrincipal.getToken(), jwtUtils.getSecretRefreshToken())) {
-                            refreshToken = userPrincipal.getToken();
-                        }
-                    } catch (ExpiredJwtException e) {
-                        refreshToken = jwtUtils.generateJwtToken(userPrincipal.getUsername(),
-                                jwtUtils.getExpirationRefreshToken(), jwtUtils.getSecretRefreshToken(), true);
-                        userService.editToken(userPrincipal.getId(), refreshToken);
-                    }
-                } else {
-                    refreshToken = jwtUtils.generateJwtToken(userPrincipal.getUsername(),
-                            jwtUtils.getExpirationRefreshToken(), jwtUtils.getSecretRefreshToken(), true);
-                    userService.editToken(userPrincipal.getId(), refreshToken);
-                }
-                String bearerToken = jwtUtils.generateJwtToken(userPrincipal.getUsername(),
-                        jwtUtils.getExpirationBearerToken(), jwtUtils.getSecretBearerToken(), true);
-                List<String> roles = userPrincipal.getRoles().stream().map(item -> item.getAuthority())
-                        .collect(Collectors.toList());
-                log.info("user " + userPrincipal.getUsername() + " authenticated");
-                AuthResDto authResDto = modelMapper.map(userService.getById(userPrincipal.getId()), AuthResDto.class);
-                authResDto.setBearerToken(bearerToken);
-                authResDto.setRefreshToken(refreshToken);
-                authResDto.setRoles(roles);
-                authResDto.setAuthenticated(true);
-                userService.updateDateLastLoginUser(userPrincipal.getId());
-                userService.updateFistLogin(userPrincipal.getId());
-                return ResponseEntity.ok(authResDto);
-            } else {
-                String code = String.valueOf(jwtUtils.generateOtpCode());
-                Users userUpdate = updateExistingUser(userPrincipal.getUsername(), code);
-                String tel = userUpdate.getTelephone() != null ? userUpdate.getTelephone() : String.valueOf(userUpdate.getTelephone());
-                String bearerToken = jwtUtils.generateJwtToken(userPrincipal.getUsername(),
-                        jwtUtils.getExpirationBearerToken(), jwtUtils.getSecretBearerToken(), false);
-                OtpCodeDto otpCodeDto = new OtpCodeDto();
-                otpCodeDto.setCode(code);
-                otpCodeDto.setTel(tel);
-//                jmsTemplate.convertAndSend(ApplicationConstant.PRODUCER_SMS_OTP, otpCodeDto);
-                return ResponseEntity.ok().body(new SignInResponse(true, messageSource.getMessage("messages.code-otp", null, LocaleContextHolder.getLocale()), bearerToken, false));
-            }
+            String code = String.valueOf(jwtUtils.generateOtpCode());
+            Users userUpdate = updateExistingUser(userPrincipal.getUsername(), code);
+            String telephone = userUpdate.getTelephone() != null ? userUpdate.getTelephone() : String.valueOf(userUpdate.getTelephone());
+            String email = userUpdate.getEmail() != null ? userUpdate.getEmail() : String.valueOf(userUpdate.getEmail());
+            String bearerToken = jwtUtils.generateJwtToken(userPrincipal.getUsername(),
+                    jwtUtils.getExpirationBearerToken(), jwtUtils.getSecretBearerToken(), false);
+
+            Map<String, Object> emailProps = new HashMap<>();
+            emailProps.put("code", code);
+            emailProps.put("telephone", telephone);
+            emailProps.put("email", email);
+
+            List<SettingProperties> settingProperties = utilitieService.findSettingPropByKey(ESettingPropertie.SUBSCRIPTION.name());
+            String replytolist = settingProperties.stream().map(s -> s.getValue()).collect(Collectors.joining(","));
+            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, email, replytolist, emailProps, ApplicationConstant.SUBJECT_EMAIL_OPT, ApplicationConstant.TEMPLATE_EMAIL_ENTREPRISE_MEMBRE));
+            log.info("Email  send successfull for user: " + email);
+            log.info("Code OTP : " + code);
+
+            return ResponseEntity.ok().body(new SignInResponse(true, messageSource.getMessage("messages.code-otp", null, LocaleContextHolder.getLocale()), bearerToken, false));
+
 
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                 new MessageResponseDto(HttpStatus.UNAUTHORIZED, messageSource.getMessage("messages.email-adresse-not-verify", null, LocaleContextHolder.getLocale())));
     }
+
+
+    @Operation(summary = "Inscription sur l'application", tags = "users", responses = {
+            @ApiResponse(responseCode = "201", description = "User crée avec succès", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = UserResDto.class)))),
+            @ApiResponse(responseCode = "400", description = "Erreur: Ce nom d'utilisateur est déjà utilisé/Erreur: Cet email est déjà utilisé", content = @Content(mediaType = "Application/Json")),})
+    @PostMapping("/sign-up")
+    public ResponseEntity<Object> add(@Valid @RequestBody UserReqDto userAddDto, HttpServletRequest request) {
+        if (userService.existsByEmail(userAddDto.getEmail(), null)) {
+            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                    messageSource.getMessage("messages.email_exists", null, LocaleContextHolder.getLocale())));
+        }
+        if (userService.existsByPinCode(userAddDto.getPinCode(), null)) {
+            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                    messageSource.getMessage("messages.pin_code_exists", null, LocaleContextHolder.getLocale())));
+        }
+        if (userService.existsByTelephone(userAddDto.getTelephone(), null)) {
+            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                    messageSource.getMessage("messages.phone_exists", null, LocaleContextHolder.getLocale())));
+        }
+        Users u = modelMapper.map(userAddDto, Users.class);
+        u.setUsing2FA(true);
+        u.setFirstName(userAddDto.get());
+        u.setLastName(userAddDto.getLastName());
+        u.setCreatedDate(LocalDateTime.now());
+        String token = "";
+        Users user = new Users();
+
+        user = userService.save(u);
+
+        token = tokenProvider.createTokenRefresh(user, true);
+        userService.updateAuthToken(user.getUserId(), token);
+        EmailVerificationDto emailVerificationDto = new EmailVerificationDto();
+        emailVerificationDto.setCode(urlConfirmAccount + token);
+        emailVerificationDto.setTo(user.getEmail());
+        emailVerificationDto.setObject(ApplicationConstant.SUBJECT_EMAIL_VERIF);
+        emailVerificationDto.setTemplate(ApplicationConstant.TEMPLATE_EMAIL_VERIF);
+        jmsTemplate.convertAndSend(ApplicationConstant.PRODUCER_EMAIL_VERIFICATION,emailVerificationDto);
+
+        // sendingMailService.sendVerificationMail(user.getEmail(), ApplicationConstant.getSiteURL(request) + "/api/v1.0/auth/user/confirm-account?code=" + token);
+        UserResDto userResDto = modelMapper.map(user, UserResDto.class);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(userResDto);
+    }
+
 
     @Operation(summary = "Vérification du code d'authentification à 2FA", tags = "authentification", responses = {
             @ApiResponse(responseCode = "200", description = "Succès de l'opération", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Users.class)))),
@@ -262,16 +293,18 @@ public class AuthenticationRest {
             @ApiResponse(responseCode = "400", description = "BAD REQUEST", content = @Content(mediaType = "Application/Json"))})
     @PostMapping("/resetOtpCode")
     public ResponseEntity<?> resetCodeConfirmAccount(@Valid @RequestBody ResetOtpCodeDto resetOtpCodeDto) {
-        Optional<Users> users = userService.getByTel(resetOtpCodeDto.getTel());
+        Optional<Users> users = userService.getByTelephone(resetOtpCodeDto.getTel());
         if (users.get().getStatus().getName().equals(EStatusUser.USER_ENABLED)) {
             return ResponseEntity.ok().body(new MessageResponseDto(HttpStatus.OK, " your account has already been activated !"));
         }
         String code = String.valueOf(jwtUtils.generateOtpCode());
         Users userUpdate = updateExistingUser(users.get().getEmail(), code);
         String tel1 = userUpdate.getTelephone() != null ? userUpdate.getTelephone() : String.valueOf(userUpdate.getTelephone());
+        String email = userUpdate.getEmail() != null ? userUpdate.getEmail() : String.valueOf(userUpdate.getEmail());
         OtpCodeDto otpCodeDto = new OtpCodeDto();
         otpCodeDto.setCode(code);
-        otpCodeDto.setTel(tel1);
+        otpCodeDto.setTelephone(tel1);
+        otpCodeDto.setEmail(email);
 //        jmsTemplate.convertAndSend(ApplicationConstant.PRODUCER_SMS_OTP, otpCodeDto);
         return ResponseEntity.ok().body(new MessageResponseDto(HttpStatus.OK, " Code Otp generated successful !"));
     }
@@ -320,7 +353,7 @@ public class AuthenticationRest {
             String tel1 = user.getTelephone() != null ? user.getTelephone() : String.valueOf(user.getTelephone());
             OtpCodeDto otpCodeDto = new OtpCodeDto();
             otpCodeDto.setCode(user.getOtpCode());
-            otpCodeDto.setTel(tel1);
+            otpCodeDto.setTelephone(tel1);
 //            jmsTemplate.convertAndSend(ApplicationConstant.PRODUCER_SMS_OTP, otpCodeDto);
         }
         return ResponseEntity.ok().body(new MessageResponseDto(HttpStatus.OK,
@@ -361,7 +394,7 @@ public class AuthenticationRest {
     public ResponseEntity<Object> resetPassword(@Valid @RequestBody UserResetPassword userResetPassword) throws Exception {
         Users user;
         if (userResetPassword.getCode().length() == 4) {
-            user = userService.getByTel(userResetPassword.getTel()).orElseThrow(() -> new ResourceNotFoundException(
+            user = userService.getByTelephone(userResetPassword.getTel()).orElseThrow(() -> new ResourceNotFoundException(
                     messageSource.getMessage("messages.user_not_found", null, LocaleContextHolder.getLocale())));
             if (userResetPassword.getCode().equals(user.getOtpCode()) && ChronoUnit.HOURS.between(user.getOtpCodeCreatedAT(), LocalDateTime.now()) > 10) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

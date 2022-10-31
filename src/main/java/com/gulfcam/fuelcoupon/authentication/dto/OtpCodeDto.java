@@ -11,5 +11,6 @@ import java.io.Serializable;
 @ToString
 public class OtpCodeDto implements Serializable {
     public String code;
-    public String tel;
+    public String telephone;
+    public String email;
 }

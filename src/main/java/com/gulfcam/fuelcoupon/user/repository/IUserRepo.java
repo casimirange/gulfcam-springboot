@@ -25,6 +25,8 @@ public interface IUserRepo extends IUserBaseRepo<Users> {
 
 	boolean existsByInternalReference(Long internalReference);
 
+	boolean existsByPinCode(int code);
+
 	Page<Users> findDistinctByRolesIn(List<RoleUser> rolesManagers, Pageable p);
 
 	Optional<Users> findByOtpCode(String code);
