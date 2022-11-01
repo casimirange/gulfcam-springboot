@@ -56,7 +56,7 @@ public class UserServiceImpl implements IUserService {
 	public Map<String, Object> add(Users u) {
 		Users user = new Users(u.getInternalReference(), u.getEmail(), u.getPassword());
 		Set<RoleUser> roles = new HashSet<>();
-		RoleUser rolesUser = roleRepo.findByName(ERole.ROLE_AGENT).orElseThrow(()-> new ResourceNotFoundException("Role:  "  +  ERole.ROLE_AGENT.name() +  "  not found"));
+		RoleUser rolesUser = roleRepo.findByName(ERole.ROLE_PRE_VERIFICATION_USER).orElseThrow(()-> new ResourceNotFoundException("Role:  "  +  ERole.ROLE_PRE_VERIFICATION_USER.name() +  "  not found"));
 		roles.add(rolesUser);
 		user.setRoles(roles);
 		TypeAccount typeAccount = typeAccountRepo.findByName(ETypeAccount.MANAGER_COUPON).orElseThrow(()-> new ResourceNotFoundException("Type de compte:  "  +  ETypeAccount.MANAGER_COUPON.name() +  "  not found"));

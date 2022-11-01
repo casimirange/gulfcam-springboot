@@ -26,10 +26,6 @@ public class AuthorizationService implements IAuthorizationService {
 			return null;
 		}
 
-		System.out.println("je test ici ");
-		System.out.println(authentication.isAuthenticated());
-		System.out.println(authentication);
-		System.out.println(authentication.getPrincipal());
 		UserDetailsImpl currentUser = (UserDetailsImpl) authentication.getPrincipal();
 		return userRepo.findById(currentUser.getId())
 				.orElseThrow(() -> new ResourceNotFoundException("User " + currentUser.getUsername() + " not found"));

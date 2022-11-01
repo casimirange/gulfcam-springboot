@@ -185,9 +185,9 @@ public class AuthenticationRest {
             emailProps.put("telephone", telephone);
             emailProps.put("email", email);
 
-            List<SettingProperties> settingProperties = utilitieService.findSettingPropByKey(ESettingPropertie.SUBSCRIPTION.name());
-            String replytolist = settingProperties.stream().map(s -> s.getValue()).collect(Collectors.joining(","));
-            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, email, replytolist, emailProps, ApplicationConstant.SUBJECT_EMAIL_OPT, ApplicationConstant.TEMPLATE_EMAIL_ENTREPRISE_MEMBRE));
+//            List<SettingProperties> settingProperties = utilitieService.findSettingPropByKey(ESettingPropertie.SUBSCRIPTION.name());
+//            String replytolist = settingProperties.stream().map(s -> s.getValue()).collect(Collectors.joining(","));
+            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, email, "", emailProps, ApplicationConstant.SUBJECT_EMAIL_OPT, ApplicationConstant.TEMPLATE_EMAIL_ENTREPRISE_MEMBRE));
             log.info("Email  send successfull for user: " + email);
             log.info("Code OTP : " + code);
 
@@ -227,33 +227,24 @@ public class AuthenticationRest {
         u.setPassword(encoder.encode(userAddDto.getPassword()));
         u.setIdStore(userAddDto.getIdStore());
         u.setCreatedDate(LocalDateTime.now());
+        Users user = new Users();
+        String password = null;
         Map<String, Object> userAndPasswordNotEncoded = new HashMap<>();
 
         userAndPasswordNotEncoded = userService.add(u);
+        user = (Users) userAndPasswordNotEncoded.get("user");
+        System.out.println("je suis la ");
+        System.out.println(user);
+        userService.editStatus(user.getUserId(), Long.valueOf(EStatusUser.USER_ENABLED.ordinal() + 1L));
         UserResDto userResDto = modelMapper.map(u, UserResDto.class);
-        if (userResDto.getEmail() != null) {
+        Map<String, Object> emailProps = new HashMap<>();
+        emailProps.put("firstname", userAddDto.getFirstName());
+        emailProps.put("lastname", userAddDto.getLastName());
 
-            String code = String.valueOf(jwtUtils.generateOtpCode());
-            Users userUpdate = updateExistingUser(userResDto.getEmail(), code);
-            String telephone = userUpdate.getTelephone() != null ? userUpdate.getTelephone() : String.valueOf(userUpdate.getTelephone());
-            String email = userUpdate.getEmail() != null ? userUpdate.getEmail() : String.valueOf(userUpdate.getEmail());
-            String bearerToken = jwtUtils.generateJwtToken(userResDto.getEmail(),
-                    jwtUtils.getExpirationBearerToken(), jwtUtils.getSecretBearerToken(), false);
+        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, userAddDto.getEmail(), "", emailProps, ApplicationConstant.SUBJECT_EMAIL_NEW_USER, ApplicationConstant.TEMPLATE_EMAIL_NEW_USER));
+        log.info("Email  send successfull for user: " + userAddDto.getEmail());
 
-            Map<String, Object> emailProps = new HashMap<>();
-            emailProps.put("code", code);
-            emailProps.put("telephone", telephone);
-            emailProps.put("email", email);
 
-//            List<SettingProperties> settingProperties = utilitieService.findSettingPropByKey(ESettingPropertie.SUBSCRIPTION.name());
-//            String replytolist = settingProperties.stream().map(s -> s.getValue()).collect(Collectors.joining(","));
-            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, email, "", emailProps, ApplicationConstant.SUBJECT_EMAIL_OPT, ApplicationConstant.TEMPLATE_EMAIL_ENTREPRISE_MEMBRE));
-            log.info("Email  send successfull for user: " + email);
-            log.info("Code OTP : " + code);
-
-            return ResponseEntity.ok().body(new SignUpResponse(true, messageSource.getMessage("messages.code-otp", null, LocaleContextHolder.getLocale()), bearerToken, false));
-
-        }
         return ResponseEntity.status(HttpStatus.CREATED).body(userResDto);
     }
 
@@ -299,10 +290,16 @@ public class AuthenticationRest {
         Users userUpdate = updateExistingUser(users.get().getEmail(), code);
         String tel1 = userUpdate.getTelephone() != null ? userUpdate.getTelephone() : String.valueOf(userUpdate.getTelephone());
         String email = userUpdate.getEmail() != null ? userUpdate.getEmail() : String.valueOf(userUpdate.getEmail());
-        OtpCodeDto otpCodeDto = new OtpCodeDto();
-        otpCodeDto.setCode(code);
-        otpCodeDto.setTelephone(tel1);
-        otpCodeDto.setEmail(email);
+        Map<String, Object> emailProps = new HashMap<>();
+        emailProps.put("code", code);
+        emailProps.put("telephone", tel1);
+        emailProps.put("email", email);
+
+//            List<SettingProperties> settingProperties = utilitieService.findSettingPropByKey(ESettingPropertie.SUBSCRIPTION.name());
+//            String replytolist = settingProperties.stream().map(s -> s.getValue()).collect(Collectors.joining(","));
+        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, email, "", emailProps, ApplicationConstant.SUBJECT_EMAIL_OPT, ApplicationConstant.TEMPLATE_EMAIL_ENTREPRISE_MEMBRE));
+        log.info("Email  send successfull for user: " + email);
+        log.info("Code OTP : " + code);
 //        jmsTemplate.convertAndSend(ApplicationConstant.PRODUCER_SMS_OTP, otpCodeDto);
         return ResponseEntity.ok().body(new MessageResponseDto(HttpStatus.OK, " Code Otp generated successful !"));
     }
