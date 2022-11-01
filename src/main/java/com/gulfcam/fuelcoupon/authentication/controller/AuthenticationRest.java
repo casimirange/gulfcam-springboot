@@ -380,60 +380,6 @@ public class AuthenticationRest {
                 messageSource.getMessage("messages.code_sent_success", null, LocaleContextHolder.getLocale())));
     }
 
-    @Operation(summary = "Réinitialiser son mot de passe 2 (confirmation du code pour le web)", tags = "users", description = "La validation du token est requis pour le client web", responses = {
-            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json")),
-            @ApiResponse(responseCode = "404", description = "L'utilisateur n'existe pas dans la BD", content = @Content(mediaType = "Application/Json")),
-            @ApiResponse(responseCode = "400", description = "Erreur dans le format de la requete", content = @Content(mediaType = "Application/Json"))})
-
-    @GetMapping("/confirm-code-email")
-    public ResponseEntity<Object> resetPassword(@RequestParam String code, @RequestParam(required = false) String tel,
-                                                @RequestBody(required = false) UserResetPassword userResetPwd) throws Exception {
-        Users user;
-        try {
-            user = getUser(code, jwtUtils.getSecretBearerToken());
-        } catch (ExpiredJwtException e) {
-            log.error("JWT token is expired: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new MessageResponseDto(HttpStatus.UNAUTHORIZED, messageSource.getMessage("messages.code_expired", null, LocaleContextHolder.getLocale())));
-        }
-        if (code.equals(user.getTokenAuth())) {
-            String newUrl = urlResetPasswordPage +"/" + code;
-            return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).header(HttpHeaders.LOCATION, newUrl).build();
-        }
-
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new MessageResponseDto(HttpStatus.UNAUTHORIZED, messageSource.getMessage("messages.unauthorized", null, LocaleContextHolder.getLocale())));
-    }
-
-    @Operation(summary = "Réinitialiser son mot de passe 2 (enrégistrement du password pour le mobile)", tags = "users", description = "Le téléphone et le nouveau password sont requis pour le client mobile", responses = {
-            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json")),
-            @ApiResponse(responseCode = "404", description = "L'utilisateur n'existe pas dans la BD", content = @Content(mediaType = "Application/Json")),
-            @ApiResponse(responseCode = "400", description =  "Erreur dans le format de la requete", content = @Content(mediaType = "Application/Json"))})
-
-    @PostMapping("/confirm-code-phone")
-    public ResponseEntity<Object> resetPassword(@Valid @RequestBody UserResetPassword userResetPassword) throws Exception {
-        Users user;
-        if (userResetPassword.getCode().length() == 4) {
-            user = userService.getByTelephone(userResetPassword.getTel()).orElseThrow(() -> new ResourceNotFoundException(
-                    messageSource.getMessage("messages.user_not_found", null, LocaleContextHolder.getLocale())));
-            if (userResetPassword.getCode().equals(user.getOtpCode()) && ChronoUnit.HOURS.between(user.getOtpCodeCreatedAT(), LocalDateTime.now()) > 10) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(new MessageResponseDto(HttpStatus.UNAUTHORIZED, messageSource.getMessage("messages.code_expired", null, LocaleContextHolder.getLocale())));
-            }
-            if (userResetPassword.getCode().equals(user.getOtpCode())) {
-                Users user2 = userService.resetPassword(user, userResetPassword.getPassword());
-                return ResponseEntity.ok(new MessageResponseDto(HttpStatus.OK, messageSource.getMessage("messages.password_reset_successful", null, LocaleContextHolder.getLocale())));
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new MessageResponseDto(HttpStatus.UNAUTHORIZED, messageSource.getMessage("messages.code_not_valid", null, LocaleContextHolder.getLocale())));
-
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new MessageResponseDto(HttpStatus.UNAUTHORIZED, messageSource.getMessage("messages.unauthorized", null, LocaleContextHolder.getLocale())));
-    }
-
-
     @Operation(summary = "Réinitialiser son mot de passe 3 enrégistrement du password(pour le web uniquement)", tags = "users", responses = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "404", description = "L'utilisateur n'existe pas dans la BD", content = @Content(mediaType = "Application/Json")),

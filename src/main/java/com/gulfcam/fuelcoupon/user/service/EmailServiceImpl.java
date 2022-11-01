@@ -40,13 +40,6 @@ public class EmailServiceImpl implements IEmailService {
 			mimeMessageHelper.setSubject(emailDto.getSubject());
 			mimeMessageHelper.setReplyTo(emailDto.getReplyTo(),emailDto.getReplyToName());
 			mimeMessageHelper.setText(html, true);
-			mimeMessageHelper.addInline("mail", new ClassPathResource("static/mail.png"));
-			mimeMessageHelper.addInline("facebook", new ClassPathResource("static/facebook.png"));
-			mimeMessageHelper.addInline("linkedin", new ClassPathResource("static/linkedin.png"));
-			mimeMessageHelper.addInline("instagram", new ClassPathResource("static/instagram.png"));
-			mimeMessageHelper.addInline("youtube", new ClassPathResource("static/youtube.png"));
-			mimeMessageHelper.addInline("logo", new ClassPathResource("static/logo_jobetrouve_no_text.png"));
-			mimeMessageHelper.addInline("cover", new ClassPathResource("static/mail_cover.png"));
 			emailSender.send(mimeMessage);
 			log.info("Email Successful send to {}", emailDto.getTo());
 		} catch (Exception ex) {
