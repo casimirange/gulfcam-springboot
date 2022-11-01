@@ -148,28 +148,6 @@ public class AuthenticationRest {
         return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).header(HttpHeaders.LOCATION, newUrl).build();
     }
 
-
-    @Parameters(@Parameter(name = "code", required = true))
-    @Operation(summary = "Validation du token et redirection de l'utilisateur vers BANBORA pour le paiement", tags = "users", responses = {
-            @ApiResponse(responseCode = "200", description = "Code vérifié avec succès", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = UserResDto.class)))),
-            @ApiResponse(responseCode = "404", description = "Erreur: Utilisateur inexistant", content = @Content(mediaType = "Application/Json")),
-            @ApiResponse(responseCode = "401", description = "Erreur: Identification requise / Login déjà confirmé", content = @Content(mediaType = "Application/Json")),})
-
-    @GetMapping("/payement-redirect")
-    public ResponseEntity<Object> confirmUserAccount(@RequestParam String code) {
-        Users user;
-        String newUrl = null;
-        try {
-            user = getUser(code, jwtUtils.getSecretBearerToken());
-        } catch (ExpiredJwtException e) {
-            log.error("JWT token is expired: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(messageSource.getMessage("messages.code_expired", null, LocaleContextHolder.getLocale()));
-        }
-        newUrl = "";
-        return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).header(HttpHeaders.LOCATION, newUrl).build();
-    }
-
     @Operation(summary = "Authentifie un utilisateur", tags = "authentification", responses = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = AuthResDto.class)))),
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "Application/Json")),
