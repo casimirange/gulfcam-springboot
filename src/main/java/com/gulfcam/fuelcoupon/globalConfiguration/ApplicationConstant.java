@@ -38,7 +38,7 @@ public class ApplicationConstant {
 
     public static final String SUBJECT_EMAIL_NEW_ENTREPRISE = "Nouvelle entreprise";
 
-    public static final String SUBJECT_PASSWORD_RESET = "GulfCam Password Reset";
+    public static final String SUBJECT_PASSWORD_RESET = "GulfCam Réinitialisation du mot de passe";
 
     public static final String TEMPLATE_EMAIL_PROFIL_NOT_VALID = "profil-not-valide";
 

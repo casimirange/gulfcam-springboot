@@ -220,9 +220,9 @@ public class UserServiceImpl implements IUserService {
 		} else {
 			user = getByPinCode(Integer.parseInt(login)).orElseThrow(() -> new ResourceNotFoundException(
 					messageSource.getMessage("messages.user_not_found", null, LocaleContextHolder.getLocale())));
-			String codeOtp = String.valueOf(jwtUtils.generateOtpCode());
-			user.setOtpCode(codeOtp);
-			user.setOtpCodeCreatedAT(LocalDateTime.now());
+			String token = jwtUtils.generateJwtToken(user.getEmail(), jwtUtils.getExpirationEmailResetPassword(),
+					jwtUtils.getSecretBearerToken(),true);
+			user.setTokenAuth(token);
 		}
 		return userRepo.save(user);
 	}

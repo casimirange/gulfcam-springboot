@@ -24,8 +24,8 @@ public class UserResetPassword {
 			@Pattern(regexp = "(?=\\S+$).+", message = "{password.spacer}")})
 	private String password;
 	@NotNull(message = "${code.required}")
-	@Pattern(regexp = "^[0-9+\\(\\)#\\.\\s\\/ext-]+$", message = "{phone.number}")
 	private String code;
 
-	private String tel;
+	@NotNull(message = "${code.required}")
+	private String email;
 }
