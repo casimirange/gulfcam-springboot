@@ -14,9 +14,9 @@ public interface IUserService {
 
 	boolean existsByEmail(String email, Long id);
 
-	boolean existsByPinCode(int code, Long id);
+	boolean existsByPinCode(int code);
 	
-	boolean existsByInternalReference(Long internalReference, Long id);
+	boolean existsByInternalReference(Long internalReference);
 	
 	Users getById(Long id);
 

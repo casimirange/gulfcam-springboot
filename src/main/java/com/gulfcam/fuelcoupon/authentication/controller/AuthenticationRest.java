@@ -231,7 +231,7 @@ public class AuthenticationRest {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.email_exists", null, LocaleContextHolder.getLocale())));
         }
-        if (userService.existsByPinCode(userAddDto.getPinCode(), null)) {
+        if (userService.existsByPinCode(userAddDto.getPinCode())) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.pin_code_exists", null, LocaleContextHolder.getLocale())));
         }
@@ -241,6 +241,7 @@ public class AuthenticationRest {
         }
         Users u = modelMapper.map(userAddDto, Users.class);
         u.setUsing2FA(true);
+
         u.setFirstName(userAddDto.getFirstName());
         u.setLastName(userAddDto.getLastName());
         u.setInternalReference(jwtUtils.generateInternalReference());
@@ -248,19 +249,17 @@ public class AuthenticationRest {
         u.setPassword(encoder.encode(userAddDto.getPassword()));
         u.setIdStore(userAddDto.getIdStore());
         u.setCreatedDate(LocalDateTime.now());
-        String token = "";
-        Users user = new Users();
         Map<String, Object> userAndPasswordNotEncoded = new HashMap<>();
 
         userAndPasswordNotEncoded = userService.add(u);
         UserResDto userResDto = modelMapper.map(u, UserResDto.class);
-        if (user.getEmail() != null) {
+        if (userResDto.getEmail() != null) {
 
             String code = String.valueOf(jwtUtils.generateOtpCode());
-            Users userUpdate = updateExistingUser(user.getEmail(), code);
+            Users userUpdate = updateExistingUser(userResDto.getEmail(), code);
             String telephone = userUpdate.getTelephone() != null ? userUpdate.getTelephone() : String.valueOf(userUpdate.getTelephone());
             String email = userUpdate.getEmail() != null ? userUpdate.getEmail() : String.valueOf(userUpdate.getEmail());
-            String bearerToken = jwtUtils.generateJwtToken(user.getEmail(),
+            String bearerToken = jwtUtils.generateJwtToken(userResDto.getEmail(),
                     jwtUtils.getExpirationBearerToken(), jwtUtils.getSecretBearerToken(), false);
 
             Map<String, Object> emailProps = new HashMap<>();
@@ -268,9 +267,9 @@ public class AuthenticationRest {
             emailProps.put("telephone", telephone);
             emailProps.put("email", email);
 
-            List<SettingProperties> settingProperties = utilitieService.findSettingPropByKey(ESettingPropertie.SUBSCRIPTION.name());
-            String replytolist = settingProperties.stream().map(s -> s.getValue()).collect(Collectors.joining(","));
-            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, email, replytolist, emailProps, ApplicationConstant.SUBJECT_EMAIL_OPT, ApplicationConstant.TEMPLATE_EMAIL_ENTREPRISE_MEMBRE));
+//            List<SettingProperties> settingProperties = utilitieService.findSettingPropByKey(ESettingPropertie.SUBSCRIPTION.name());
+//            String replytolist = settingProperties.stream().map(s -> s.getValue()).collect(Collectors.joining(","));
+            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, email, "", emailProps, ApplicationConstant.SUBJECT_EMAIL_OPT, ApplicationConstant.TEMPLATE_EMAIL_ENTREPRISE_MEMBRE));
             log.info("Email  send successfull for user: " + email);
             log.info("Code OTP : " + code);
 
@@ -285,7 +284,6 @@ public class AuthenticationRest {
             @ApiResponse(responseCode = "200", description = "Succès de l'opération", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Users.class)))),
             @ApiResponse(responseCode = "400", description = "code de vérification incorrect", content = @Content(mediaType = "Application/Json"))})
     @GetMapping("/verify")
-    @PreAuthorize("hasRole('PRE_VERIFICATION_USER')")
     public ResponseEntity<?> verifyCode(@NotEmpty @RequestParam(name = "code", required = true) String code) {
         Users users = authorizationService.getUserInContextApp();
         log.info("user_otp_code" + users.getOtpCode() + "otpCodeCreatedAt:" + users.getOtpCodeCreatedAT());
@@ -495,7 +493,10 @@ public class AuthenticationRest {
 
     private Users updateExistingUser(String email, String code) {
         Optional<Users> existingUser = userService.getByEmail(email);
-        existingUser.get().setOtpCode(code);
+
+        if(code != null)
+            existingUser.get().setOtpCode(code);
+
         existingUser.get().setOtpCodeCreatedAT(LocalDateTime.now());
         return userRepo.save(existingUser.get());
     }

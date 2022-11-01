@@ -65,8 +65,15 @@ public class UserServiceImpl implements IUserService {
 		user.setStatus(status);
 		user.setTokenAuth(null);
 		user.setCreatedDate(LocalDateTime.now());
-		OldPassword oldPassword = oldPasswordRepo.save(new OldPassword(u.getPassword()));
-		user.setOldPasswords(Arrays.asList(oldPassword));
+//		OldPassword oldPassword = oldPasswordRepo.save(new OldPassword(u.getPassword()));
+//		user.setOldPasswords(Arrays.asList(oldPassword));
+		user.setFirstName(u.getFirstName());
+		user.setLastName(u.getLastName());
+		user.setTelephone(u.getTelephone());
+		user.setPinCode(u.getPinCode());
+		user.setPosition(u.getPosition());
+		user.setIdStore(u.getIdStore());
+		user.setCreatedDate(LocalDateTime.now());
 		userRepo.save(user);
 		Map<String, Object> userAndPasswordNotEncoded = new HashMap<>();
 		userAndPasswordNotEncoded.put("user", user);
@@ -181,13 +188,13 @@ public class UserServiceImpl implements IUserService {
 	}
 
 	@Override
-	public boolean existsByInternalReference(Long internalReference, Long id) {
+	public boolean existsByInternalReference(Long internalReference) {
 		return userRepo.existsByInternalReference(internalReference);
 	}
 
 
 	@Override
-	public boolean existsByPinCode(int pinCode, Long id) {
+	public boolean existsByPinCode(int pinCode) {
 		return userRepo.existsByPinCode(pinCode);
 	}
 

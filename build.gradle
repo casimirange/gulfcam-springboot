@@ -58,7 +58,6 @@ dependencies {
 	implementation 'org.mapstruct:mapstruct-processor:1.4.2.Final'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
 	implementation 'io.springfox:springfox-swagger2:3.0.0'
-	implementation 'org.hibernate:hibernate-validator:6.2.5.Final'
 	implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.9'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	compileOnly 'org.projectlombok:lombok'

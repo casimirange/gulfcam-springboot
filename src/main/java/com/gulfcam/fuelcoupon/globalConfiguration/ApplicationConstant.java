@@ -16,7 +16,7 @@ public class ApplicationConstant {
 
     public static final String SUBJECT_EMAIL_VILID_PROFIL_NOT_VALIDE = "GulfCam - Profil non valide";
 
-    public static final String TEMPLATE_EMAIL_ENTREPRISE_MEMBRE = "entreprise-access-membre";
+    public static final String TEMPLATE_EMAIL_ENTREPRISE_MEMBRE = "email-verification";
 
     public static final String SUBJECT_EMAIL_PAY_SERVICE_ABONNEMENT = "nouveau membre";
 
