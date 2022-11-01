@@ -103,6 +103,8 @@ public class AuthenticationRest {
     String urlConfirmCode;
     @Value("${mail.from[0]}")
     String mailFrom;
+    @Value("${mail.replyTo[0]}")
+    String mailReplyTo;
 
 
     @Parameters(@Parameter(name = "tel", required = true))
@@ -113,11 +115,11 @@ public class AuthenticationRest {
 
     @GetMapping("/confirm-account")
     public ResponseEntity<Object> confirmUserAccount(@RequestParam String code,
-                                                     @RequestParam(required = false) String tel) {
+                                                     @RequestParam(required = false) String email) {
         Users user;
         String newUrl = null;
         if (code.length() == 6) {
-            user = userService.getByTelephone(tel).orElseThrow(() -> new ResourceNotFoundException(
+            user = userService.getByEmail(email).orElseThrow(() -> new ResourceNotFoundException(
                     messageSource.getMessage("messages.user_not_found", null, LocaleContextHolder.getLocale())));
             if (ChronoUnit.HOURS.between(user.getOtpCodeCreatedAT(), LocalDateTime.now()) > 1) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -146,6 +148,30 @@ public class AuthenticationRest {
             newUrl = signInUrl;
         }
         return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).header(HttpHeaders.LOCATION, newUrl).build();
+    }
+
+    @Operation(summary = "Réinitialiser son mot de passe 2 (confirmation du code pour le web)", tags = "users", description = "La validation du token est requis pour le client web", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "404", description = "L'utilisateur n'existe pas dans la BD", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "400", description = "Erreur dans le format de la requete", content = @Content(mediaType = "Application/Json"))})
+
+    @GetMapping("/confirm-code")
+    public ResponseEntity<Object> resetPassword(@RequestParam String code) throws Exception {
+        Users user;
+        try {
+            user = getUser(code, jwtUtils.getSecretBearerToken());
+        } catch (ExpiredJwtException e) {
+            log.error("JWT token is expired: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new MessageResponseDto(HttpStatus.UNAUTHORIZED, messageSource.getMessage("messages.code_expired", null, LocaleContextHolder.getLocale())));
+        }
+        if (code.equals(user.getTokenAuth())) {
+            String newUrl = urlResetPasswordPage +"/" + code;
+            return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).header(HttpHeaders.LOCATION, newUrl).build();
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new MessageResponseDto(HttpStatus.UNAUTHORIZED, messageSource.getMessage("messages.unauthorized", null, LocaleContextHolder.getLocale())));
     }
 
     @Operation(summary = "Authentifie un utilisateur", tags = "authentification", responses = {
@@ -185,9 +211,7 @@ public class AuthenticationRest {
             emailProps.put("telephone", telephone);
             emailProps.put("email", email);
 
-//            List<SettingProperties> settingProperties = utilitieService.findSettingPropByKey(ESettingPropertie.SUBSCRIPTION.name());
-//            String replytolist = settingProperties.stream().map(s -> s.getValue()).collect(Collectors.joining(","));
-            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, email, "", emailProps, ApplicationConstant.SUBJECT_EMAIL_OPT, ApplicationConstant.TEMPLATE_EMAIL_ENTREPRISE_MEMBRE));
+            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, email, mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_OPT, ApplicationConstant.TEMPLATE_EMAIL_ENTREPRISE_MEMBRE));
             log.info("Email  send successfull for user: " + email);
             log.info("Code OTP : " + code);
 
@@ -219,7 +243,6 @@ public class AuthenticationRest {
         }
         Users u = modelMapper.map(userAddDto, Users.class);
         u.setUsing2FA(true);
-
         u.setFirstName(userAddDto.getFirstName());
         u.setLastName(userAddDto.getLastName());
         u.setInternalReference(jwtUtils.generateInternalReference());
@@ -233,15 +256,13 @@ public class AuthenticationRest {
 
         userAndPasswordNotEncoded = userService.add(u);
         user = (Users) userAndPasswordNotEncoded.get("user");
-        System.out.println("je suis la ");
-        System.out.println(user);
         userService.editStatus(user.getUserId(), Long.valueOf(EStatusUser.USER_ENABLED.ordinal() + 1L));
         UserResDto userResDto = modelMapper.map(u, UserResDto.class);
         Map<String, Object> emailProps = new HashMap<>();
         emailProps.put("firstname", userAddDto.getFirstName());
         emailProps.put("lastname", userAddDto.getLastName());
 
-        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, userAddDto.getEmail(), "", emailProps, ApplicationConstant.SUBJECT_EMAIL_NEW_USER, ApplicationConstant.TEMPLATE_EMAIL_NEW_USER));
+        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, userAddDto.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_NEW_USER, ApplicationConstant.TEMPLATE_EMAIL_NEW_USER));
         log.info("Email  send successfull for user: " + userAddDto.getEmail());
 
 
@@ -267,6 +288,10 @@ public class AuthenticationRest {
             updateExistingUser(users.getEmail(), null);
             userService.updateDateLastLoginUser(users.getUserId());
             userService.updateFistLogin(users.getUserId());
+            userService.editToken(users.getUserId(), null);
+            users.setOtpCode(null);
+            users.setOtpCodeCreatedAT(null);
+            userRepo.save(users);
             log.info("user " + users.getOtpCode() + " authenticated");
             return ResponseEntity.ok(new AuthSignInResDto(bearerToken, refreshToken, "Bearer", roles, true));
 
@@ -295,12 +320,10 @@ public class AuthenticationRest {
         emailProps.put("telephone", tel1);
         emailProps.put("email", email);
 
-//            List<SettingProperties> settingProperties = utilitieService.findSettingPropByKey(ESettingPropertie.SUBSCRIPTION.name());
-//            String replytolist = settingProperties.stream().map(s -> s.getValue()).collect(Collectors.joining(","));
         emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, email, "", emailProps, ApplicationConstant.SUBJECT_EMAIL_OPT, ApplicationConstant.TEMPLATE_EMAIL_ENTREPRISE_MEMBRE));
         log.info("Email  send successfull for user: " + email);
         log.info("Code OTP : " + code);
-//        jmsTemplate.convertAndSend(ApplicationConstant.PRODUCER_SMS_OTP, otpCodeDto);
+
         return ResponseEntity.ok().body(new MessageResponseDto(HttpStatus.OK, " Code Otp generated successful !"));
     }
 
@@ -336,21 +359,17 @@ public class AuthenticationRest {
                     messageSource.getMessage("messages.requete_incorrect", null, LocaleContextHolder.getLocale())));
         }
         Users user = userService.checkUserAndGenerateCode(resetPasswordDto.getLogin());
-        if (resetPasswordDto.getLogin().contains("@")) {
-            EmailResetPasswordDto emailVerificationDto = new EmailResetPasswordDto();
-            emailVerificationDto.setCode(urlConfirmCode + user.getTokenAuth());
-            emailVerificationDto.setTo(user.getEmail());
-            emailVerificationDto.setUsername(user.getEmail());
-            emailVerificationDto.setObject(ApplicationConstant.SUBJECT_PASSWORD_RESET);
-            emailVerificationDto.setTemplate(ApplicationConstant.TEMPLATE_PASSWORD_RESET);
-//            jmsTemplate.convertAndSend(ApplicationConstant.PRODUCER_EMAIL_RESET_PASSWORD, emailVerificationDto);
-        } else {
-            String tel1 = user.getTelephone() != null ? user.getTelephone() : String.valueOf(user.getTelephone());
-            OtpCodeDto otpCodeDto = new OtpCodeDto();
-            otpCodeDto.setCode(user.getOtpCode());
-            otpCodeDto.setTelephone(tel1);
-//            jmsTemplate.convertAndSend(ApplicationConstant.PRODUCER_SMS_OTP, otpCodeDto);
-        }
+
+        Map<String, Object> emailProps = new HashMap<>();
+        emailProps.put("firstname", user.getFirstName());
+        emailProps.put("lastname", user.getLastName());
+        emailProps.put("code", user.getEmail());
+        emailProps.put("username", user.getEmail());
+        emailProps.put("code", urlConfirmCode + user.getTokenAuth());
+
+        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), "", emailProps, ApplicationConstant.SUBJECT_PASSWORD_RESET, ApplicationConstant.TEMPLATE_PASSWORD_RESET));
+        log.info("Email for reset password send successfull for user: " + user.getEmail());
+
         return ResponseEntity.ok().body(new MessageResponseDto(HttpStatus.OK,
                 messageSource.getMessage("messages.code_sent_success", null, LocaleContextHolder.getLocale())));
     }

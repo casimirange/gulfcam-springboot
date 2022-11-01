@@ -91,6 +91,7 @@ public class JwtUtils {
 
 
 	public Boolean isAuthenticated(String token) {
+
 		Claims claims = Jwts.parser().setSigningKey(secretRefreshToken).parseClaimsJws(token).getBody();
 		return claims.get(AUTHENTICATED, Boolean.class);
 	}

@@ -45,16 +45,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 			String token = jwtUtils.parseJwt(request);
 
 			if (token != null && !uri.equals(REFRESH_PATH)) {
-				System.out.println("je suis la ");
-				System.out.println(token);
-				System.out.println(uri);
-				System.out.println(REFRESH_PATH);
 				if (jwtUtils.validateJwtToken(token, jwtUtils.getSecretBearerToken())) {
 
-					System.out.println("je suis la ");
 					String username = jwtUtils.getIdGulfcamFromJwtToken(token, jwtUtils.getSecretBearerToken());
-
-					System.out.println(username);
 					UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 					Collection<? extends GrantedAuthority> authorities = jwtUtils.isAuthenticated(token)
 							? userDetails.getAuthorities()
