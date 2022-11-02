@@ -108,7 +108,7 @@ public class AuthenticationRest {
 
 
     @Parameters(@Parameter(name = "tel", required = true))
-    @Operation(summary = "Confirmation du login pour activation du compte", tags = "users", responses = {
+    @Operation(summary = "Confirmation du login pour activation du compte", tags = "authentification", responses = {
             @ApiResponse(responseCode = "200", description = "Code vérifié avec succès", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = UserResDto.class)))),
             @ApiResponse(responseCode = "404", description = "Erreur: Utilisateur inexistant", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Erreur: Identification requise / Login déjà confirmé", content = @Content(mediaType = "Application/Json")),})
@@ -150,7 +150,7 @@ public class AuthenticationRest {
         return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).header(HttpHeaders.LOCATION, newUrl).build();
     }
 
-    @Operation(summary = "Réinitialiser son mot de passe 2 (confirmation du code pour le web)", tags = "users", description = "La validation du token est requis pour le client web", responses = {
+    @Operation(summary = "Réinitialiser son mot de passe 2 (confirmation du code pour le web)", tags = "authentification", description = "La validation du token est requis pour le client web", responses = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "404", description = "L'utilisateur n'existe pas dans la BD", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "400", description = "Erreur dans le format de la requete", content = @Content(mediaType = "Application/Json"))})
@@ -224,7 +224,7 @@ public class AuthenticationRest {
     }
 
 
-    @Operation(summary = "Inscription sur l'application", tags = "users", responses = {
+    @Operation(summary = "Inscription sur l'application", tags = "authentification", responses = {
             @ApiResponse(responseCode = "201", description = "Utilisateur crée avec succès", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = UserResDto.class)))),
             @ApiResponse(responseCode = "400", description = "Erreur: Ce nom d'utilisateur est déjà utilisé/Erreur: Cet email est déjà utilisé", content = @Content(mediaType = "Application/Json")),})
     @PostMapping("/sign-up")
@@ -328,7 +328,7 @@ public class AuthenticationRest {
     }
 
 
-    @Operation(summary = "Obtenir un nouveau token de sécurité", tags = "users", responses = {
+    @Operation(summary = "Obtenir un nouveau token de sécurité", tags = "authentification", responses = {
             @ApiResponse(responseCode = "200", description = "Succès de l'opération", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "404", description = "L'utilisateur n'existe pas dans la BD", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Refresh token revoqué", content = @Content(mediaType = "Application/Json")),
@@ -347,7 +347,7 @@ public class AuthenticationRest {
                 messageSource.getMessage("messages.token_revoked", null, LocaleContextHolder.getLocale())));
     }
 
-    @Operation(summary = "Réinitialiser son mot de passe etape 1 (verification du user)", tags = "users", responses = {
+    @Operation(summary = "Réinitialiser son mot de passe etape 1 (verification du user)", tags = "authentification", responses = {
             @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "404", description = "L'utilisateur n'existe pas dans la BD", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "400", description = "Erreur dans le format de la requete", content = @Content(mediaType = "Application/Json"))})
@@ -374,7 +374,7 @@ public class AuthenticationRest {
                 messageSource.getMessage("messages.code_sent_success", null, LocaleContextHolder.getLocale())));
     }
 
-    @Operation(summary = "Réinitialiser son mot de passe 3 enrégistrement du password(pour le web uniquement)", tags = "users", responses = {
+    @Operation(summary = "Réinitialiser son mot de passe 3 enrégistrement du password(pour le web uniquement)", tags = "authentification", responses = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "404", description = "L'utilisateur n'existe pas dans la BD", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "400", description = "Mot de passe déjà utilisé par le passé", content = @Content(mediaType = "Application/Json"))})
@@ -395,7 +395,7 @@ public class AuthenticationRest {
         return ResponseEntity.ok(user2);
     }
 
-    @Operation(summary = "modifier le password d'un utilisateur", tags = "users", responses = {
+    @Operation(summary = "modifier le password d'un utilisateur", tags = "authentification", responses = {
             @ApiResponse(responseCode = "200", description = "Mot de passe changé avec succès", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "400", description = "Erreur: Ancien mot de passe incorrect", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("@authorizationService.canUpdateOwnerItem(#id, 'User')")

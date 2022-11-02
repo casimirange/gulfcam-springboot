@@ -1,13 +1,14 @@
 package com.gulfcam.fuelcoupon.client.controller;
 
 import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
+import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.client.dto.CreateClientDTO;
 import com.gulfcam.fuelcoupon.client.entity.Client;
+import com.gulfcam.fuelcoupon.client.entity.ETypeClient;
 import com.gulfcam.fuelcoupon.client.entity.TypeClient;
 import com.gulfcam.fuelcoupon.client.repository.IClientRepo;
 import com.gulfcam.fuelcoupon.client.repository.ITypeClientRepo;
 import com.gulfcam.fuelcoupon.client.service.IClientService;
-import com.gulfcam.fuelcoupon.client.utils.ClientUtils;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
 import com.gulfcam.fuelcoupon.user.dto.EmailDto;
 import com.gulfcam.fuelcoupon.user.service.IEmailService;
@@ -45,7 +46,8 @@ public class ClientRest {
     @Autowired
     private ResourceBundleMessageSource messageSource;
 
-    ClientUtils clientUtils;
+    @Autowired
+    JwtUtils jwtUtils;
 
     @Autowired
     IEmailService emailService;
@@ -75,7 +77,7 @@ public class ClientRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
     @PostMapping()
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> addTestLanguage(@Valid @RequestBody CreateClientDTO createClientDTO) {
+    public ResponseEntity<?> addClient(@Valid @RequestBody CreateClientDTO createClientDTO) {
 
         if (iClientService.existsByEmail(createClientDTO.getEmail())) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
@@ -86,7 +88,7 @@ public class ClientRest {
                     messageSource.getMessage("messages.num_gulfcam_exists", null, LocaleContextHolder.getLocale())));
         }
         Client client = new Client();
-        client.setInternalReference(clientUtils.generateInternalReference());
+        client.setInternalReference(jwtUtils.generateInternalReference());
         client.setCreatedAt(LocalDateTime.now());
         client.setAddress(createClientDTO.getAddress());
         client.setCompanyName(createClientDTO.getCompanyName());
@@ -95,8 +97,7 @@ public class ClientRest {
         client.setRCCM(createClientDTO.getRCCM());
         client.setGulfcamAccountNumber(createClientDTO.getGulfcamAccountNumber());
         client.setEmail(createClientDTO.getEmail());
-
-        TypeClient typeAccount = iTypeClientRepo.findByName(createClientDTO.getTypeClient().toUpperCase()).orElseThrow(()-> new ResourceNotFoundException("Type de Client:  "  +  createClientDTO.getTypeClient() +  "  not found"));
+        TypeClient typeAccount = iTypeClientRepo.findByName(ETypeClient.valueOf(createClientDTO.getTypeClient().toUpperCase())).orElseThrow(()-> new ResourceNotFoundException("Type de Client:  "  +  createClientDTO.getTypeClient() +  "  not found"));
         client.setTypeClient(typeAccount);
 
         iClientService.createClient(client);
@@ -107,6 +108,36 @@ public class ClientRest {
             emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, createClientDTO.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_NEW_USER, ApplicationConstant.TEMPLATE_EMAIL_NEW_USER));
             log.info("Email  send successfull for user: " + createClientDTO.getEmail());
         }
+        return ResponseEntity.ok(client);
+    }
+
+    @Operation(summary = "création des informations pour un client", tags = "Client", responses = {
+            @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Client.class)))),
+            @ApiResponse(responseCode = "404", description = "Client not found", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
+    @PutMapping("/{id:[0-9]+}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+    public ResponseEntity<?> updateClient(@Valid @RequestBody CreateClientDTO createClientDTO, @PathVariable Long id) {
+
+        Client client = iClientService.getClientById(id).get();
+        if (client.getId() == null) {
+            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                    messageSource.getMessage("messages.client_exists", null, LocaleContextHolder.getLocale())));
+        }
+        client.setUpdateAt(LocalDateTime.now());
+        client.setAddress(createClientDTO.getAddress());
+        client.setCompanyName(createClientDTO.getCompanyName());
+        client.setCompleteName(createClientDTO.getCompleteName());
+        client.setPhone(createClientDTO.getPhone());
+        client.setRCCM(createClientDTO.getRCCM());
+        client.setGulfcamAccountNumber(createClientDTO.getGulfcamAccountNumber());
+        client.setEmail(createClientDTO.getEmail());
+        TypeClient typeAccount = iTypeClientRepo.findByName(ETypeClient.valueOf(createClientDTO.getTypeClient().toUpperCase())).orElseThrow(()-> new ResourceNotFoundException("Type de Client:  "  +  createClientDTO.getTypeClient() +  "  not found"));
+        client.setTypeClient(typeAccount);
+
+        iClientService.createClient(client);
+
         return ResponseEntity.ok(client);
     }
 
@@ -146,7 +177,7 @@ public class ClientRest {
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasRole('SUPERADMIN') or hasRole('ADMIN') or hasRole('USER') or hasRole('USER')")
     @DeleteMapping("/{id:[0-9]+}")
-    public ResponseEntity<Object> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Object> deleteClient(@PathVariable Long id) {
         Client offerJob = iClientService.getClientById(id).get();
         iClientService.deleteClient(offerJob);
         return ResponseEntity.ok(new MessageResponseDto(
@@ -163,7 +194,7 @@ public class ClientRest {
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @GetMapping("")
-    public ResponseEntity<?> getApplications(@RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
+    public ResponseEntity<?> getClients(@RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                              @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                              @RequestParam(required = false, defaultValue = "id") String sort,
                                              @RequestParam(required = false, defaultValue = "desc") String order) {
