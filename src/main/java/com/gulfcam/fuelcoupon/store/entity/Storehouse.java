@@ -1,38 +1,34 @@
 package com.gulfcam.fuelcoupon.store.entity;
+
 import com.gulfcam.fuelcoupon.utilities.entity.EStatus;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-public class Store {
-
+public class Storehouse {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Schema(description = "Reférence interne", example = "0987698")
     @NotNull
-    @Column(unique = true)
-    private Long internalReference;
+    @Column(nullable = true, name = "id_store")
+    private Long idStore;
 
-    @Column(nullable = true, name = "Localization")
-    private String localization;
+    private String type;
 
-    private LocalDateTime createdAt;
+    private LocalDate updateAt;
 
-    private LocalDateTime updateAt;
+    private LocalDate createAt;
 
     @ManyToOne
     private EStatus status;
-
 
 }

@@ -1,4 +1,4 @@
-package com.gulfcam.fuelcoupon.store.entity;
+package com.gulfcam.fuelcoupon.order.entity;
 import com.gulfcam.fuelcoupon.utilities.entity.EStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Store {
+public class PaymentMethod {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,8 +24,7 @@ public class Store {
     @Column(unique = true)
     private Long internalReference;
 
-    @Column(nullable = true, name = "Localization")
-    private String localization;
+    private String designation;
 
     private LocalDateTime createdAt;
 
@@ -33,6 +32,5 @@ public class Store {
 
     @ManyToOne
     private EStatus status;
-
 
 }

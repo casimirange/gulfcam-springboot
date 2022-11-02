@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Store {
+public class Ticket {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,8 +24,11 @@ public class Store {
     @Column(unique = true)
     private Long internalReference;
 
-    @Column(nullable = true, name = "Localization")
-    private String localization;
+    private Long IdRequestOpposition;
+
+    @NotNull
+    @Column(nullable = true, name = "id_coupon")
+    private Long idCoupon;
 
     private LocalDateTime createdAt;
 
@@ -33,6 +36,5 @@ public class Store {
 
     @ManyToOne
     private EStatus status;
-
 
 }

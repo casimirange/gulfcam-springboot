@@ -1,4 +1,5 @@
 package com.gulfcam.fuelcoupon.store.entity;
+
 import com.gulfcam.fuelcoupon.utilities.entity.EStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Store {
+public class Coupon {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,8 +25,18 @@ public class Store {
     @Column(unique = true)
     private Long internalReference;
 
-    @Column(nullable = true, name = "Localization")
-    private String localization;
+    @NotNull
+    @Column(unique = true)
+    private String serialNumber;
+
+    @Column(nullable = true, name = "id_client")
+    private Long idClient;
+
+    @Column(nullable = true, name = "id_notebook")
+    private Long idNotebook;
+
+    @Column(nullable = true, name = "id_station")
+    private Long idStation;
 
     private LocalDateTime createdAt;
 

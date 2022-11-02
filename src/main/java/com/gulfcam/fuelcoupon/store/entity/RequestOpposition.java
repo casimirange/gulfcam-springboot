@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Store {
+public class RequestOpposition {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,8 +25,18 @@ public class Store {
     @Column(unique = true)
     private Long internalReference;
 
-    @Column(nullable = true, name = "Localization")
-    private String localization;
+    @Lob
+    @Type(type = "org.hibernate.type.TextType")
+    private String description;
+
+    private String reason;
+
+    @NotNull
+    @Column(nullable = true, name = "id_service_client")
+    private Long idServiceClient;
+
+    @Column(nullable = true, name = "id_manager_coupon")
+    private Long idManagerCoupon;
 
     private LocalDateTime createdAt;
 
@@ -33,6 +44,5 @@ public class Store {
 
     @ManyToOne
     private EStatus status;
-
 
 }

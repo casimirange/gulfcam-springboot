@@ -1,4 +1,4 @@
-package com.gulfcam.fuelcoupon.user.entity;
+package com.gulfcam.fuelcoupon.client.entity;
 
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -14,9 +14,9 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @ToString
-@Table(name = "TypeAccount")
+@Table(name = "TypeClient")
 @Audited(withModifiedFlag = true)
-public class TypeAccount {
+public class TypeClient {
 
     @Schema(description = "identifiant unique du type de compte", example = "1", required = true, accessMode = Schema.AccessMode.READ_ONLY)
     @Id
@@ -25,11 +25,11 @@ public class TypeAccount {
     private Long id;
 
     @NotNull
-    @Schema(description = "nom du type de compte", example = "STORE_KEEPER, MANAGER_COUPON, MANAGER_STORE, TREASURY, CUSTOMER_SERVICE, MANAGER_STATION, POMPIST")
+    @Schema(description = "nom du type de compte", example = "PARTICULAR, ENTREPRISE, INSTITUTION")
     @Enumerated(EnumType.STRING)
-    private ETypeAccount name;
+    private ETypeClient name;
 
-    public TypeAccount(ETypeAccount name) {
+    public TypeClient(ETypeClient name) {
         this.name = name;
     }
 }

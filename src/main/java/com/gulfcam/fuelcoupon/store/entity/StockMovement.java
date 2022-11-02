@@ -1,5 +1,7 @@
 package com.gulfcam.fuelcoupon.store.entity;
-import com.gulfcam.fuelcoupon.utilities.entity.EStatus;
+
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,12 +10,13 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-public class Store {
+public class StockMovement {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,15 +27,18 @@ public class Store {
     @Column(unique = true)
     private Long internalReference;
 
-    @Column(nullable = true, name = "Localization")
-    private String localization;
+    @Column(nullable = true, name = "id_store1")
+    private Long idStore1;
 
-    private LocalDateTime createdAt;
+    @Column(nullable = true, name = "id_store_house1")
+    private Long idStoreHouse1;
 
-    private LocalDateTime updateAt;
+    @Column(nullable = true, name = "id_store2")
+    private Long idStore2;
 
-    @ManyToOne
-    private EStatus status;
+    @Column(nullable = true, name = "id_store_house2")
+    private Long idStoreHouse2;
 
+    private String type;
 
 }

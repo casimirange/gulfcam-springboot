@@ -71,10 +71,6 @@ public class JwtUtils {
 		return  (1000 + new Random().nextInt(9000));
 	}
 
-	public String geerateIdTransaction() {
-				return "IMEM" +"-"+ LocalDate.now().toString().replace("-","")  +"-"+ RandomStringUtils.random(4, 35, 125, true, true, null, new SecureRandom()) +"-"+ (100 + new Random().nextInt(900)) +"-"+ RandomStringUtils.random(4, 35, 125, true, true, null, new SecureRandom());
-	}
-	
 	public String getIdGulfcamFromJwtToken(String token, String secret) {
 		return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getSubject();
 	}
@@ -113,8 +109,8 @@ public class JwtUtils {
 	}
 
 	public Long generateInternalReference() {
-		Long jobetrouveId =  Long.parseLong((100 + new Random().nextInt(900)) + RandomStringUtils.random(4, 35, 125, false, true, null, new SecureRandom()));
-		return jobetrouveId;
+		Long internalReference =  Long.parseLong((100 + new Random().nextInt(900)) + RandomStringUtils.random(4, 35, 125, false, true, null, new SecureRandom()));
+		return internalReference;
 	}
 
 	public String refreshToken(String token) throws Exception {
