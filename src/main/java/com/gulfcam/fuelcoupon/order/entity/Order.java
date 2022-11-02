@@ -1,8 +1,6 @@
 package com.gulfcam.fuelcoupon.order.entity;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -13,6 +11,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+@ToString
+@Table(name = "orders")
 public class Order {
 
     @Id
@@ -41,16 +42,16 @@ public class Order {
     private Long idManagerCoupon;
 
     @Column(nullable = true, name = "net_aggregate_amount")
-    private float NetAggregateAmount;
+    private int NetAggregateAmount;
 
     @Column(nullable = true, name = "ttc_aggregateA_amount")
-    private float TTCAggregateAmount;
+    private int TTCAggregateAmount;
 
     @Column(nullable = true, name = "id_storekeeper")
     private Long idStorekeeper;
 
     @Column(nullable = true, name = "tax")
-    private float tax;
+    private String tax;
 
     @NotNull
     @Column(nullable = true, name = "id_store")
@@ -78,6 +79,5 @@ public class Order {
     private LocalDateTime createdAt;
 
     private LocalDateTime updateAt;
-
 
 }

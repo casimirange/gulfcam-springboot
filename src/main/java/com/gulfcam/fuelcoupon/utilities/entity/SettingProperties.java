@@ -10,7 +10,8 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@Table(name = "setting_properties")
+@EqualsAndHashCode(callSuper = false)
+@Table(name = "settingproperties")
 public class SettingProperties {
 
     @Id
