@@ -1,10 +1,9 @@
 package com.gulfcam.fuelcoupon.store.entity;
-import com.gulfcam.fuelcoupon.utilities.entity.EStatus;
+import com.gulfcam.fuelcoupon.utilities.entity.Status;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -40,6 +39,6 @@ public class Station {
     private LocalDateTime updateAt;
 
     @ManyToOne
-    private EStatus status;
+    private Status status;
 
 }

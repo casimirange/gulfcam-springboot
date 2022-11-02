@@ -1,6 +1,5 @@
 package com.gulfcam.fuelcoupon.store.entity;
-
-import com.gulfcam.fuelcoupon.utilities.entity.EStatus;
+import com.gulfcam.fuelcoupon.utilities.entity.Status;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,6 +28,6 @@ public class Storehouse {
     private LocalDate createAt;
 
     @ManyToOne
-    private EStatus status;
+    private Status status;
 
 }

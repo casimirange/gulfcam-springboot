@@ -1,6 +1,5 @@
 package com.gulfcam.fuelcoupon.store.entity;
-
-import com.gulfcam.fuelcoupon.utilities.entity.EStatus;
+import com.gulfcam.fuelcoupon.utilities.entity.Status;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -43,7 +42,7 @@ public class Coupon {
     private LocalDateTime updateAt;
 
     @ManyToOne
-    private EStatus status;
+    private Status status;
 
 
 }
