@@ -110,7 +110,7 @@ public class ClientRest {
         return ResponseEntity.ok(client);
     }
 
-    @Operation(summary = "Recupérer Un Client par son email", tags = "client", responses = {
+    @Operation(summary = "Recupérer Un Client par son email", tags = "Client", responses = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Client.class)))),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
@@ -120,7 +120,7 @@ public class ClientRest {
         return ResponseEntity.ok(iClientService.getClientByEmail(email).get());
     }
 
-    @Operation(summary = "Recupérer Un Client par son Identifiant Gulfcam", tags = "client", responses = {
+    @Operation(summary = "Recupérer Un Client par son Identifiant Gulfcam", tags = "Client", responses = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Client.class)))),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
@@ -130,7 +130,7 @@ public class ClientRest {
         return ResponseEntity.ok(iClientService.getClientByGulfCamAccountNumber(gulfcamaccountnumber).get());
     }
 
-    @Operation(summary = "Recupérer Un Client par son ID", tags = "client", responses = {
+    @Operation(summary = "Recupérer Un Client par son ID", tags = "Client", responses = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Client.class)))),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
@@ -140,7 +140,7 @@ public class ClientRest {
         return ResponseEntity.ok(iClientService.getClientById(id).get());
     }
 
-    @Operation(summary = "Supprimer un client", tags = "client", responses = {
+    @Operation(summary = "Supprimer un client", tags = "Client", responses = {
             @ApiResponse(responseCode = "200", description = "Client deleted successfully", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : access denied", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
@@ -156,7 +156,7 @@ public class ClientRest {
     @Parameters(value = {
             @Parameter(name = "sort", schema = @Schema(allowableValues = {"id", "createdAt"})),
             @Parameter(name = "order", schema = @Schema(allowableValues = {"asc", "desc"}))})
-    @Operation(summary = "Liste des Clients", tags = "client", responses = {
+    @Operation(summary = "Liste des Clients", tags = "Client", responses = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "404", description = "Client not found", content = @Content(mediaType = "Application/Json")),

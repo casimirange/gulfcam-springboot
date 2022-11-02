@@ -42,7 +42,7 @@ public class UtilitiesRestController {
     @Autowired
     IEmailService emailService;
 
-    @Operation(summary = "Liste complet de tous les niveaux d'expérience", tags = "utilities", responses = {
+    @Operation(summary = "Liste complet de tous les niveaux d'expérience", tags = "Utilities", responses = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
@@ -53,7 +53,7 @@ public class UtilitiesRestController {
         return ResponseEntity.ok(message);
     }
 
-    @Operation(summary = "Création d'un parametre système", tags = "utilities", responses = {
+    @Operation(summary = "Création d'un parametre système", tags = "Utilities", responses = {
             @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = SettingProperties.class)))),
             @ApiResponse(responseCode = "400", description = "Erreur: bad request", content = @Content(mediaType = "Application/Json")),})
     //@PreAuthorize("hasRole('ADMIN')")
@@ -64,7 +64,7 @@ public class UtilitiesRestController {
         return ResponseEntity.status(HttpStatus.CREATED).body(settingsave);
     }
 
-    @Operation(summary = "modiffication d'un paramêtre système", tags = "utilities", responses = {
+    @Operation(summary = "modiffication d'un paramêtre système", tags = "Utilities", responses = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = SettingProperties.class)))),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
@@ -76,7 +76,7 @@ public class UtilitiesRestController {
         return ResponseEntity.ok(settingsave);
     }
 
-    @Operation(summary = "Liste de tous les paramêtre système", tags = "utilities", responses = {
+    @Operation(summary = "Liste de tous les paramêtre système", tags = "Utilities", responses = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
@@ -86,7 +86,7 @@ public class UtilitiesRestController {
         return ResponseEntity.ok(settingProperties);
     }
 
-    @Operation(summary = "Supprimer un paramêtre système", tags = "utilities", responses = {
+    @Operation(summary = "Supprimer un paramêtre système", tags = "Utilities", responses = {
             @ApiResponse(responseCode = "200", description = "paramêtre système supprimé avec succès", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
