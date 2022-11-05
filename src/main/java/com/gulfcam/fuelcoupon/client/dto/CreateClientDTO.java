@@ -1,15 +1,10 @@
 package com.gulfcam.fuelcoupon.client.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.gulfcam.fuelcoupon.client.entity.TypeClient;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.ManyToOne;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter

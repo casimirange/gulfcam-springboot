@@ -7,6 +7,7 @@ public interface IClientRepo extends JpaRepository<Client, Long> {
 
     Optional<Client> getClientByEmail(String email);
     Optional<Client> getClientByGulfcamAccountNumber(String gulfcamaccountnumber);
+    Optional<Client> getClientByInternalReference(Long internalReference);
 
     boolean existsByEmail(String email);
     boolean existsByGulfcamAccountNumber(String gulfcamaccountnumber);

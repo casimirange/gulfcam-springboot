@@ -44,6 +44,11 @@ public class ClientServiceImpl implements IClientService {
     }
 
     @Override
+    public Optional<Client> getClientByInternalReference(Long internalReference) {
+        return iClientRepo.getClientByInternalReference(internalReference);
+    }
+
+    @Override
     public void createClient(Client client) {
         iClientRepo.save(client);
     }

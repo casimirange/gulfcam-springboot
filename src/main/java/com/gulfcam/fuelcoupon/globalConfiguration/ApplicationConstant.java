@@ -12,6 +12,8 @@ public class ApplicationConstant {
 
     public static final String SUBJECT_EMAIL_NEW_USER = "GulfCam - Bienvenue";
 
+    public static final String SUBJECT_EMAIL_NEW_ORDER = "GulfCam - Nouvelle Commande : #Ref";
+
     public static final String SUBJECT_EMAIL_PAY_TEMPORAIRE = "GulfCam - Accès Temporaire";
 
     public static final String SUBJECT_EMAIL_VILID_PROFIL = "GulfCam - Validation de profil ";
@@ -21,6 +23,8 @@ public class ApplicationConstant {
     public static final String TEMPLATE_EMAIL_ENTREPRISE_MEMBRE = "email-verification";
 
     public static final String TEMPLATE_EMAIL_NEW_USER = "new-user";
+
+    public static final String TEMPLATE_EMAIL_NEW_ORDER = "new-order";
 
     public static final String SUBJECT_EMAIL_PAY_SERVICE_ABONNEMENT = "nouveau membre";
 

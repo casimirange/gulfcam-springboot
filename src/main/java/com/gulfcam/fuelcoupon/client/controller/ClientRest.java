@@ -111,16 +111,16 @@ public class ClientRest {
         return ResponseEntity.ok(client);
     }
 
-    @Operation(summary = "création des informations pour un client", tags = "Client", responses = {
+    @Operation(summary = "modification des informations pour un client", tags = "Client", responses = {
             @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Client.class)))),
             @ApiResponse(responseCode = "404", description = "Client not found", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
-    @PutMapping("/{id:[0-9]+}")
+    @PutMapping("/{internalReference:[0-9]+}")
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> updateClient(@Valid @RequestBody CreateClientDTO createClientDTO, @PathVariable Long id) {
+    public ResponseEntity<?> updateClient(@Valid @RequestBody CreateClientDTO createClientDTO, @PathVariable Long internalReference) {
 
-        Client client = iClientService.getClientById(id).get();
+        Client client = iClientService.getClientByInternalReference(internalReference).get();
         if (client.getId() == null) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.client_exists", null, LocaleContextHolder.getLocale())));
@@ -171,14 +171,24 @@ public class ClientRest {
         return ResponseEntity.ok(iClientService.getClientById(id).get());
     }
 
+    @Operation(summary = "Recupérer Un Client par sa reference interne", tags = "Client", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Client.class)))),
+            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+    @GetMapping("/{internalReference:[0-9]+}")
+    public ResponseEntity<Client> getClientByInternalReference(@PathVariable Long internalReference) {
+        return ResponseEntity.ok(iClientService.getClientByInternalReference(internalReference).get());
+    }
+
     @Operation(summary = "Supprimer un client", tags = "Client", responses = {
             @ApiResponse(responseCode = "200", description = "Client deleted successfully", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : access denied", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasRole('SUPERADMIN') or hasRole('ADMIN') or hasRole('USER') or hasRole('USER')")
-    @DeleteMapping("/{id:[0-9]+}")
-    public ResponseEntity<Object> deleteClient(@PathVariable Long id) {
-        Client offerJob = iClientService.getClientById(id).get();
+    @DeleteMapping("/{internalReference:[0-9]+}")
+    public ResponseEntity<Object> deleteClient(@PathVariable Long internalReference) {
+        Client offerJob = iClientService.getClientByInternalReference(internalReference).get();
         iClientService.deleteClient(offerJob);
         return ResponseEntity.ok(new MessageResponseDto(
                 messageSource.getMessage("messages.request_successful-delete", null, LocaleContextHolder.getLocale())));

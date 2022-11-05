@@ -12,6 +12,7 @@ public interface IClientService {
     Optional<Client> getClientByEmail(String email);
     Optional<Client> getClientByGulfCamAccountNumber(String gulfcamaccountnumber);
     Optional<Client> getClientById(Long id);
+    Optional<Client> getClientByInternalReference(Long internalReference);
     void createClient(Client client);
     void deleteClient(Client client);
     boolean existsByEmail(String email);

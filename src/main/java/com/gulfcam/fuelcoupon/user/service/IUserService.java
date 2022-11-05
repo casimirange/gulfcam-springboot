@@ -20,6 +20,8 @@ public interface IUserService {
 	
 	Users getById(Long id);
 
+	Users getByInternalReference(Long internalReference);
+
 	Optional<Users> getByTelephone(String tel);
 
 	Optional<Users> getByEmail(String email);

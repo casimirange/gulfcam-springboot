@@ -6,9 +6,10 @@ import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.authentication.service.UserDetailsImpl;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
 import com.gulfcam.fuelcoupon.user.dto.*;
-import com.gulfcam.fuelcoupon.user.entity.EStatusUser;
-import com.gulfcam.fuelcoupon.user.entity.OldPassword;
-import com.gulfcam.fuelcoupon.user.entity.Users;
+import com.gulfcam.fuelcoupon.user.entity.*;
+import com.gulfcam.fuelcoupon.user.repository.IOldPasswordRepo;
+import com.gulfcam.fuelcoupon.user.repository.IRoleUserRepo;
+import com.gulfcam.fuelcoupon.user.repository.ITypeAccountRepository;
 import com.gulfcam.fuelcoupon.user.repository.IUserRepo;
 import com.gulfcam.fuelcoupon.user.service.IEmailService;
 import com.gulfcam.fuelcoupon.user.service.IUserService;
@@ -82,6 +83,12 @@ public class AuthenticationRest {
 
     @Autowired
     IUtilitieService utilitieService;
+
+    @Autowired
+    private IRoleUserRepo roleRepo;
+
+    @Autowired
+    ITypeAccountRepository typeAccountRepo;
 
     @Autowired
     IEmailService emailService;
@@ -245,6 +252,12 @@ public class AuthenticationRest {
         u.setUsing2FA(true);
         u.setFirstName(userAddDto.getFirstName());
         u.setLastName(userAddDto.getLastName());
+        Set<RoleUser> roles = new HashSet<>();
+        RoleUser rolesUser = roleRepo.findByName(userAddDto.getRoleName() != null ? ERole.valueOf(userAddDto.getRoleName()) : ERole.ROLE_USER).orElseThrow(()-> new ResourceNotFoundException("Role not found"));
+        roles.add(rolesUser);
+        u.setRoles(roles);
+        TypeAccount typeAccount = typeAccountRepo.findByName(userAddDto.getTypeAccount() != null ? ETypeAccount.valueOf(userAddDto.getTypeAccount()) : ETypeAccount.MANAGER_STORE).orElseThrow(()-> new ResourceNotFoundException("Type de compte not found"));
+        u.setTypeAccount(typeAccount);
         u.setInternalReference(jwtUtils.generateInternalReference());
         u.setPosition(userAddDto.getPosition());
         u.setPassword(encoder.encode(userAddDto.getPassword()));

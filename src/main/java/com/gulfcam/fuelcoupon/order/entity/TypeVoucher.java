@@ -35,6 +35,4 @@ public class TypeVoucher {
 
     @ManyToOne
     private Status status;
-
-
 }

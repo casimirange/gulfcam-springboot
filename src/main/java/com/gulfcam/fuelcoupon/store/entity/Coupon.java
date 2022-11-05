@@ -31,6 +31,9 @@ public class Coupon {
     @Column(nullable = true, name = "id_client")
     private Long idClient;
 
+    @Column(nullable = true, name = "id_ticket")
+    private Long idTicket;
+
     @Column(nullable = true, name = "id_notebook")
     private Long idNotebook;
 

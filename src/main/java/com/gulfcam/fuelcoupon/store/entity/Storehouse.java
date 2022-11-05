@@ -1,5 +1,6 @@
 package com.gulfcam.fuelcoupon.store.entity;
 import com.gulfcam.fuelcoupon.utilities.entity.Status;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,6 +17,11 @@ public class Storehouse {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Schema(description = "Reférence interne", example = "0987698")
+    @NotNull
+    @Column(unique = true)
+    private Long internalReference;
 
     @NotNull
     @Column(nullable = true, name = "id_store")

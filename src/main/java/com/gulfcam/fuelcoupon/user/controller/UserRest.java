@@ -1,9 +1,13 @@
 package com.gulfcam.fuelcoupon.user.controller;
 
 import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
+import com.gulfcam.fuelcoupon.user.dto.UserResDto;
+import com.gulfcam.fuelcoupon.user.entity.Users;
 import com.gulfcam.fuelcoupon.user.service.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,25 +38,36 @@ public class UserRest {
 			@ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
 			@ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json")) })
 	@GetMapping("/{userId:[0-9]+}")
+	@PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
 	public ResponseEntity<?> getByIds(@PathVariable Long userId) {
 		return ResponseEntity.ok(userService.getById(userId));
 	}
 
-	/*
-          @Operation(summary = "Liste de 20 utilisateurs pour la landing page", tags = "users", responses = {
+          @Operation(summary = "Liste de utilisateurs", tags = "users", responses = {
                   @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json")),
                   @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
                   @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json")) })
-          @GetMapping("/20-landingpage")
-          public ResponseEntity<Page<User>> get20Users(
+          @GetMapping("")
+		  @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+          public ResponseEntity<Page<Users>> get20Users(
                   @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                   @RequestParam(required = false, value = "size", defaultValue = "20") String sizeParam,
                   @RequestParam(required = false, defaultValue = "userId") String sort,
                   @RequestParam(required = false, defaultValue = "desc") String order) {
-              Page<User> users = userService.get20Users(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
+              Page<Users> users = userService.getUsers(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
               return ResponseEntity.ok(users);
           }
 
+	@Operation(summary = "modifie le statut d'un compte ", tags = "users", responses = {
+			@ApiResponse(responseCode = "200", description = "Succès de l'opération", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = UserResDto.class)))), })
+	@PreAuthorize("hasRole('MANAGER') or hasRole('ADMIN')")
+	@PutMapping("/{id:[0-9]+}/status")
+	public ResponseEntity<Users> editStatus(@PathVariable("id") Long userId, @RequestParam Long statusId) {
+		Users user = userService.editStatus(userId, statusId);
+		return ResponseEntity.ok(user);
+	}
+
+	/*
           @Operation(summary = "Récupère un utilisateur à partir de son username", tags = "users", responses = {
                   @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json")),
                   @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),

@@ -55,12 +55,7 @@ public class UserServiceImpl implements IUserService {
 	@Transactional
 	public Map<String, Object> add(Users u) {
 		Users user = new Users(u.getInternalReference(), u.getEmail(), u.getPassword());
-		Set<RoleUser> roles = new HashSet<>();
-		RoleUser rolesUser = roleRepo.findByName(ERole.ROLE_AGENT).orElseThrow(()-> new ResourceNotFoundException("Role:  "  +  ERole.ROLE_AGENT.name() +  "  not found"));
-		roles.add(rolesUser);
-		user.setRoles(roles);
-		TypeAccount typeAccount = typeAccountRepo.findByName(ETypeAccount.MANAGER_COUPON).orElseThrow(()-> new ResourceNotFoundException("Type de compte:  "  +  ETypeAccount.MANAGER_COUPON.name() +  "  not found"));
-		user.setTypeAccount(typeAccount);
+
 		StatusUser status = statusRepo.findByName(EStatusUser.USER_ENABLED);
 		user.setStatus(status);
 		user.setTokenAuth(null);
@@ -73,6 +68,8 @@ public class UserServiceImpl implements IUserService {
 		user.setPinCode(u.getPinCode());
 		user.setPosition(u.getPosition());
 		user.setIdStore(u.getIdStore());
+		user.setRoles(u.getRoles());
+		user.setTypeAccount(u.getTypeAccount());
 		user.setCreatedDate(LocalDateTime.now());
 		userRepo.save(user);
 		Map<String, Object> userAndPasswordNotEncoded = new HashMap<>();
@@ -84,6 +81,14 @@ public class UserServiceImpl implements IUserService {
 	@Override
 	public Users getById(Long id) {
 		Users user = userRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(
+				messageSource.getMessage("messages.user_not_found", null, LocaleContextHolder.getLocale())));
+
+		return user;
+	}
+
+	@Override
+	public Users getByInternalReference(Long internalReference) {
+		Users user = userRepo.findByInternalReference(internalReference).orElseThrow(() -> new ResourceNotFoundException(
 				messageSource.getMessage("messages.user_not_found", null, LocaleContextHolder.getLocale())));
 
 		return user;

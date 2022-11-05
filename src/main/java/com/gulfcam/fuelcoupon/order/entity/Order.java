@@ -26,7 +26,6 @@ public class Order {
     private Long internalReference;
 
     @Schema(description = "Reférence client", example = "0987698")
-    @Column(unique = true)
     private Long clientReference;
 
     @Column(nullable = true, name = "id_client")
