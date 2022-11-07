@@ -94,19 +94,19 @@ public class ProductRest {
         Order order= new Order();
         TypeVoucher typeVoucher = new TypeVoucher();
         if (createProductDTO.getIdTypeVoucher()  != null) {
-            typeVoucher = iTypeVoucherService.getByInternalReference(createProductDTO.getIdTypeVoucher()).get();
-
-            if(typeVoucher.getId() == null)
+            if(!iTypeVoucherService.getByInternalReference(createProductDTO.getIdTypeVoucher()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.typevoucher_exists", null, LocaleContextHolder.getLocale())));
+            typeVoucher = iTypeVoucherService.getByInternalReference(createProductDTO.getIdTypeVoucher()).get();
+
         }
 
         if (createProductDTO.getIdOrder()  != null) {
-            order = iOrderService.getByInternalReference(createProductDTO.getIdOrder()).get();
-
-            if(order.getId() == null)
+            if(!iOrderService.getByInternalReference(createProductDTO.getIdOrder()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.order_exists", null, LocaleContextHolder.getLocale())));
+            order = iOrderService.getByInternalReference(createProductDTO.getIdOrder()).get();
+
         }
         Product product = new Product();
         product.setInternalReference(jwtUtils.generateInternalReference());
@@ -131,27 +131,27 @@ public class ProductRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     public ResponseEntity<?> updateProduct(@Valid @RequestBody CreateProductDTO createProductDTO, @PathVariable Long internalReference) {
 
-        Product product = iProductService.getByInternalReference(internalReference).get();
-        if (product.getId() == null) {
+        if (!iProductService.getByInternalReference(internalReference).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.product_exists", null, LocaleContextHolder.getLocale())));
         }
+        Product product = iProductService.getByInternalReference(internalReference).get();
         Order order= new Order();
         TypeVoucher typeVoucher = new TypeVoucher();
         if (createProductDTO.getIdTypeVoucher()  != null) {
-            typeVoucher = iTypeVoucherService.getByInternalReference(createProductDTO.getIdTypeVoucher()).get();
-
-            if(typeVoucher.getId() == null)
+            if(!iTypeVoucherService.getByInternalReference(createProductDTO.getIdTypeVoucher()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.typevoucher_exists", null, LocaleContextHolder.getLocale())));
+            typeVoucher = iTypeVoucherService.getByInternalReference(createProductDTO.getIdTypeVoucher()).get();
+
         }
 
         if (createProductDTO.getIdOrder()  != null) {
-            order = iOrderService.getByInternalReference(createProductDTO.getIdOrder()).get();
-
-            if(order.getId() == null)
+            if(!iOrderService.getByInternalReference(createProductDTO.getIdOrder()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.order_exists", null, LocaleContextHolder.getLocale())));
+            order = iOrderService.getByInternalReference(createProductDTO.getIdOrder()).get();
+
         }
         product.setUpdateAt(LocalDateTime.now());
         if (createProductDTO.getIdTypeVoucher() != null)

@@ -95,19 +95,19 @@ public class UnitRest {
         Store store= new Store();
         TypeVoucher typeVoucher = new TypeVoucher();
         if (createUnitDTO.getIdTypeVoucher()  != null) {
-            typeVoucher = iTypeVoucherService.getByInternalReference(createUnitDTO.getIdTypeVoucher()).get();
-
-            if(typeVoucher.getId() == null)
+            if(!iTypeVoucherService.getByInternalReference(createUnitDTO.getIdTypeVoucher()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.typevoucher_exists", null, LocaleContextHolder.getLocale())));
+            typeVoucher = iTypeVoucherService.getByInternalReference(createUnitDTO.getIdTypeVoucher()).get();
+
         }
 
         if (createUnitDTO.getIdStore()  != null) {
-            store = iStoreService.getByInternalReference(createUnitDTO.getIdStore()).get();
-
-            if(store.getId() == null)
+            if(!iStoreService.getByInternalReference(createUnitDTO.getIdStore()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
+            store = iStoreService.getByInternalReference(createUnitDTO.getIdStore()).get();
+
         }
         Unit unit = new Unit();
         unit.setInternalReference(jwtUtils.generateInternalReference());
@@ -132,27 +132,27 @@ public class UnitRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     public ResponseEntity<?> updateUnit(@Valid @RequestBody CreateUnitDTO createUnitDTO, @PathVariable Long internalReference) {
 
-        Unit unit = iUnitService.getByInternalReference(internalReference).get();
-        if (unit.getId() == null) {
+        if (!iUnitService.getByInternalReference(internalReference).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.unit_exists", null, LocaleContextHolder.getLocale())));
         }
+        Unit unit = iUnitService.getByInternalReference(internalReference).get();
         Store store= new Store();
         TypeVoucher typeVoucher = new TypeVoucher();
         if (createUnitDTO.getIdTypeVoucher()  != null) {
-            typeVoucher = iTypeVoucherService.getByInternalReference(createUnitDTO.getIdTypeVoucher()).get();
-
-            if(typeVoucher.getId() == null)
+            if(!iTypeVoucherService.getByInternalReference(createUnitDTO.getIdTypeVoucher()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.typevoucher_exists", null, LocaleContextHolder.getLocale())));
+            typeVoucher = iTypeVoucherService.getByInternalReference(createUnitDTO.getIdTypeVoucher()).get();
+
         }
 
         if (createUnitDTO.getIdStore()  != null) {
-            store = iStoreService.getByInternalReference(createUnitDTO.getIdStore()).get();
-
-            if(store.getId() == null)
+            if(!iStoreService.getByInternalReference(createUnitDTO.getIdStore()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
+            store = iStoreService.getByInternalReference(createUnitDTO.getIdStore()).get();
+
         }
         unit.setUpdateAt(LocalDateTime.now());
         if (createUnitDTO.getIdTypeVoucher()  != null)

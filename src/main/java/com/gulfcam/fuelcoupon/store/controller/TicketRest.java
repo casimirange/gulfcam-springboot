@@ -90,16 +90,16 @@ public class TicketRest {
         Coupon coupon = new Coupon();
         RequestOpposition requestOpposition = new RequestOpposition();
         if (createTicketDTO.getIdCoupon() != null) {
-            coupon = iCouponService.getByInternalReference(createTicketDTO.getIdCoupon()).get();
-            if(coupon.getId() == null)
+            if(!iCouponService.getByInternalReference(createTicketDTO.getIdCoupon()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.coupon_exists", null, LocaleContextHolder.getLocale())));
+            coupon = iCouponService.getByInternalReference(createTicketDTO.getIdCoupon()).get();
         }
         if (createTicketDTO.getIdRequestOpposition() != null) {
-            requestOpposition = iRequestOppositionService.getByInternalReference(createTicketDTO.getIdRequestOpposition()).get();
-            if(requestOpposition.getId() == null)
+            if(!iRequestOppositionService.getByInternalReference(createTicketDTO.getIdRequestOpposition()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.requestopposition_exists", null, LocaleContextHolder.getLocale())));
+            requestOpposition = iRequestOppositionService.getByInternalReference(createTicketDTO.getIdRequestOpposition()).get();
         }
         Ticket ticket = new Ticket();
         ticket.setInternalReference(jwtUtils.generateInternalReference());
@@ -123,24 +123,24 @@ public class TicketRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     public ResponseEntity<?> updateTicket(@Valid @RequestBody CreateTicketDTO createTicketDTO, @PathVariable Long internalReference) {
 
-        Ticket ticket = iTicketService.getByInternalReference(internalReference).get();
-        if (ticket.getId() == null) {
+        if (!iTicketService.getByInternalReference(internalReference).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.ticket_exists", null, LocaleContextHolder.getLocale())));
         }
+        Ticket ticket = iTicketService.getByInternalReference(internalReference).get();
         Coupon coupon = new Coupon();
         RequestOpposition requestOpposition = new RequestOpposition();
         if (createTicketDTO.getIdCoupon() != null) {
-            coupon = iCouponService.getByInternalReference(createTicketDTO.getIdCoupon()).get();
-            if(coupon.getId() == null)
+            if(!iCouponService.getByInternalReference(createTicketDTO.getIdCoupon()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.coupon_exists", null, LocaleContextHolder.getLocale())));
+            coupon = iCouponService.getByInternalReference(createTicketDTO.getIdCoupon()).get();
         }
         if (createTicketDTO.getIdRequestOpposition() != null) {
-            requestOpposition = iRequestOppositionService.getByInternalReference(createTicketDTO.getIdRequestOpposition()).get();
-            if(requestOpposition.getId() == null)
+            if(!iRequestOppositionService.getByInternalReference(createTicketDTO.getIdRequestOpposition()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.requestopposition_exists", null, LocaleContextHolder.getLocale())));
+            requestOpposition = iRequestOppositionService.getByInternalReference(createTicketDTO.getIdRequestOpposition()).get();
         }
         ticket.setUpdateAt(LocalDateTime.now());
         if (createTicketDTO.getIdCoupon() != null)

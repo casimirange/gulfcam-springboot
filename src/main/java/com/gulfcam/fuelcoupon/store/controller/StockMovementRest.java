@@ -84,28 +84,28 @@ public class StockMovementRest {
         Store store2 = new Store();
         Storehouse storehouse2 = new Storehouse();
         if (createStockMovementDTO.getIdStore1() != null) {
-            store1 = iStoreService.getByInternalReference(createStockMovementDTO.getIdStore1()).get();
-            if(store1.getId() == null)
+            if(!iStoreService.getByInternalReference(createStockMovementDTO.getIdStore1()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
+            store1 = iStoreService.getByInternalReference(createStockMovementDTO.getIdStore1()).get();
         }
         if (createStockMovementDTO.getIdStore1() != null) {
-            store2 = iStoreService.getByInternalReference(createStockMovementDTO.getIdStore1()).get();
-            if(store1.getId() == null)
+            if(!iStoreService.getByInternalReference(createStockMovementDTO.getIdStore1()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
+            store2 = iStoreService.getByInternalReference(createStockMovementDTO.getIdStore1()).get();
         }
         if (createStockMovementDTO.getIdStoreHouse1() != null) {
-            storehouse1 = iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouse1()).get();
-            if(storehouse1.getId() == null)
+            if(!iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouse1()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.storehouse_exists", null, LocaleContextHolder.getLocale())));
+            storehouse1 = iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouse1()).get();
         }
         if (createStockMovementDTO.getIdStoreHouse2() != null) {
-            storehouse2 = iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouse2()).get();
-            if(storehouse2.getId() == null)
+            if(!iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouse2()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.storehouse_exists", null, LocaleContextHolder.getLocale())));
+            storehouse2 = iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouse2()).get();
         }
         StockMovement stockMovement = new StockMovement();
         stockMovement.setInternalReference(jwtUtils.generateInternalReference());
@@ -128,38 +128,38 @@ public class StockMovementRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     public ResponseEntity<?> updateStockMovement(@Valid @RequestBody CreateStockMovementDTO createStockMovementDTO, @PathVariable Long internalReference) {
 
-        StockMovement stockMovement = iStockMovementService.getByInternalReference(internalReference).get();
-        if (stockMovement.getId() == null) {
+        if (!iStockMovementService.getByInternalReference(internalReference).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.stockMovement_exists", null, LocaleContextHolder.getLocale())));
         }
+        StockMovement stockMovement = iStockMovementService.getByInternalReference(internalReference).get();
         Store store1 = new Store();
         Storehouse storehouse1 = new Storehouse();
         Store store2 = new Store();
         Storehouse storehouse2 = new Storehouse();
         if (createStockMovementDTO.getIdStore1() != null) {
-            store1 = iStoreService.getByInternalReference(createStockMovementDTO.getIdStore1()).get();
-            if(store1.getId() == null)
+            if(!iStoreService.getByInternalReference(createStockMovementDTO.getIdStore1()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
+            store1 = iStoreService.getByInternalReference(createStockMovementDTO.getIdStore1()).get();
         }
         if (createStockMovementDTO.getIdStore1() != null) {
-            store2 = iStoreService.getByInternalReference(createStockMovementDTO.getIdStore1()).get();
-            if(store1.getId() == null)
+            if(!iStoreService.getByInternalReference(createStockMovementDTO.getIdStore1()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
+            store2 = iStoreService.getByInternalReference(createStockMovementDTO.getIdStore1()).get();
         }
         if (createStockMovementDTO.getIdStoreHouse1() != null) {
-            storehouse1 = iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouse1()).get();
-            if(storehouse1.getId() == null)
+            if(!iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouse1()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.storehouse_exists", null, LocaleContextHolder.getLocale())));
+            storehouse1 = iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouse1()).get();
         }
         if (createStockMovementDTO.getIdStoreHouse2() != null) {
-            storehouse2 = iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouse2()).get();
-            if(storehouse2.getId() == null)
+            if(!iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouse2()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.storehouse_exists", null, LocaleContextHolder.getLocale())));
+            storehouse2 = iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouse2()).get();
         }
         if (createStockMovementDTO.getIdStore1() != null)
             stockMovement.setIdStore1(createStockMovementDTO.getIdStore1());

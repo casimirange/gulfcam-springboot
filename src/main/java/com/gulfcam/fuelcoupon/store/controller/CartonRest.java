@@ -96,11 +96,11 @@ public class CartonRest {
         }
 
         if (createCartonDTO.getIdStoreHouse()  != null) {
-            storehouse = iStorehouseService.getByInternalReference(createCartonDTO.getIdStoreHouse()).get();
-
-            if(storehouse.getId() == null)
+            if(!iStorehouseService.getByInternalReference(createCartonDTO.getIdStoreHouse()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.storehouse_exists", null, LocaleContextHolder.getLocale())));
+            storehouse = iStorehouseService.getByInternalReference(createCartonDTO.getIdStoreHouse()).get();
+
         }
 
         if (createCartonDTO.getIdStoreKeeper() != null) {
@@ -135,18 +135,18 @@ public class CartonRest {
 
         Users storeKeeper = new Users();
         Storehouse storehouse = new Storehouse();
-        Carton carton = iCartonService.getByInternalReference(internalReference).get();
-        if (carton.getId() == null) {
+        if (!iCartonService.getByInternalReference(internalReference).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.carton_exists", null, LocaleContextHolder.getLocale())));
         }
+        Carton carton = iCartonService.getByInternalReference(internalReference).get();
 
         if (createCartonDTO.getIdStoreHouse()  != null) {
-            storehouse = iStorehouseService.getByInternalReference(createCartonDTO.getIdStoreHouse()).get();
-
-            if(storehouse == null)
+            if(!iStorehouseService.getByInternalReference(createCartonDTO.getIdStoreHouse()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.storehouse_exists", null, LocaleContextHolder.getLocale())));
+            storehouse = iStorehouseService.getByInternalReference(createCartonDTO.getIdStoreHouse()).get();
+
         }
 
         if (createCartonDTO.getIdStoreKeeper() != null) {

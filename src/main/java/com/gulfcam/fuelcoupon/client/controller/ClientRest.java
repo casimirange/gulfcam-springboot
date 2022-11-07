@@ -120,11 +120,11 @@ public class ClientRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     public ResponseEntity<?> updateClient(@Valid @RequestBody CreateClientDTO createClientDTO, @PathVariable Long internalReference) {
 
-        Client client = iClientService.getClientByInternalReference(internalReference).get();
-        if (client.getId() == null) {
+        if (!iClientService.getClientByInternalReference(internalReference).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.client_exists", null, LocaleContextHolder.getLocale())));
         }
+        Client client = iClientService.getClientByInternalReference(internalReference).get();
         client.setUpdateAt(LocalDateTime.now());
         client.setAddress(createClientDTO.getAddress());
         client.setCompanyName(createClientDTO.getCompanyName());

@@ -114,11 +114,11 @@ public class OrderRest {
         PaymentMethod paymentMethod = new PaymentMethod();
 
         if (createOrderDTO.getIdClient()  != null) {
-            client = iClientService.getClientByInternalReference(createOrderDTO.getIdClient()).get();
-
-            if(client.getId() == null)
+            if(!iClientService.getClientByInternalReference(createOrderDTO.getIdClient()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.client_exists", null, LocaleContextHolder.getLocale())));
+            client = iClientService.getClientByInternalReference(createOrderDTO.getIdClient()).get();
+
         }
         if (createOrderDTO.getIdManagerCoupon()  != null) {
             managerCoupon = iUserService.getByInternalReference(createOrderDTO.getIdManagerCoupon());
@@ -149,18 +149,18 @@ public class OrderRest {
                         messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
         }
         if (createOrderDTO.getIdStore()  != null) {
-            store = iStoreService.getByInternalReference(createOrderDTO.getIdStore()).get();
-
-            if(store.getId() == null)
+            if(!iStoreService.getByInternalReference(createOrderDTO.getIdStore()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
+            store = iStoreService.getByInternalReference(createOrderDTO.getIdStore()).get();
+
         }
         if (createOrderDTO.getIdPaymentMethod()  != null) {
-            paymentMethod = iPaymentMethodService.getByInternalReference(createOrderDTO.getIdPaymentMethod()).get();
-
-            if(paymentMethod.getId() == null)
+            if(!iPaymentMethodService.getByInternalReference(createOrderDTO.getIdPaymentMethod()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.payment_exists", null, LocaleContextHolder.getLocale())));
+            paymentMethod = iPaymentMethodService.getByInternalReference(createOrderDTO.getIdPaymentMethod()).get();
+
         }
 
         Long internalReference = jwtUtils.generateInternalReference();
@@ -235,11 +235,11 @@ public class OrderRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     public ResponseEntity<?> updateOrder(@Valid @RequestBody CreateOrderDTO createOrderDTO, @PathVariable Long InternalReference) {
 
-        Order order = iOrderService.getByInternalReference(InternalReference).get();
-        if (order.getId() == null) {
+        if (!iOrderService.getByInternalReference(InternalReference).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.order_exists", null, LocaleContextHolder.getLocale())));
         }
+        Order order = iOrderService.getByInternalReference(InternalReference).get();
         Client client = new Client();
         Users managerCoupon = new Users();
         Users fund = new Users();
@@ -249,11 +249,11 @@ public class OrderRest {
         PaymentMethod paymentMethod = new PaymentMethod();
 
         if (createOrderDTO.getIdClient()  != null) {
-            client = iClientService.getClientByInternalReference(createOrderDTO.getIdClient()).get();
-
-            if(client.getId() == null)
+            if(!iClientService.getClientByInternalReference(createOrderDTO.getIdClient()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.client_exists", null, LocaleContextHolder.getLocale())));
+            client = iClientService.getClientByInternalReference(createOrderDTO.getIdClient()).get();
+
         }
         if (createOrderDTO.getIdManagerCoupon()  != null) {
             managerCoupon = iUserService.getByInternalReference(createOrderDTO.getIdManagerCoupon());
@@ -284,18 +284,18 @@ public class OrderRest {
                         messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
         }
         if (createOrderDTO.getIdStore()  != null) {
-            store = iStoreService.getByInternalReference(createOrderDTO.getIdStore()).get();
-
-            if(store.getId() == null)
+            if(!iStoreService.getByInternalReference(createOrderDTO.getIdStore()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
+            store = iStoreService.getByInternalReference(createOrderDTO.getIdStore()).get();
+
         }
         if (createOrderDTO.getIdPaymentMethod()  != null) {
-            paymentMethod = iPaymentMethodService.getByInternalReference(createOrderDTO.getIdPaymentMethod()).get();
-
-            if(paymentMethod.getId() == null)
+            if(!iPaymentMethodService.getByInternalReference(createOrderDTO.getIdPaymentMethod()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.payment_exists", null, LocaleContextHolder.getLocale())));
+            paymentMethod = iPaymentMethodService.getByInternalReference(createOrderDTO.getIdPaymentMethod()).get();
+
         }
         order.setUpdateAt(LocalDateTime.now());
         order.setClientReference(createOrderDTO.getClientReference());

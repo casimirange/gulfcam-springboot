@@ -99,11 +99,11 @@ public class TypeVoucherRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     public ResponseEntity<?> updateTypeVoucher(@Valid @RequestBody CreateTypeVoucherDTO createTypeVoucherDTO, @PathVariable Long internalReference) {
 
-        TypeVoucher typeVoucher = iTypeVoucherService.getByInternalReference(internalReference).get();
-        if (typeVoucher.getId() == null) {
+        if (!iTypeVoucherService.getByInternalReference(internalReference).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.typeVoucher_exists", null, LocaleContextHolder.getLocale())));
         }
+        TypeVoucher typeVoucher = iTypeVoucherService.getByInternalReference(internalReference).get();
         typeVoucher.setUpdateAt(LocalDateTime.now());
         typeVoucher.setDesignation(createTypeVoucherDTO.getDesignation());
         typeVoucher.setAmount(createTypeVoucherDTO.getAmount());

@@ -85,10 +85,10 @@ public class StorehouseRest {
 
         Store store = new Store();
         if (createStorehouseDTO.getIdStore() != null) {
-            store = iStoreService.getByInternalReference(createStorehouseDTO.getIdStore()).get();
-            if(store.getId() == null)
+            if(!iStoreService.getByInternalReference(createStorehouseDTO.getIdStore()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
+            store = iStoreService.getByInternalReference(createStorehouseDTO.getIdStore()).get();
         }
 
         Storehouse storehouse = new Storehouse();
@@ -113,17 +113,17 @@ public class StorehouseRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     public ResponseEntity<?> updateStorehouse(@Valid @RequestBody CreateStorehouseDTO createStorehouseDTO, @PathVariable Long internalReference) {
 
-        Storehouse storehouse = iStorehouseService.getByInternalReference(internalReference).get();
-        if (storehouse.getId() == null) {
+        if (!iStorehouseService.getByInternalReference(internalReference).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.storehouse_exists", null, LocaleContextHolder.getLocale())));
         }
+        Storehouse storehouse = iStorehouseService.getByInternalReference(internalReference).get();
         Store store = new Store();
         if (createStorehouseDTO.getIdStore() != null) {
-            store = iStoreService.getByInternalReference(createStorehouseDTO.getIdStore()).get();
-            if(store.getId() == null)
+            if(!iStoreService.getByInternalReference(createStorehouseDTO.getIdStore()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
+            store = iStoreService.getByInternalReference(createStorehouseDTO.getIdStore()).get();
         }
         storehouse.setUpdateAt(LocalDate.now());
         if (createStorehouseDTO.getIdStore() != null)

@@ -255,11 +255,11 @@ public class AuthenticationRest {
         }
         Store store = new Store();
         if (userAddDto.getIdStore() != null) {
-            store =  iStoreService.getByInternalReference(userAddDto.getIdStore()).get();
 
-            if(store.getId() == null)
+            if(!iStoreService.getByInternalReference(userAddDto.getIdStore()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
+            store =  iStoreService.getByInternalReference(userAddDto.getIdStore()).get();
         }
 
         Users u = modelMapper.map(userAddDto, Users.class);
@@ -275,7 +275,7 @@ public class AuthenticationRest {
         u.setInternalReference(jwtUtils.generateInternalReference());
         u.setPosition(userAddDto.getPosition());
         u.setPassword(encoder.encode(userAddDto.getPassword()));
-        u.setIdStore(store.getId());
+        u.setIdStore(userAddDto.getIdStore());
         u.setCreatedDate(LocalDateTime.now());
         Users user = new Users();
         String password = null;

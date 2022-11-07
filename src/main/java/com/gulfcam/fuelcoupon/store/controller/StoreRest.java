@@ -99,11 +99,11 @@ public class StoreRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     public ResponseEntity<?> updateStore(@Valid @RequestBody CreateStoreDTO createStoreDTO, @PathVariable Long internalReference) {
 
-        Store store = iStoreService.getByInternalReference(internalReference).get();
-        if (store.getId() == null) {
+        if (!iStoreService.getByInternalReference(internalReference).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
         }
+        Store store = iStoreService.getByInternalReference(internalReference).get();
         store.setUpdateAt(LocalDateTime.now());
         store.setLocalization(createStoreDTO.getLocalization());
 

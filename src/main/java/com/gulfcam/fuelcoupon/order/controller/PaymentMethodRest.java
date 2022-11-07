@@ -100,11 +100,11 @@ public class PaymentMethodRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     public ResponseEntity<?> updatePaymentMethod(@Valid @RequestBody CreatePaymentMethodDTO createPaymentMethodDTO, @PathVariable Long internalReference) {
 
-        PaymentMethod paymentMethod = iPaymentMethodService.getByInternalReference(internalReference).get();
-        if (paymentMethod.getId() == null) {
+        if (!iPaymentMethodService.getByInternalReference(internalReference).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.payment_exists", null, LocaleContextHolder.getLocale())));
         }
+        PaymentMethod paymentMethod = iPaymentMethodService.getByInternalReference(internalReference).get();
         paymentMethod.setUpdateAt(LocalDateTime.now());
         paymentMethod.setCreatedAt(LocalDateTime.now());
         paymentMethod.setDesignation(createPaymentMethodDTO.getDesignation());

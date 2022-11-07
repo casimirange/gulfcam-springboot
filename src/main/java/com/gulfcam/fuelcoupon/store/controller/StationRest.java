@@ -107,11 +107,12 @@ public class StationRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     public ResponseEntity<?> updateStation(@Valid @RequestBody CreateStationDTO createStationDTO, @PathVariable Long internalReference) {
 
-        Station station = iStationService.getByInternalReference(internalReference).get();
-        if (station.getId() == null) {
+        if (!iStationService.getByInternalReference(internalReference).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.station_exists", null, LocaleContextHolder.getLocale())));
         }
+        Station station = iStationService.getByInternalReference(internalReference).get();
+
         station.setUpdateAt(LocalDateTime.now());
         station.setPinCode(createStationDTO.getPinCode());
         station.setBalance(createStationDTO.getBalance());

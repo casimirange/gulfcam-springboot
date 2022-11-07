@@ -96,10 +96,10 @@ public class NotebookRest {
         Users storekeeper = new Users();
 
         if (createNotebookDTO.getIdCarton() != null) {
-            carton = iCartonService.getByInternalReference(createNotebookDTO.getIdCarton()).get();
-            if(carton.getId() == null)
+            if(!iCartonService.getByInternalReference(createNotebookDTO.getIdCarton()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.client_exists", null, LocaleContextHolder.getLocale())));
+            carton = iCartonService.getByInternalReference(createNotebookDTO.getIdCarton()).get();
         }
 
         if (createNotebookDTO.getIdStoreKeeper() != null) {
@@ -132,20 +132,20 @@ public class NotebookRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     public ResponseEntity<?> updateNotebook(@Valid @RequestBody CreateNotebookDTO createNotebookDTO, @PathVariable Long internalReference) {
 
-        Notebook notebook = iNotebookService.getByInternalReference(internalReference).get();
-        if (notebook.getId() == null) {
+        if (!iNotebookService.getByInternalReference(internalReference).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.notebook_exists", null, LocaleContextHolder.getLocale())));
         }
+        Notebook notebook = iNotebookService.getByInternalReference(internalReference).get();
 
         Carton carton = new Carton();
         Users storekeeper = new Users();
 
         if (createNotebookDTO.getIdCarton() != null) {
-            carton = iCartonService.getByInternalReference(createNotebookDTO.getIdCarton()).get();
-            if(carton.getId() == null)
+            if(!iCartonService.getByInternalReference(createNotebookDTO.getIdCarton()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.client_exists", null, LocaleContextHolder.getLocale())));
+            carton = iCartonService.getByInternalReference(createNotebookDTO.getIdCarton()).get();
         }
 
         if (createNotebookDTO.getIdStoreKeeper() != null) {

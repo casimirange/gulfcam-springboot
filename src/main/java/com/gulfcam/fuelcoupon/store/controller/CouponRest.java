@@ -103,31 +103,31 @@ public class CouponRest {
         Ticket ticket = new Ticket();
 
         if (createCouponDTO.getIdClient() != null) {
-            client = iClientService.getClientByInternalReference(createCouponDTO.getIdClient()).get();
-            if(client.getId() == null)
+            if(!iClientService.getClientByInternalReference(createCouponDTO.getIdClient()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.client_exists", null, LocaleContextHolder.getLocale())));
+            client = iClientService.getClientByInternalReference(createCouponDTO.getIdClient()).get();
         }
 
         if (createCouponDTO.getIdNotebook() != null) {
-            notebook = iNotebookService.getByInternalReference(createCouponDTO.getIdNotebook()).get();
-            if(client.getId() == null)
+            if(!iNotebookService.getByInternalReference(createCouponDTO.getIdNotebook()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.notebook_exists", null, LocaleContextHolder.getLocale())));
+            notebook = iNotebookService.getByInternalReference(createCouponDTO.getIdNotebook()).get();
         }
 
         if (createCouponDTO.getIdStation() != null) {
-            station = iStationService.getByInternalReference(createCouponDTO.getIdStation()).get();
-            if(client.getId() == null)
+            if(!iStationService.getByInternalReference(createCouponDTO.getIdStation()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.station_exists", null, LocaleContextHolder.getLocale())));
+            station = iStationService.getByInternalReference(createCouponDTO.getIdStation()).get();
         }
 
         if (createCouponDTO.getIdTicket() != null) {
-            ticket = iTicketService.getByInternalReference(createCouponDTO.getIdTicket()).get();
-            if(client.getId() == null)
+            if(!iTicketService.getByInternalReference(createCouponDTO.getIdTicket()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.ticket_exists", null, LocaleContextHolder.getLocale())));
+            ticket = iTicketService.getByInternalReference(createCouponDTO.getIdTicket()).get();
         }
 
         Coupon coupon = new Coupon();
@@ -155,11 +155,11 @@ public class CouponRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     public ResponseEntity<?> updateCoupon(@Valid @RequestBody CreateCouponDTO createCouponDTO, @PathVariable Long internalReference) {
 
-        Coupon coupon = iCouponService.getByInternalReference(internalReference).get();
-        if (coupon.getId() == null) {
+        if (!iCouponService.getByInternalReference(internalReference).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.coupon_exists", null, LocaleContextHolder.getLocale())));
         }
+        Coupon coupon = iCouponService.getByInternalReference(internalReference).get();
 
 
 
@@ -169,31 +169,31 @@ public class CouponRest {
         Ticket ticket = new Ticket();
 
         if (createCouponDTO.getIdClient() != null) {
-            client = iClientService.getClientByInternalReference(createCouponDTO.getIdClient()).get();
-            if(client.getId() == null)
+            if(!iClientService.getClientByInternalReference(createCouponDTO.getIdClient()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.client_exists", null, LocaleContextHolder.getLocale())));
+            client = iClientService.getClientByInternalReference(createCouponDTO.getIdClient()).get();
         }
 
         if (createCouponDTO.getIdNotebook() != null) {
-            notebook = iNotebookService.getByInternalReference(createCouponDTO.getIdNotebook()).get();
-            if(client.getId() == null)
+            if(!iNotebookService.getByInternalReference(createCouponDTO.getIdNotebook()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.notebook_exists", null, LocaleContextHolder.getLocale())));
+            notebook = iNotebookService.getByInternalReference(createCouponDTO.getIdNotebook()).get();
         }
 
         if (createCouponDTO.getIdStation() != null) {
-            station = iStationService.getByInternalReference(createCouponDTO.getIdStation()).get();
-            if(client.getId() == null)
+            if(!iStationService.getByInternalReference(createCouponDTO.getIdStation()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.station_exists", null, LocaleContextHolder.getLocale())));
+            station = iStationService.getByInternalReference(createCouponDTO.getIdStation()).get();
         }
 
         if (createCouponDTO.getIdTicket() != null) {
-            ticket = iTicketService.getByInternalReference(createCouponDTO.getIdTicket()).get();
-            if(client.getId() == null)
+            if(!iTicketService.getByInternalReference(createCouponDTO.getIdTicket()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.ticket_exists", null, LocaleContextHolder.getLocale())));
+            ticket = iTicketService.getByInternalReference(createCouponDTO.getIdTicket()).get();
         }
 
         coupon.setUpdateAt(LocalDateTime.now());

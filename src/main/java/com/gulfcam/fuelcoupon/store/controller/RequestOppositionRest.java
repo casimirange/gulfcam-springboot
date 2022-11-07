@@ -123,11 +123,11 @@ public class RequestOppositionRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     public ResponseEntity<?> updateRequestOpposition(@Valid @RequestBody CreateRequestOppositionDTO createRequestOppositionDTO, @PathVariable Long internalReference) {
 
-        RequestOpposition requestOpposition = iRequestOppositionService.getByInternalReference(internalReference).get();
-        if (requestOpposition.getId() == null) {
+        if (!iRequestOppositionService.getByInternalReference(internalReference).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.requestopposition_exists", null, LocaleContextHolder.getLocale())));
         }
+        RequestOpposition requestOpposition = iRequestOppositionService.getByInternalReference(internalReference).get();
 
         Users managerCoupon = new Users();
         Users serviceClient = new Users();
