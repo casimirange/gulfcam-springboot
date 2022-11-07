@@ -2,6 +2,7 @@ package com.gulfcam.fuelcoupon.user.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.gulfcam.fuelcoupon.store.entity.Store;
 import com.gulfcam.fuelcoupon.user.entity.RoleUser;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,6 +31,8 @@ public class UserResDto{
 	private String firstName;
 
 	private String position;
+
+	private Store store;
 
 	private List<RoleUser> roles;
 

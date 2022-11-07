@@ -3,16 +3,17 @@ package com.gulfcam.fuelcoupon.store.controller;
 import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
-import com.gulfcam.fuelcoupon.order.entity.Item;
-import com.gulfcam.fuelcoupon.store.dto.CreateCartonDTO;
 import com.gulfcam.fuelcoupon.store.dto.CreateNotebookDTO;
 import com.gulfcam.fuelcoupon.store.entity.Carton;
 import com.gulfcam.fuelcoupon.store.entity.Notebook;
-import com.gulfcam.fuelcoupon.store.repository.ICartonRepo;
 import com.gulfcam.fuelcoupon.store.repository.INotebookRepo;
 import com.gulfcam.fuelcoupon.store.service.ICartonService;
 import com.gulfcam.fuelcoupon.store.service.INotebookService;
+import com.gulfcam.fuelcoupon.user.entity.Users;
 import com.gulfcam.fuelcoupon.user.service.IEmailService;
+import com.gulfcam.fuelcoupon.user.service.IUserService;
+import com.gulfcam.fuelcoupon.utilities.entity.EStatus;
+import com.gulfcam.fuelcoupon.utilities.entity.Status;
 import com.gulfcam.fuelcoupon.utilities.repository.IStatusRepo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,6 +30,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -53,9 +55,14 @@ public class NotebookRest {
     @Autowired
     IEmailService emailService;
 
-
     @Autowired
     INotebookService iNotebookService;
+
+    @Autowired
+    IUserService iUserService;
+
+    @Autowired
+    ICartonService iCartonService;
 
     @Autowired
     IStatusRepo iStatusRepo;
@@ -85,12 +92,32 @@ public class NotebookRest {
                     messageSource.getMessage("messages.serial_exists", null, LocaleContextHolder.getLocale())));
         }
 
+        Carton carton = new Carton();
+        Users storekeeper = new Users();
+
+        if (createNotebookDTO.getIdCarton() != null) {
+            carton = iCartonService.getByInternalReference(createNotebookDTO.getIdCarton()).get();
+            if(carton.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.client_exists", null, LocaleContextHolder.getLocale())));
+        }
+
+        if (createNotebookDTO.getIdStoreKeeper() != null) {
+            storekeeper = iUserService.getByInternalReference(createNotebookDTO.getIdStoreKeeper());
+            if(storekeeper.getUserId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
+        }
+
         Notebook notebook = new Notebook();
         notebook.setInternalReference(jwtUtils.generateInternalReference());
         notebook.setCreatedAt(LocalDateTime.now());
         notebook.setSerialNumber(createNotebookDTO.getSerialNumber());
         notebook.setIdCarton(createNotebookDTO.getIdCarton());
         notebook.setIdStoreKeeper(createNotebookDTO.getIdStoreKeeper());
+
+        Status status = iStatusRepo.findByName(EStatus.STORE_ENABLE).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.STORE_ENABLE +  "  not found"));
+        notebook.setStatus(status);
 
         iNotebookService.createNotebook(notebook);
         return ResponseEntity.ok(notebook);
@@ -110,10 +137,29 @@ public class NotebookRest {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.notebook_exists", null, LocaleContextHolder.getLocale())));
         }
+
+        Carton carton = new Carton();
+        Users storekeeper = new Users();
+
+        if (createNotebookDTO.getIdCarton() != null) {
+            carton = iCartonService.getByInternalReference(createNotebookDTO.getIdCarton()).get();
+            if(carton.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.client_exists", null, LocaleContextHolder.getLocale())));
+        }
+
+        if (createNotebookDTO.getIdStoreKeeper() != null) {
+            storekeeper = iUserService.getByInternalReference(createNotebookDTO.getIdStoreKeeper());
+            if(storekeeper.getUserId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
+        }
         notebook.setUpdateAt(LocalDateTime.now());
         notebook.setSerialNumber(createNotebookDTO.getSerialNumber());
-        notebook.setIdCarton(createNotebookDTO.getIdCarton());
-        notebook.setIdStoreKeeper(createNotebookDTO.getIdStoreKeeper());
+        if (createNotebookDTO.getIdCarton() != null)
+            notebook.setIdCarton(createNotebookDTO.getIdCarton());
+        if (createNotebookDTO.getIdStoreKeeper() != null)
+            notebook.setIdStoreKeeper(createNotebookDTO.getIdStoreKeeper());
 
         iNotebookService.createNotebook(notebook);
 

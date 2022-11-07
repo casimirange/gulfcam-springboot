@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 public class CreateOrderDTO {
 
     @Schema(description = "Référence client")
-    private Long clientReference;
+    private String clientReference;
 
     @Schema(description = "Reference interne du client")
     @NotNull(message = "{client.required}")
@@ -19,7 +19,7 @@ public class CreateOrderDTO {
 
     @Schema(description = "Reference interne du Gestionnaire de commandes")
     @NotNull(message = "{idManagerStore.required}")
-    private Long idManagerStore;
+    private Long idManagerOrder;
 
     @Schema(description = "Reference interne du Gestionnaire de coupons")
     private Long idManagerCoupon;

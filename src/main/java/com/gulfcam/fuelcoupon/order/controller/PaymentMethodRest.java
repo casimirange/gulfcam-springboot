@@ -12,6 +12,8 @@ import com.gulfcam.fuelcoupon.order.repository.IPaymentMethodRepo;
 import com.gulfcam.fuelcoupon.order.service.IItemService;
 import com.gulfcam.fuelcoupon.order.service.IPaymentMethodService;
 import com.gulfcam.fuelcoupon.user.service.IEmailService;
+import com.gulfcam.fuelcoupon.utilities.entity.EStatus;
+import com.gulfcam.fuelcoupon.utilities.entity.Status;
 import com.gulfcam.fuelcoupon.utilities.repository.IStatusRepo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -28,6 +30,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -48,6 +51,9 @@ public class PaymentMethodRest {
 
     @Autowired
     JwtUtils jwtUtils;
+
+    @Autowired
+    IStatusRepo iStatusRepo;
 
 
     @Autowired
@@ -77,6 +83,9 @@ public class PaymentMethodRest {
         item.setInternalReference(jwtUtils.generateInternalReference());
         item.setCreatedAt(LocalDateTime.now());
         item.setDesignation(createPaymentMethodDTO.getDesignation());
+
+        Status status = iStatusRepo.findByName(EStatus.STORE_ENABLE).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.STORE_ENABLE +  "  not found"));
+        item.setStatus(status);
 
         iPaymentMethodService.createPaymentMethod(item);
         return ResponseEntity.ok(item);

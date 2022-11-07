@@ -1,4 +1,5 @@
 package com.gulfcam.fuelcoupon.order.entity;
+import com.gulfcam.fuelcoupon.store.entity.Store;
 import com.gulfcam.fuelcoupon.utilities.entity.Status;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;

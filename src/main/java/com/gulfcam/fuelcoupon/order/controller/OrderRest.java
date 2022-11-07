@@ -2,21 +2,22 @@ package com.gulfcam.fuelcoupon.order.controller;
 
 import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
+import com.gulfcam.fuelcoupon.client.entity.Client;
 import com.gulfcam.fuelcoupon.client.entity.ETypeClient;
 import com.gulfcam.fuelcoupon.client.entity.TypeClient;
 import com.gulfcam.fuelcoupon.client.service.IClientService;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
 import com.gulfcam.fuelcoupon.order.dto.CreateItemDTO;
 import com.gulfcam.fuelcoupon.order.dto.CreateOrderDTO;
-import com.gulfcam.fuelcoupon.order.entity.EStatusOrder;
-import com.gulfcam.fuelcoupon.order.entity.Item;
-import com.gulfcam.fuelcoupon.order.entity.Order;
-import com.gulfcam.fuelcoupon.order.entity.StatusOrder;
+import com.gulfcam.fuelcoupon.order.entity.*;
 import com.gulfcam.fuelcoupon.order.repository.IItemRepo;
 import com.gulfcam.fuelcoupon.order.repository.IOrderRepo;
 import com.gulfcam.fuelcoupon.order.repository.IStatusOrderRepo;
 import com.gulfcam.fuelcoupon.order.service.IItemService;
 import com.gulfcam.fuelcoupon.order.service.IOrderService;
+import com.gulfcam.fuelcoupon.order.service.IPaymentMethodService;
+import com.gulfcam.fuelcoupon.store.entity.Store;
+import com.gulfcam.fuelcoupon.store.service.IStoreService;
 import com.gulfcam.fuelcoupon.user.dto.EmailDto;
 import com.gulfcam.fuelcoupon.user.entity.ETypeAccount;
 import com.gulfcam.fuelcoupon.user.entity.Users;
@@ -66,9 +67,17 @@ public class OrderRest {
     @Autowired
     IEmailService emailService;
 
-
     @Autowired
     IOrderService iOrderService;
+
+    @Autowired
+    IUserService iUserService;
+
+    @Autowired
+    IPaymentMethodService iPaymentMethodService;
+
+    @Autowired
+    IClientService iClientService;
 
     @Autowired
     IStatusOrderRepo iStatusOrderRepo;
@@ -77,10 +86,7 @@ public class OrderRest {
     IOrderRepo iOrderRepo;
 
     @Autowired
-    IUserService iUserService;
-
-    @Autowired
-    IClientService iClientService;
+    IStoreService iStoreService;
 
     @Autowired
     ApplicationContext appContext;
@@ -99,6 +105,64 @@ public class OrderRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     public ResponseEntity<?> addOrder(@Valid @RequestBody CreateOrderDTO createOrderDTO) {
 
+        Client client = new Client();
+        Users managerCoupon = new Users();
+        Users fund = new Users();
+        Users managerOrder = new Users();
+        Users managerStorekeeper = new Users();
+        Store store = new Store();
+        PaymentMethod paymentMethod = new PaymentMethod();
+
+        if (createOrderDTO.getIdClient()  != null) {
+            client = iClientService.getClientByInternalReference(createOrderDTO.getIdClient()).get();
+
+            if(client.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.client_exists", null, LocaleContextHolder.getLocale())));
+        }
+        if (createOrderDTO.getIdManagerCoupon()  != null) {
+            managerCoupon = iUserService.getByInternalReference(createOrderDTO.getIdManagerCoupon());
+
+            if(managerCoupon.getUserId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
+        }
+        if (createOrderDTO.getIdManagerOrder()  != null) {
+            managerOrder = iUserService.getByInternalReference(createOrderDTO.getIdManagerOrder());
+
+            if(managerOrder.getUserId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
+        }
+        if (createOrderDTO.getIdStorekeeper()  != null) {
+            managerStorekeeper = iUserService.getByInternalReference(createOrderDTO.getIdStorekeeper());
+
+            if(managerStorekeeper.getUserId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
+        }
+        if (createOrderDTO.getIdFund()  != null) {
+            fund = iUserService.getByInternalReference(createOrderDTO.getIdFund());
+
+            if(fund.getUserId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
+        }
+        if (createOrderDTO.getIdStore()  != null) {
+            store = iStoreService.getByInternalReference(createOrderDTO.getIdStore()).get();
+
+            if(store.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
+        }
+        if (createOrderDTO.getIdPaymentMethod()  != null) {
+            paymentMethod = iPaymentMethodService.getByInternalReference(createOrderDTO.getIdPaymentMethod()).get();
+
+            if(paymentMethod.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.payment_exists", null, LocaleContextHolder.getLocale())));
+        }
+
         Long internalReference = jwtUtils.generateInternalReference();
         Order order = new Order();
         order.setInternalReference(internalReference);
@@ -107,7 +171,7 @@ public class OrderRest {
         order.setIdClient(createOrderDTO.getIdClient());
         order.setIdFund(createOrderDTO.getIdFund());
         order.setIdManagerCoupon(createOrderDTO.getIdManagerCoupon());
-        order.setIdManagerCoupon(createOrderDTO.getIdManagerCoupon());
+        order.setIdManagerOrder(createOrderDTO.getIdManagerOrder());
         order.setChannel(createOrderDTO.getChannel());
         order.setDescription(createOrderDTO.getDescription());
         order.setDeliveryTime(createOrderDTO.getDeliveryTime());
@@ -134,9 +198,8 @@ public class OrderRest {
             }
         }
 
-        if(createOrderDTO.getIdManagerStore() != null){
-            Users userManagerStore = iUserService.getByInternalReference(createOrderDTO.getIdManagerStore());
-            emailToStore += userManagerStore.getEmail();
+        if(createOrderDTO.getIdManagerOrder() != null){
+            emailToStore += managerOrder.getEmail();
         }
 
         Map<String, Object> emailProps = new HashMap<>();
@@ -177,21 +240,85 @@ public class OrderRest {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.order_exists", null, LocaleContextHolder.getLocale())));
         }
+        Client client = new Client();
+        Users managerCoupon = new Users();
+        Users fund = new Users();
+        Users managerOrder = new Users();
+        Users managerStorekeeper = new Users();
+        Store store = new Store();
+        PaymentMethod paymentMethod = new PaymentMethod();
+
+        if (createOrderDTO.getIdClient()  != null) {
+            client = iClientService.getClientByInternalReference(createOrderDTO.getIdClient()).get();
+
+            if(client.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.client_exists", null, LocaleContextHolder.getLocale())));
+        }
+        if (createOrderDTO.getIdManagerCoupon()  != null) {
+            managerCoupon = iUserService.getByInternalReference(createOrderDTO.getIdManagerCoupon());
+
+            if(managerCoupon.getUserId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
+        }
+        if (createOrderDTO.getIdManagerOrder()  != null) {
+            managerOrder = iUserService.getByInternalReference(createOrderDTO.getIdManagerOrder());
+
+            if(managerOrder.getUserId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
+        }
+        if (createOrderDTO.getIdStorekeeper()  != null) {
+            managerStorekeeper = iUserService.getByInternalReference(createOrderDTO.getIdStorekeeper());
+
+            if(managerStorekeeper.getUserId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
+        }
+        if (createOrderDTO.getIdFund()  != null) {
+            fund = iUserService.getByInternalReference(createOrderDTO.getIdFund());
+
+            if(fund.getUserId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
+        }
+        if (createOrderDTO.getIdStore()  != null) {
+            store = iStoreService.getByInternalReference(createOrderDTO.getIdStore()).get();
+
+            if(store.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
+        }
+        if (createOrderDTO.getIdPaymentMethod()  != null) {
+            paymentMethod = iPaymentMethodService.getByInternalReference(createOrderDTO.getIdPaymentMethod()).get();
+
+            if(paymentMethod.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.payment_exists", null, LocaleContextHolder.getLocale())));
+        }
         order.setUpdateAt(LocalDateTime.now());
         order.setClientReference(createOrderDTO.getClientReference());
-        order.setIdClient(createOrderDTO.getIdClient());
-        order.setIdFund(createOrderDTO.getIdFund());
-        order.setIdManagerCoupon(createOrderDTO.getIdManagerCoupon());
-        order.setIdManagerCoupon(createOrderDTO.getIdManagerCoupon());
+        if (createOrderDTO.getIdClient() != null)
+            order.setIdClient(createOrderDTO.getIdClient());
+        if (createOrderDTO.getIdFund() != null)
+            order.setIdFund(createOrderDTO.getIdFund());
+        if (createOrderDTO.getIdManagerCoupon() != null)
+            order.setIdManagerCoupon(createOrderDTO.getIdManagerCoupon());
+        if (createOrderDTO.getIdManagerOrder() != null)
+            order.setIdManagerOrder(createOrderDTO.getIdManagerOrder());
         order.setChannel(createOrderDTO.getChannel());
         order.setDescription(createOrderDTO.getDescription());
         order.setDeliveryTime(createOrderDTO.getDeliveryTime());
-        order.setIdPaymentMethod(createOrderDTO.getIdPaymentMethod());
+        if (createOrderDTO.getIdPaymentMethod() != null)
+            order.setIdPaymentMethod(createOrderDTO.getIdPaymentMethod());
         order.setNetAggregateAmount(createOrderDTO.getNetAggregateAmount());
         order.setTTCAggregateAmount(createOrderDTO.getTTCAggregateAmount());
         order.setTax(createOrderDTO.getTax());
-        order.setIdStorekeeper(createOrderDTO.getIdStorekeeper());
-        order.setIdStore(createOrderDTO.getIdStore());
+        if (createOrderDTO.getIdStorekeeper() != null)
+            order.setIdStorekeeper(createOrderDTO.getIdStorekeeper());
+        if (createOrderDTO.getIdStore() != null)
+            order.setIdStore(createOrderDTO.getIdStore());
         order.setPaymentReference(createOrderDTO.getPaymentReference());
         order.setReasonForCancellation(createOrderDTO.getReasonForCancellation());
 
@@ -255,20 +382,20 @@ public class OrderRest {
         return ResponseEntity.ok(orders);
     }
 
-    @Operation(summary = "Recupérer la liste des commandes par gestionnaire de magasin", tags = "Order", responses = {
+    @Operation(summary = "Recupérer la liste des commandes par gestionnaire de commandes", tags = "Order", responses = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Order.class)))),
             @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/managerstore/{idManagerStore:[0-9]+}")
-    public ResponseEntity<Page<Order>> getOrdersByIdManagerStore(@PathVariable Long idManagerStore,
+    @GetMapping("/managerstore/{idManagerOrder:[0-9]+}")
+    public ResponseEntity<Page<Order>> getOrdersByIdManagerStore(@PathVariable Long idManagerOrder,
                                                                  @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                                                  @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
-                                                                 @RequestParam(required = false, defaultValue = "idManagerStore") String sort,
+                                                                 @RequestParam(required = false, defaultValue = "idManagerOrder") String sort,
                                                                  @RequestParam(required = false, defaultValue = "desc") String order) {
 
-        Page<Order> orders = iOrderService.getOrdersByIdManagerStore(idManagerStore,
+        Page<Order> orders = iOrderService.getOrdersByIdManagerOrder(idManagerOrder,
                 Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(orders);
     }

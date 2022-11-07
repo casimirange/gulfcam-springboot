@@ -24,6 +24,7 @@ public class Ticket {
     @Column(unique = true)
     private Long internalReference;
 
+    @Column(nullable = true, name = "id_request_opposition")
     private Long IdRequestOpposition;
 
     @NotNull

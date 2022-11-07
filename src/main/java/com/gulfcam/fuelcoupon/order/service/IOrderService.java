@@ -12,7 +12,7 @@ public interface IOrderService {
     Page<Order> getOrdersByIdClient(Long idClient, int page, int size, String sort, String order);
     Page<Order> getOrdersByIdFund(Long idFund, int page, int size, String sort, String order);
     Page<Order> getOrdersByIdManagerCoupon(Long idManagerCoupon, int page, int size, String sort, String order);
-    Page<Order> getOrdersByIdManagerStore(Long idManagerStore, int page, int size, String sort, String order);
+    Page<Order> getOrdersByIdManagerOrder(Long idManagerOrder, int page, int size, String sort, String order);
     Page<Order> getOrdersByIdStorekeeper(Long idStorekeeper, int page, int size, String sort, String order);
     Page<Order> getOrdersByIdStore(Long idStore, int page, int size, String sort, String order);
     Optional<Order> getOrderById(Long id);

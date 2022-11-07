@@ -3,17 +3,15 @@ package com.gulfcam.fuelcoupon.store.controller;
 import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
-import com.gulfcam.fuelcoupon.order.entity.Item;
-import com.gulfcam.fuelcoupon.store.dto.CreateCartonDTO;
 import com.gulfcam.fuelcoupon.store.dto.CreateStockMovementDTO;
-import com.gulfcam.fuelcoupon.store.entity.Carton;
 import com.gulfcam.fuelcoupon.store.entity.StockMovement;
-import com.gulfcam.fuelcoupon.store.repository.ICartonRepo;
+import com.gulfcam.fuelcoupon.store.entity.Store;
+import com.gulfcam.fuelcoupon.store.entity.Storehouse;
 import com.gulfcam.fuelcoupon.store.repository.IStokMovementRepo;
-import com.gulfcam.fuelcoupon.store.service.ICartonService;
 import com.gulfcam.fuelcoupon.store.service.IStockMovementService;
+import com.gulfcam.fuelcoupon.store.service.IStoreService;
+import com.gulfcam.fuelcoupon.store.service.IStorehouseService;
 import com.gulfcam.fuelcoupon.user.service.IEmailService;
-import com.gulfcam.fuelcoupon.utilities.repository.IStatusRepo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -35,7 +33,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.LocalDateTime;
 
 @RestController
 @Tag(name = "Mouvement en stock")
@@ -53,12 +50,14 @@ public class StockMovementRest {
     @Autowired
     IEmailService emailService;
 
-
     @Autowired
     IStockMovementService iStockMovementService;
 
     @Autowired
-    IStatusRepo iStatusRepo;
+    IStoreService iStoreService;
+
+    @Autowired
+    IStorehouseService iStorehouseService;
 
     @Autowired
     IStokMovementRepo iStokMovementRepo;
@@ -80,8 +79,37 @@ public class StockMovementRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     public ResponseEntity<?> addStockMovement(@Valid @RequestBody CreateStockMovementDTO createStockMovementDTO) {
 
+        Store store1 = new Store();
+        Storehouse storehouse1 = new Storehouse();
+        Store store2 = new Store();
+        Storehouse storehouse2 = new Storehouse();
+        if (createStockMovementDTO.getIdStore1() != null) {
+            store1 = iStoreService.getByInternalReference(createStockMovementDTO.getIdStore1()).get();
+            if(store1.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
+        }
+        if (createStockMovementDTO.getIdStore1() != null) {
+            store2 = iStoreService.getByInternalReference(createStockMovementDTO.getIdStore1()).get();
+            if(store1.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
+        }
+        if (createStockMovementDTO.getIdStoreHouse1() != null) {
+            storehouse1 = iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouse1()).get();
+            if(storehouse1.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.storehouse_exists", null, LocaleContextHolder.getLocale())));
+        }
+        if (createStockMovementDTO.getIdStoreHouse2() != null) {
+            storehouse2 = iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouse2()).get();
+            if(storehouse2.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.storehouse_exists", null, LocaleContextHolder.getLocale())));
+        }
         StockMovement stockMovement = new StockMovement();
         stockMovement.setInternalReference(jwtUtils.generateInternalReference());
+        stockMovement.setType(createStockMovementDTO.getType());
         stockMovement.setIdStore1(createStockMovementDTO.getIdStore1());
         stockMovement.setIdStore2(createStockMovementDTO.getIdStore2());
         stockMovement.setIdStoreHouse1(createStockMovementDTO.getIdStoreHouse1());
@@ -105,10 +133,43 @@ public class StockMovementRest {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.stockMovement_exists", null, LocaleContextHolder.getLocale())));
         }
-        stockMovement.setIdStore1(createStockMovementDTO.getIdStore1());
-        stockMovement.setIdStore2(createStockMovementDTO.getIdStore2());
-        stockMovement.setIdStoreHouse1(createStockMovementDTO.getIdStoreHouse1());
-        stockMovement.setIdStoreHouse2(createStockMovementDTO.getIdStoreHouse2());
+        Store store1 = new Store();
+        Storehouse storehouse1 = new Storehouse();
+        Store store2 = new Store();
+        Storehouse storehouse2 = new Storehouse();
+        if (createStockMovementDTO.getIdStore1() != null) {
+            store1 = iStoreService.getByInternalReference(createStockMovementDTO.getIdStore1()).get();
+            if(store1.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
+        }
+        if (createStockMovementDTO.getIdStore1() != null) {
+            store2 = iStoreService.getByInternalReference(createStockMovementDTO.getIdStore1()).get();
+            if(store1.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
+        }
+        if (createStockMovementDTO.getIdStoreHouse1() != null) {
+            storehouse1 = iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouse1()).get();
+            if(storehouse1.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.storehouse_exists", null, LocaleContextHolder.getLocale())));
+        }
+        if (createStockMovementDTO.getIdStoreHouse2() != null) {
+            storehouse2 = iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouse2()).get();
+            if(storehouse2.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.storehouse_exists", null, LocaleContextHolder.getLocale())));
+        }
+        if (createStockMovementDTO.getIdStore1() != null)
+            stockMovement.setIdStore1(createStockMovementDTO.getIdStore1());
+        if (createStockMovementDTO.getIdStore2() != null)
+            stockMovement.setIdStore2(createStockMovementDTO.getIdStore2());
+        if (createStockMovementDTO.getIdStoreHouse1() != null)
+            stockMovement.setIdStoreHouse1(createStockMovementDTO.getIdStoreHouse1());
+        if (createStockMovementDTO.getIdStoreHouse2() != null)
+            stockMovement.setIdStoreHouse2(createStockMovementDTO.getIdStoreHouse2());
+        stockMovement.setType(createStockMovementDTO.getType());
 
         iStockMovementService.createStockMovement(stockMovement);
 

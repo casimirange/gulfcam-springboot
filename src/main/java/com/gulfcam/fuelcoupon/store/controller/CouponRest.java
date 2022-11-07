@@ -2,17 +2,16 @@ package com.gulfcam.fuelcoupon.store.controller;
 
 import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
+import com.gulfcam.fuelcoupon.client.entity.Client;
+import com.gulfcam.fuelcoupon.client.service.IClientService;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
-import com.gulfcam.fuelcoupon.order.entity.Item;
-import com.gulfcam.fuelcoupon.store.dto.CreateCartonDTO;
 import com.gulfcam.fuelcoupon.store.dto.CreateCouponDTO;
-import com.gulfcam.fuelcoupon.store.entity.Carton;
-import com.gulfcam.fuelcoupon.store.entity.Coupon;
-import com.gulfcam.fuelcoupon.store.repository.ICartonRepo;
+import com.gulfcam.fuelcoupon.store.entity.*;
 import com.gulfcam.fuelcoupon.store.repository.ICouponRepo;
-import com.gulfcam.fuelcoupon.store.service.ICartonService;
-import com.gulfcam.fuelcoupon.store.service.ICouponService;
+import com.gulfcam.fuelcoupon.store.service.*;
 import com.gulfcam.fuelcoupon.user.service.IEmailService;
+import com.gulfcam.fuelcoupon.utilities.entity.EStatus;
+import com.gulfcam.fuelcoupon.utilities.entity.Status;
 import com.gulfcam.fuelcoupon.utilities.repository.IStatusRepo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,6 +28,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -53,9 +53,20 @@ public class CouponRest {
     @Autowired
     IEmailService emailService;
 
-
     @Autowired
     ICouponService iCouponService;
+
+    @Autowired
+    IClientService iClientService;
+
+    @Autowired
+    INotebookService iNotebookService;
+
+    @Autowired
+    IStationService iStationService;
+
+    @Autowired
+    ITicketService iTicketService;
 
     @Autowired
     IStatusRepo iStatusRepo;
@@ -85,6 +96,40 @@ public class CouponRest {
                     messageSource.getMessage("messages.serial_exists", null, LocaleContextHolder.getLocale())));
         }
 
+
+        Client client = new Client();
+        Notebook notebook = new Notebook();
+        Station station = new Station();
+        Ticket ticket = new Ticket();
+
+        if (createCouponDTO.getIdClient() != null) {
+            client = iClientService.getClientByInternalReference(createCouponDTO.getIdClient()).get();
+            if(client.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.client_exists", null, LocaleContextHolder.getLocale())));
+        }
+
+        if (createCouponDTO.getIdNotebook() != null) {
+            notebook = iNotebookService.getByInternalReference(createCouponDTO.getIdNotebook()).get();
+            if(client.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.notebook_exists", null, LocaleContextHolder.getLocale())));
+        }
+
+        if (createCouponDTO.getIdStation() != null) {
+            station = iStationService.getByInternalReference(createCouponDTO.getIdStation()).get();
+            if(client.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.station_exists", null, LocaleContextHolder.getLocale())));
+        }
+
+        if (createCouponDTO.getIdTicket() != null) {
+            ticket = iTicketService.getByInternalReference(createCouponDTO.getIdTicket()).get();
+            if(client.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.ticket_exists", null, LocaleContextHolder.getLocale())));
+        }
+
         Coupon coupon = new Coupon();
         coupon.setInternalReference(jwtUtils.generateInternalReference());
         coupon.setCreatedAt(LocalDateTime.now());
@@ -93,6 +138,9 @@ public class CouponRest {
         coupon.setIdNotebook(createCouponDTO.getIdNotebook());
         coupon.setIdStation(createCouponDTO.getIdStation());
         coupon.setIdTicket(createCouponDTO.getIdTicket());
+
+        Status status = iStatusRepo.findByName(EStatus.STORE_ENABLE).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.STORE_ENABLE +  "  not found"));
+        coupon.setStatus(status);
 
         iCouponService.createCoupon(coupon);
         return ResponseEntity.ok(coupon);
@@ -112,12 +160,52 @@ public class CouponRest {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.coupon_exists", null, LocaleContextHolder.getLocale())));
         }
+
+
+
+        Client client = new Client();
+        Notebook notebook = new Notebook();
+        Station station = new Station();
+        Ticket ticket = new Ticket();
+
+        if (createCouponDTO.getIdClient() != null) {
+            client = iClientService.getClientByInternalReference(createCouponDTO.getIdClient()).get();
+            if(client.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.client_exists", null, LocaleContextHolder.getLocale())));
+        }
+
+        if (createCouponDTO.getIdNotebook() != null) {
+            notebook = iNotebookService.getByInternalReference(createCouponDTO.getIdNotebook()).get();
+            if(client.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.notebook_exists", null, LocaleContextHolder.getLocale())));
+        }
+
+        if (createCouponDTO.getIdStation() != null) {
+            station = iStationService.getByInternalReference(createCouponDTO.getIdStation()).get();
+            if(client.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.station_exists", null, LocaleContextHolder.getLocale())));
+        }
+
+        if (createCouponDTO.getIdTicket() != null) {
+            ticket = iTicketService.getByInternalReference(createCouponDTO.getIdTicket()).get();
+            if(client.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.ticket_exists", null, LocaleContextHolder.getLocale())));
+        }
+
         coupon.setUpdateAt(LocalDateTime.now());
         coupon.setSerialNumber(createCouponDTO.getSerialNumber());
-        coupon.setIdClient(createCouponDTO.getIdClient());
-        coupon.setIdNotebook(createCouponDTO.getIdNotebook());
-        coupon.setIdStation(createCouponDTO.getIdStation());
-        coupon.setIdTicket(createCouponDTO.getIdTicket());
+        if (createCouponDTO.getIdClient() != null)
+            coupon.setIdClient(createCouponDTO.getIdClient());
+        if (createCouponDTO.getIdNotebook() != null)
+            coupon.setIdNotebook(createCouponDTO.getIdNotebook());
+        if (createCouponDTO.getIdStation() != null)
+            coupon.setIdStation(createCouponDTO.getIdStation());
+        if (createCouponDTO.getIdTicket() != null)
+            coupon.setIdTicket(createCouponDTO.getIdTicket());
 
         iCouponService.createCoupon(coupon);
 

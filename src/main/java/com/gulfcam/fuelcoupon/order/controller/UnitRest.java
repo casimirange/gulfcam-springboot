@@ -6,12 +6,19 @@ import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
 import com.gulfcam.fuelcoupon.order.dto.CreateItemDTO;
 import com.gulfcam.fuelcoupon.order.dto.CreateUnitDTO;
 import com.gulfcam.fuelcoupon.order.entity.Item;
+import com.gulfcam.fuelcoupon.order.entity.Order;
+import com.gulfcam.fuelcoupon.order.entity.TypeVoucher;
 import com.gulfcam.fuelcoupon.order.entity.Unit;
 import com.gulfcam.fuelcoupon.order.repository.IItemRepo;
 import com.gulfcam.fuelcoupon.order.repository.IUnitRepo;
 import com.gulfcam.fuelcoupon.order.service.IItemService;
+import com.gulfcam.fuelcoupon.order.service.ITypeVoucherService;
 import com.gulfcam.fuelcoupon.order.service.IUnitService;
+import com.gulfcam.fuelcoupon.store.entity.Store;
+import com.gulfcam.fuelcoupon.store.service.IStoreService;
 import com.gulfcam.fuelcoupon.user.service.IEmailService;
+import com.gulfcam.fuelcoupon.utilities.entity.EStatus;
+import com.gulfcam.fuelcoupon.utilities.entity.Status;
 import com.gulfcam.fuelcoupon.utilities.repository.IStatusRepo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -28,6 +35,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -52,9 +60,14 @@ public class UnitRest {
     @Autowired
     IEmailService emailService;
 
-
     @Autowired
     IUnitService iUnitService;
+
+    @Autowired
+    ITypeVoucherService iTypeVoucherService;
+
+    @Autowired
+    IStoreService iStoreService;
 
     @Autowired
     IStatusRepo iStatusRepo;
@@ -79,12 +92,32 @@ public class UnitRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     public ResponseEntity<?> addUnit(@Valid @RequestBody CreateUnitDTO createUnitDTO) {
 
+        Store store= new Store();
+        TypeVoucher typeVoucher = new TypeVoucher();
+        if (createUnitDTO.getIdTypeVoucher()  != null) {
+            typeVoucher = iTypeVoucherService.getByInternalReference(createUnitDTO.getIdTypeVoucher()).get();
+
+            if(typeVoucher.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.typevoucher_exists", null, LocaleContextHolder.getLocale())));
+        }
+
+        if (createUnitDTO.getIdStore()  != null) {
+            store = iStoreService.getByInternalReference(createUnitDTO.getIdStore()).get();
+
+            if(store.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
+        }
         Unit unit = new Unit();
         unit.setInternalReference(jwtUtils.generateInternalReference());
         unit.setCreatedAt(LocalDateTime.now());
-        unit.setIdTypeVoucher(createUnitDTO.getIdTypeVoucher());
+        unit.setIdTypeVoucher(createUnitDTO.getIdTypeVoucher() );
         unit.setIdStore(createUnitDTO.getIdStore());
         unit.setQuantityNotebook(createUnitDTO.getQuantityNotebook());
+
+        Status status = iStatusRepo.findByName(EStatus.STORE_ENABLE).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.STORE_ENABLE +  "  not found"));
+        unit.setStatus(status);
 
         iUnitService.createUnit(unit);
         return ResponseEntity.ok(unit);
@@ -104,9 +137,28 @@ public class UnitRest {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.unit_exists", null, LocaleContextHolder.getLocale())));
         }
+        Store store= new Store();
+        TypeVoucher typeVoucher = new TypeVoucher();
+        if (createUnitDTO.getIdTypeVoucher()  != null) {
+            typeVoucher = iTypeVoucherService.getByInternalReference(createUnitDTO.getIdTypeVoucher()).get();
+
+            if(typeVoucher.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.typevoucher_exists", null, LocaleContextHolder.getLocale())));
+        }
+
+        if (createUnitDTO.getIdStore()  != null) {
+            store = iStoreService.getByInternalReference(createUnitDTO.getIdStore()).get();
+
+            if(store.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
+        }
         unit.setUpdateAt(LocalDateTime.now());
-        unit.setIdTypeVoucher(createUnitDTO.getIdTypeVoucher());
-        unit.setIdStore(createUnitDTO.getIdStore());
+        if (createUnitDTO.getIdTypeVoucher()  != null)
+            unit.setIdTypeVoucher(createUnitDTO.getIdTypeVoucher());
+        if (createUnitDTO.getIdStore()  != null)
+            unit.setIdStore(createUnitDTO.getIdStore());
         unit.setQuantityNotebook(createUnitDTO.getQuantityNotebook());
 
         iUnitService.createUnit(unit);

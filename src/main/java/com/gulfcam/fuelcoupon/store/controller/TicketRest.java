@@ -3,16 +3,17 @@ package com.gulfcam.fuelcoupon.store.controller;
 import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
-import com.gulfcam.fuelcoupon.order.entity.Item;
-import com.gulfcam.fuelcoupon.store.dto.CreateCartonDTO;
 import com.gulfcam.fuelcoupon.store.dto.CreateTicketDTO;
-import com.gulfcam.fuelcoupon.store.entity.Carton;
+import com.gulfcam.fuelcoupon.store.entity.Coupon;
+import com.gulfcam.fuelcoupon.store.entity.RequestOpposition;
 import com.gulfcam.fuelcoupon.store.entity.Ticket;
-import com.gulfcam.fuelcoupon.store.repository.ICartonRepo;
 import com.gulfcam.fuelcoupon.store.repository.ITicketRepo;
-import com.gulfcam.fuelcoupon.store.service.ICartonService;
+import com.gulfcam.fuelcoupon.store.service.ICouponService;
+import com.gulfcam.fuelcoupon.store.service.IRequestOppositionService;
 import com.gulfcam.fuelcoupon.store.service.ITicketService;
 import com.gulfcam.fuelcoupon.user.service.IEmailService;
+import com.gulfcam.fuelcoupon.utilities.entity.EStatus;
+import com.gulfcam.fuelcoupon.utilities.entity.Status;
 import com.gulfcam.fuelcoupon.utilities.repository.IStatusRepo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,6 +30,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -53,9 +55,14 @@ public class TicketRest {
     @Autowired
     IEmailService emailService;
 
-
     @Autowired
     ITicketService iTicketService;
+
+    @Autowired
+    IRequestOppositionService iRequestOppositionService;
+
+    @Autowired
+    ICouponService iCouponService;
 
     @Autowired
     IStatusRepo iStatusRepo;
@@ -80,11 +87,28 @@ public class TicketRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     public ResponseEntity<?> addTicket(@Valid @RequestBody CreateTicketDTO createTicketDTO) {
 
+        Coupon coupon = new Coupon();
+        RequestOpposition requestOpposition = new RequestOpposition();
+        if (createTicketDTO.getIdCoupon() != null) {
+            coupon = iCouponService.getByInternalReference(createTicketDTO.getIdCoupon()).get();
+            if(coupon.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.coupon_exists", null, LocaleContextHolder.getLocale())));
+        }
+        if (createTicketDTO.getIdRequestOpposition() != null) {
+            requestOpposition = iRequestOppositionService.getByInternalReference(createTicketDTO.getIdRequestOpposition()).get();
+            if(requestOpposition.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.requestopposition_exists", null, LocaleContextHolder.getLocale())));
+        }
         Ticket ticket = new Ticket();
         ticket.setInternalReference(jwtUtils.generateInternalReference());
         ticket.setCreatedAt(LocalDateTime.now());
         ticket.setIdCoupon(createTicketDTO.getIdCoupon());
         ticket.setIdRequestOpposition(createTicketDTO.getIdRequestOpposition());
+
+        Status status = iStatusRepo.findByName(EStatus.STORE_ENABLE).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.STORE_ENABLE +  "  not found"));
+        ticket.setStatus(status);
 
         iTicketService.createTicket(ticket);
         return ResponseEntity.ok(ticket);
@@ -104,9 +128,25 @@ public class TicketRest {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.ticket_exists", null, LocaleContextHolder.getLocale())));
         }
+        Coupon coupon = new Coupon();
+        RequestOpposition requestOpposition = new RequestOpposition();
+        if (createTicketDTO.getIdCoupon() != null) {
+            coupon = iCouponService.getByInternalReference(createTicketDTO.getIdCoupon()).get();
+            if(coupon.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.coupon_exists", null, LocaleContextHolder.getLocale())));
+        }
+        if (createTicketDTO.getIdRequestOpposition() != null) {
+            requestOpposition = iRequestOppositionService.getByInternalReference(createTicketDTO.getIdRequestOpposition()).get();
+            if(requestOpposition.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.requestopposition_exists", null, LocaleContextHolder.getLocale())));
+        }
         ticket.setUpdateAt(LocalDateTime.now());
-        ticket.setIdCoupon(createTicketDTO.getIdCoupon());
-        ticket.setIdRequestOpposition(createTicketDTO.getIdRequestOpposition());
+        if (createTicketDTO.getIdCoupon() != null)
+            ticket.setIdCoupon(createTicketDTO.getIdCoupon());
+        if (createTicketDTO.getIdRequestOpposition() != null)
+            ticket.setIdRequestOpposition(createTicketDTO.getIdRequestOpposition());
 
         iTicketService.createTicket(ticket);
 

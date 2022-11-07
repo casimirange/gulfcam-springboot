@@ -49,8 +49,8 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public Page<Order> getOrdersByIdManagerStore(Long idManagerStore, int page, int size, String sort, String order) {
-        return iOrderRepo.getOrdersByIdManagerStore(idManagerStore,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
+    public Page<Order> getOrdersByIdManagerOrder(Long idManagerOrder, int page, int size, String sort, String order) {
+        return iOrderRepo.getOrdersByIdManagerOrder(idManagerOrder,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
     }
 
     @Override

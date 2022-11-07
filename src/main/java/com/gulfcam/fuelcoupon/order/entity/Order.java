@@ -26,7 +26,8 @@ public class Order {
     private Long internalReference;
 
     @Schema(description = "Reférence client", example = "0987698")
-    private Long clientReference;
+    @Column(unique = false)
+    private String clientReference;
 
     @Column(nullable = true, name = "id_client")
     private Long idClient;
@@ -34,8 +35,8 @@ public class Order {
     @Column(nullable = true, name = "id_fund")
     private Long idFund;
 
-    @Column(nullable = true, name = "id_manager_store")
-    private Long idManagerStore;
+    @Column(nullable = true, name = "id_manager_order")
+    private Long idManagerOrder;
 
     @Column(nullable = true, name = "id_manager_coupon")
     private Long idManagerCoupon;
@@ -63,6 +64,7 @@ public class Order {
 
     private String deliveryTime;
 
+    @Column(nullable = true, name = "id_payment_method")
     private Long IdPaymentMethod;
 
     private String paymentReference;

@@ -5,6 +5,8 @@ import com.gulfcam.fuelcoupon.authentication.service.IAuthorizationService;
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.authentication.service.UserDetailsImpl;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
+import com.gulfcam.fuelcoupon.store.entity.Store;
+import com.gulfcam.fuelcoupon.store.service.IStoreService;
 import com.gulfcam.fuelcoupon.user.dto.*;
 import com.gulfcam.fuelcoupon.user.entity.*;
 import com.gulfcam.fuelcoupon.user.repository.IOldPasswordRepo;
@@ -80,6 +82,9 @@ public class AuthenticationRest {
 
     @Autowired
     PasswordEncoder encoder;
+
+    @Autowired
+    IStoreService iStoreService;
 
     @Autowired
     IUtilitieService utilitieService;
@@ -248,6 +253,15 @@ public class AuthenticationRest {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.phone_exists", null, LocaleContextHolder.getLocale())));
         }
+        Store store = new Store();
+        if (userAddDto.getIdStore() != null) {
+            store =  iStoreService.getByInternalReference(userAddDto.getIdStore()).get();
+
+            if(store.getId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                    messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
+        }
+
         Users u = modelMapper.map(userAddDto, Users.class);
         u.setUsing2FA(true);
         u.setFirstName(userAddDto.getFirstName());
@@ -261,7 +275,7 @@ public class AuthenticationRest {
         u.setInternalReference(jwtUtils.generateInternalReference());
         u.setPosition(userAddDto.getPosition());
         u.setPassword(encoder.encode(userAddDto.getPassword()));
-        u.setIdStore(userAddDto.getIdStore());
+        u.setIdStore(store.getId());
         u.setCreatedDate(LocalDateTime.now());
         Users user = new Users();
         String password = null;
@@ -271,6 +285,7 @@ public class AuthenticationRest {
         user = (Users) userAndPasswordNotEncoded.get("user");
         userService.editStatus(user.getUserId(), Long.valueOf(EStatusUser.USER_ENABLED.ordinal() + 1L));
         UserResDto userResDto = modelMapper.map(u, UserResDto.class);
+        userResDto.setStore(store);
         Map<String, Object> emailProps = new HashMap<>();
         emailProps.put("firstname", userAddDto.getFirstName());
         emailProps.put("lastname", userAddDto.getLastName());
@@ -306,7 +321,7 @@ public class AuthenticationRest {
             users.setOtpCodeCreatedAT(null);
             userRepo.save(users);
             log.info("user " + users.getOtpCode() + " authenticated");
-            return ResponseEntity.ok(new AuthSignInResDto(bearerToken, refreshToken, "Bearer", roles, true));
+            return ResponseEntity.ok(new AuthSignInResDto(bearerToken, refreshToken, "Bearer", users, roles, true));
 
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

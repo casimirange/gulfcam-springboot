@@ -3,16 +3,15 @@ package com.gulfcam.fuelcoupon.store.controller;
 import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
-import com.gulfcam.fuelcoupon.order.entity.Item;
-import com.gulfcam.fuelcoupon.store.dto.CreateCartonDTO;
 import com.gulfcam.fuelcoupon.store.dto.CreateRequestOppositionDTO;
-import com.gulfcam.fuelcoupon.store.entity.Carton;
 import com.gulfcam.fuelcoupon.store.entity.RequestOpposition;
-import com.gulfcam.fuelcoupon.store.repository.ICartonRepo;
 import com.gulfcam.fuelcoupon.store.repository.IRequestOppositionRepo;
-import com.gulfcam.fuelcoupon.store.service.ICartonService;
 import com.gulfcam.fuelcoupon.store.service.IRequestOppositionService;
+import com.gulfcam.fuelcoupon.user.entity.Users;
 import com.gulfcam.fuelcoupon.user.service.IEmailService;
+import com.gulfcam.fuelcoupon.user.service.IUserService;
+import com.gulfcam.fuelcoupon.utilities.entity.EStatus;
+import com.gulfcam.fuelcoupon.utilities.entity.Status;
 import com.gulfcam.fuelcoupon.utilities.repository.IStatusRepo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,6 +28,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -53,9 +53,11 @@ public class RequestOppositionRest {
     @Autowired
     IEmailService emailService;
 
-
     @Autowired
     IRequestOppositionService iRequestOppositionService;
+
+    @Autowired
+    IUserService iUserService;
 
     @Autowired
     IStatusRepo iStatusRepo;
@@ -80,6 +82,23 @@ public class RequestOppositionRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     public ResponseEntity<?> addRequestOpposition(@Valid @RequestBody CreateRequestOppositionDTO createRequestOppositionDTO) {
 
+        Users managerCoupon = new Users();
+        Users serviceClient = new Users();
+
+        if (createRequestOppositionDTO.getIdManagerCoupon() != null) {
+            managerCoupon = iUserService.getByInternalReference(createRequestOppositionDTO.getIdManagerCoupon());
+            if(managerCoupon.getUserId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
+        }
+
+        if (createRequestOppositionDTO.getIdServiceClient() != null) {
+            serviceClient = iUserService.getByInternalReference(createRequestOppositionDTO.getIdServiceClient());
+            if(serviceClient.getUserId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
+        }
+
         RequestOpposition requestOpposition = new RequestOpposition();
         requestOpposition.setInternalReference(jwtUtils.generateInternalReference());
         requestOpposition.setCreatedAt(LocalDateTime.now());
@@ -87,6 +106,9 @@ public class RequestOppositionRest {
         requestOpposition.setReason(createRequestOppositionDTO.getReason());
         requestOpposition.setIdManagerCoupon(createRequestOppositionDTO.getIdManagerCoupon());
         requestOpposition.setIdServiceClient(createRequestOppositionDTO.getIdServiceClient());
+
+        Status status = iStatusRepo.findByName(EStatus.STORE_ENABLE).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.STORE_ENABLE +  "  not found"));
+        requestOpposition.setStatus(status);
 
         iRequestOppositionService.createRequestOpposition(requestOpposition);
         return ResponseEntity.ok(requestOpposition);
@@ -106,11 +128,31 @@ public class RequestOppositionRest {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.requestopposition_exists", null, LocaleContextHolder.getLocale())));
         }
+
+        Users managerCoupon = new Users();
+        Users serviceClient = new Users();
+
+        if (createRequestOppositionDTO.getIdManagerCoupon() != null) {
+            managerCoupon = iUserService.getByInternalReference(createRequestOppositionDTO.getIdManagerCoupon());
+            if(managerCoupon.getUserId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
+        }
+
+        if (createRequestOppositionDTO.getIdServiceClient() != null) {
+            serviceClient = iUserService.getByInternalReference(createRequestOppositionDTO.getIdServiceClient());
+            if(serviceClient.getUserId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
+        }
+
         requestOpposition.setUpdateAt(LocalDateTime.now());
         requestOpposition.setDescription(createRequestOppositionDTO.getDescription());
         requestOpposition.setReason(createRequestOppositionDTO.getReason());
-        requestOpposition.setIdManagerCoupon(createRequestOppositionDTO.getIdManagerCoupon());
-        requestOpposition.setIdServiceClient(createRequestOppositionDTO.getIdServiceClient());
+        if (createRequestOppositionDTO.getIdManagerCoupon() != null)
+            requestOpposition.setIdManagerCoupon(createRequestOppositionDTO.getIdManagerCoupon());
+        if (createRequestOppositionDTO.getIdServiceClient() != null)
+            requestOpposition.setIdServiceClient(createRequestOppositionDTO.getIdServiceClient());
 
         iRequestOppositionService.createRequestOpposition(requestOpposition);
 
