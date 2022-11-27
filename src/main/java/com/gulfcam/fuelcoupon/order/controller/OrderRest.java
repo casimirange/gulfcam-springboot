@@ -7,15 +7,14 @@ import com.gulfcam.fuelcoupon.client.entity.ETypeClient;
 import com.gulfcam.fuelcoupon.client.entity.TypeClient;
 import com.gulfcam.fuelcoupon.client.service.IClientService;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
-import com.gulfcam.fuelcoupon.order.dto.CreateItemDTO;
 import com.gulfcam.fuelcoupon.order.dto.CreateOrderDTO;
+import com.gulfcam.fuelcoupon.order.dto.ProductDTO;
+import com.gulfcam.fuelcoupon.order.dto.UploadFileResponseDto;
 import com.gulfcam.fuelcoupon.order.entity.*;
-import com.gulfcam.fuelcoupon.order.repository.IItemRepo;
 import com.gulfcam.fuelcoupon.order.repository.IOrderRepo;
 import com.gulfcam.fuelcoupon.order.repository.IStatusOrderRepo;
-import com.gulfcam.fuelcoupon.order.service.IItemService;
-import com.gulfcam.fuelcoupon.order.service.IOrderService;
-import com.gulfcam.fuelcoupon.order.service.IPaymentMethodService;
+import com.gulfcam.fuelcoupon.order.repository.ITypeDocumentRepo;
+import com.gulfcam.fuelcoupon.order.service.*;
 import com.gulfcam.fuelcoupon.store.entity.Store;
 import com.gulfcam.fuelcoupon.store.service.IStoreService;
 import com.gulfcam.fuelcoupon.user.dto.EmailDto;
@@ -23,7 +22,6 @@ import com.gulfcam.fuelcoupon.user.entity.ETypeAccount;
 import com.gulfcam.fuelcoupon.user.entity.Users;
 import com.gulfcam.fuelcoupon.user.service.IEmailService;
 import com.gulfcam.fuelcoupon.user.service.IUserService;
-import com.gulfcam.fuelcoupon.utilities.repository.IStatusRepo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -33,23 +31,32 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @Tag(name = "Order")
@@ -77,13 +84,25 @@ public class OrderRest {
     IPaymentMethodService iPaymentMethodService;
 
     @Autowired
+    IProductService iProductService;
+
+    @Autowired
     IClientService iClientService;
 
     @Autowired
     IStatusOrderRepo iStatusOrderRepo;
 
     @Autowired
+    ITypeDocumentRepo iTypeDocumentRepo;
+
+    @Autowired
     IOrderRepo iOrderRepo;
+
+    @Autowired
+    ITypeVoucherService iTypeVoucherService;
+
+    @Autowired
+    IDocumentStorageService iDocumentStorageService;
 
     @Autowired
     IStoreService iStoreService;
@@ -95,6 +114,8 @@ public class OrderRest {
     String mailFrom;
     @Value("${mail.replyTo[0]}")
     String mailReplyTo;
+    @Value("${app.api.base.url}")
+    private String api_base_url;
 
     @Operation(summary = "création des informations pour une commande", tags = "Order", responses = {
             @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Order.class)))),
@@ -103,7 +124,7 @@ public class OrderRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
     @PostMapping()
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> addOrder(@Valid @RequestBody CreateOrderDTO createOrderDTO) {
+    public ResponseEntity<?> addOrder(@Valid @RequestBody CreateOrderDTO createOrderDTO) throws JRException, IOException {
 
         Client client = new Client();
         Users managerCoupon = new Users();
@@ -184,7 +205,7 @@ public class OrderRest {
         order.setPaymentReference(createOrderDTO.getPaymentReference());
         order.setReasonForCancellation(createOrderDTO.getReasonForCancellation());
 
-        StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.ORDER_CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.ORDER_CREATED +  "  not found"));
+        StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.CREATED +  "  not found"));
         order.setStatus(statusOrder);
 
         List<Users> usersList = iUserService.getUsers();
@@ -201,16 +222,16 @@ public class OrderRest {
         if(createOrderDTO.getIdManagerOrder() != null){
             emailToStore += managerOrder.getEmail();
         }
-
+        String ClientReference = createOrderDTO.getIdClient()+" - "+client.getEmail()+" - "+client.getCompleteName()+" - "+client.getCompanyName();
         Map<String, Object> emailProps = new HashMap<>();
         emailProps.put("internalReferenceOrder", internalReference);
-        emailProps.put("internalReferenceClient", createOrderDTO.getIdClient());
+        emailProps.put("internalReferenceClient", ClientReference);
         emailProps.put("internalReferenceStore", createOrderDTO.getIdStore());
         emailProps.put("delivryTime", createOrderDTO.getDeliveryTime());
         emailProps.put("canal", createOrderDTO.getChannel());
         emailProps.put("netAmount", createOrderDTO.getNetAggregateAmount());
         emailProps.put("ttcAmount", createOrderDTO.getTTCAggregateAmount());
-        emailProps.put("payementMethode", createOrderDTO.getIdPaymentMethod());
+        emailProps.put("payementMethode", createOrderDTO.getIdPaymentMethod()+ " - "+paymentMethod.getDesignation());
 
         if(emailToTresury != null){
             emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, emailToTresury, mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_NEW_ORDER+internalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_ORDER));
@@ -221,6 +242,14 @@ public class OrderRest {
             emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, emailToStore, mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_NEW_ORDER+internalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_ORDER));
             log.info("Email  send successfull for user: " + emailToStore);
         }
+
+        byte[] data = generateInvoice(order, client);
+
+        Map<String, Object> emailProps2 = new HashMap<>();
+        emailProps2.put("Internalreference", internalReference);
+        emailProps2.put("completename", client.getCompleteName());
+        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, ApplicationConstant.SUBJECT_EMAIL_NEW_INVOICE+internalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_INVOICE, data));
+        log.info("Email send successfull for user: " + client.getEmail());
 
         iOrderService.createOrder(order);
         return ResponseEntity.ok(order);
@@ -323,6 +352,232 @@ public class OrderRest {
         order.setReasonForCancellation(createOrderDTO.getReasonForCancellation());
 
         iOrderService.createOrder(order);
+
+        return ResponseEntity.ok(order);
+    }
+
+    @Operation(summary = "Effectuer un paiement pour une commande", tags = "Order", responses = {
+            @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Order.class)))),
+            @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
+    @PostMapping("/accept/{InternalReference:[0-9]+}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+    public ResponseEntity<?> acceptOrder(@RequestBody MultipartFile file, @PathVariable Long InternalReference, @RequestParam("idFund") Long idFund, @RequestParam("idPaymentMethod") Long idPaymentMethod, @RequestParam("paymentReference") String paymentReference, @RequestParam("docType") String docType) throws JRException, IOException {
+
+        Order order = iOrderService.getByInternalReference(InternalReference).get();
+        Client client = iClientService.getClientByInternalReference(order.getIdClient()).get();
+        StatusOrder statusOrderCreated = iStatusOrderRepo.findByName(EStatusOrder.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.CREATED +  "  not found"));
+        if (order.getStatus() != statusOrderCreated) {
+            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                    messageSource.getMessage("messages.order_created_before", null, LocaleContextHolder.getLocale())));
+        }
+        StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.ACCEPTED).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.ACCEPTED +  "  not found"));
+        TypeDocument typeDocument = iTypeDocumentRepo.findByName(ETypeDocument.INVOICE).orElseThrow(()-> new ResourceNotFoundException("Statut :  "  +  ETypeDocument.INVOICE +  "  not found"));
+        String fileName = iDocumentStorageService.storeFile(file, InternalReference, docType, typeDocument);
+        String fileDownloadUri = api_base_url+"/api/v1.0/order/file/" + InternalReference + "/downloadFile?type=invoice&docType=" + docType;
+        order.setLinkInvoice(fileDownloadUri);
+        order.setStatus(statusOrder);
+        order.setIdPaymentMethod(idPaymentMethod);
+        order.setIdFund(idFund);
+        order.setPaymentReference(paymentReference);
+        iOrderService.createOrder(order);
+
+        byte[] data = generateReceived(order, client);
+
+        Map<String, Object> emailProps2 = new HashMap<>();
+        emailProps2.put("Internalreference", InternalReference);
+        emailProps2.put("completename", client.getCompleteName());
+        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, ApplicationConstant.SUBJECT_EMAIL_NEW_RECEIVED+InternalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_RECEIVED, data));
+        log.info("Email send successfull for user: " + client.getEmail());
+
+        Map<String, Object> emailProps = new HashMap<>();
+        emailProps.put("internalReferenceOrder", InternalReference);
+        emailProps.put("internalReferenceClient", order.getClientReference());
+        emailProps.put("internalReferenceStore", order.getIdStore());
+        emailProps.put("delivryTime", order.getDeliveryTime());
+        emailProps.put("canal", order.getChannel());
+        emailProps.put("netAmount", order.getNetAggregateAmount());
+        emailProps.put("ttcAmount", order.getTTCAggregateAmount());
+        emailProps.put("status", EStatusOrder.ACCEPTED);
+        emailProps.put("payementMethode", order.getIdPaymentMethod()+ " - "+iPaymentMethodService.getByInternalReference(order.getIdPaymentMethod()).get().getDesignation());
+
+        List<Users> usersList = iUserService.getUsers();
+        for (Users user : usersList) {
+            if (user.getTypeAccount().getName() == ETypeAccount.TREASURY) {
+                emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_MODIFY_ORDER+InternalReference+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_MODIFY_ORDER));
+                log.info("Email  send successfull for user: " + user.getEmail());
+            }
+
+            if (user.getTypeAccount().getName() == ETypeAccount.MANAGER_COUPON) {
+                emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_MODIFY_ORDER+InternalReference+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_MODIFY_ORDER));
+                log.info("Email  send successfull for user: " + user.getEmail());
+            }
+        }
+
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=received-" + order.getClientReference() + ".pdf");
+
+        return ResponseEntity.ok().headers(headers).contentType(MediaType.APPLICATION_PDF).body(data);
+    }
+
+    @Operation(summary = "Générer le bordereau de livraison pour une commande", tags = "Order", responses = {
+            @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Order.class)))),
+            @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
+    @PostMapping("/delivery/{InternalReference:[0-9]+}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+    public ResponseEntity<?> devliveryOrder(@PathVariable Long InternalReference, @RequestParam("idManagerCoupon") Long idManagerCoupon) throws JRException, IOException {
+
+        Order order = iOrderService.getByInternalReference(InternalReference).get();
+        Client client = iClientService.getClientByInternalReference(order.getIdClient()).get();
+        StatusOrder statusOrderPaid = iStatusOrderRepo.findByName(EStatusOrder.PAID).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.PAID +  "  not found"));
+        if (order.getStatus() != statusOrderPaid) {
+            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                    messageSource.getMessage("messages.order_pay_before", null, LocaleContextHolder.getLocale())));
+        }
+        byte[] data = generateDelivery(order, client);
+        StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.IN_PROCESS_OF_DELIVERY).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.IN_PROCESS_OF_DELIVERY +  "  not found"));
+        order.setStatus(statusOrder);
+        order.setIdManagerCoupon(idManagerCoupon);
+        iOrderService.createOrder(order);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=delivery-" + order.getClientReference() + ".pdf");
+
+        return ResponseEntity.ok().headers(headers).contentType(MediaType.APPLICATION_PDF).body(data);
+    }
+
+    @Operation(summary = "Télécharger un document (Bon de commande, reçue ou preuve de paiement) pour une commande", tags = "Order", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "404", description = "File not found", content = @Content(mediaType = "Application/Json")),})
+    @GetMapping("/file/{InternalReference:[0-9]+}/downloadFile")
+    public ResponseEntity<Object> downloadFile(@PathVariable("InternalReference") Long InternalReference, @Schema(required = true, allowableValues = {"INVOICE", "DELIVERY"}, description = "Type de document") @RequestParam("type") String type, @RequestParam("docType") String docType,
+                                               HttpServletRequest request) {
+
+        TypeDocument typeDocument = iTypeDocumentRepo.findByName(ETypeDocument.valueOf(type.toUpperCase())).orElseThrow(()-> new ResourceNotFoundException("Type de document:  "  +  type +  "  not found"));
+
+        String fileName = iDocumentStorageService.getDocumentName(InternalReference, docType, typeDocument.getId());
+        Resource resource = null;
+        if (fileName != null && !fileName.isEmpty()) {
+            try {
+                resource = iDocumentStorageService.loadFileAsResource(fileName);
+            } catch (Exception e) {
+                log.info(e.getMessage());
+            }
+            // Try to determine file's content type
+            String contentType = null;
+            try {
+                contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+            } catch (IOException e) {
+                log.info("Could not determine file type.");
+            }
+            // Fallback to the default content type if type could not be determined
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            }
+            return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                    .body(resource);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("File not found");
+        }
+    }
+
+    @Operation(summary = "Valider le paiement pour une commande", tags = "Order", responses = {
+            @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Order.class)))),
+            @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
+    @PostMapping("/pay/{InternalReference:[0-9]+}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+    public ResponseEntity<?> payOrder(@PathVariable Long InternalReference, @RequestParam("idManagerCoupon") Long idManagerCoupon) {
+
+        Order order = iOrderService.getByInternalReference(InternalReference).get();
+        Client client = iClientService.getClientByInternalReference(order.getIdClient()).get();
+        StatusOrder statusOrderAccept = iStatusOrderRepo.findByName(EStatusOrder.ACCEPTED).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.ACCEPTED +  "  not found"));
+        if (order.getStatus() != statusOrderAccept) {
+            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                    messageSource.getMessage("messages.order_accept_before", null, LocaleContextHolder.getLocale())));
+        }
+        StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.PAID).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.PAID +  "  not found"));
+        order.setStatus(statusOrder);
+        order.setIdManagerCoupon(idManagerCoupon);
+        iOrderService.createOrder(order);
+
+        Map<String, Object> emailProps = new HashMap<>();
+        emailProps.put("internalReferenceOrder", InternalReference);
+        emailProps.put("internalReferenceClient", order.getClientReference());
+        emailProps.put("internalReferenceStore", order.getIdStore());
+        emailProps.put("delivryTime", order.getDeliveryTime());
+        emailProps.put("canal", order.getChannel());
+        emailProps.put("netAmount", order.getNetAggregateAmount());
+        emailProps.put("ttcAmount", order.getTTCAggregateAmount());
+        emailProps.put("status", EStatusOrder.PAID);
+        emailProps.put("payementMethode", order.getIdPaymentMethod()+ " - "+iPaymentMethodService.getByInternalReference(order.getIdPaymentMethod()).get().getDesignation());
+
+        List<Users> usersList = iUserService.getUsers();
+        for (Users user : usersList) {
+            if (user.getTypeAccount().getName() == ETypeAccount.STORE_KEEPER) {
+                emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_MODIFY_ORDER+InternalReference+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_MODIFY_ORDER));
+                log.info("Email  send successfull for user: " + user.getEmail());
+            }
+
+            if (user.getTypeAccount().getName() == ETypeAccount.MANAGER_COUPON) {
+                emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_MODIFY_ORDER+InternalReference+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_MODIFY_ORDER));
+                log.info("Email  send successfull for user: " + user.getEmail());
+            }
+        }
+
+        return ResponseEntity.ok(order);
+    }
+
+    @Operation(summary = "valider le bon de livraison et terminer pour une commande", tags = "Order", responses = {
+            @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Order.class)))),
+            @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
+    @PostMapping("/valid/delivery/{InternalReference:[0-9]+}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+    public ResponseEntity<?> validDeliveryOrder(@RequestBody MultipartFile file, @PathVariable Long InternalReference, @RequestParam("idManagerCoupon") Long idManagerCoupon) throws JRException, IOException {
+
+        Order order = iOrderService.getByInternalReference(InternalReference).get();
+        Client client = iClientService.getClientByInternalReference(order.getIdClient()).get();
+        StatusOrder statusOrderDelivery = iStatusOrderRepo.findByName(EStatusOrder.IN_PROCESS_OF_DELIVERY).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.IN_PROCESS_OF_DELIVERY +  "  not found"));
+        if (order.getStatus() != statusOrderDelivery) {
+            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                    messageSource.getMessage("messages.order_delivery_before", null, LocaleContextHolder.getLocale())));
+        }
+        StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.CLOSED).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.CLOSED +  "  not found"));
+        TypeDocument typeDocument = iTypeDocumentRepo.findByName(ETypeDocument.DELIVERY).orElseThrow(()-> new ResourceNotFoundException("Statut :  "  +  ETypeDocument.DELIVERY +  "  not found"));
+        String fileName = iDocumentStorageService.storeFile(file, InternalReference, "pdf", typeDocument);
+        String fileDownloadUri = api_base_url+"/api/v1.0/order/file/" + InternalReference + "/downloadFile?type=delivery&docType=pdf";
+        order.setLinkDelivery(fileDownloadUri);
+        order.setStatus(statusOrder);
+        order.setIdManagerCoupon(idManagerCoupon);
+        iOrderService.createOrder(order);
+
+        Map<String, Object> emailProps = new HashMap<>();
+        emailProps.put("internalReferenceOrder", InternalReference);
+        emailProps.put("internalReferenceClient", order.getClientReference());
+        emailProps.put("internalReferenceStore", order.getIdStore());
+        emailProps.put("delivryTime", order.getDeliveryTime());
+        emailProps.put("canal", order.getChannel());
+        emailProps.put("netAmount", order.getNetAggregateAmount());
+        emailProps.put("ttcAmount", order.getTTCAggregateAmount());
+        emailProps.put("status", EStatusOrder.CLOSED);
+        emailProps.put("payementMethode", order.getIdPaymentMethod()+ " - "+iPaymentMethodService.getByInternalReference(order.getIdPaymentMethod()).get().getDesignation());
+
+        List<Users> usersList = iUserService.getUsers();
+        for (Users user : usersList) {
+            if (user.getTypeAccount().getName() == ETypeAccount.MANAGER_COUPON) {
+                emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_MODIFY_ORDER+InternalReference+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_MODIFY_ORDER));
+                log.info("Email  send successfull for user: " + user.getEmail());
+            }
+        }
+
 
         return ResponseEntity.ok(order);
     }
@@ -447,6 +702,24 @@ public class OrderRest {
         return ResponseEntity.ok(iOrderService.getByInternalReference(internalReference).get());
     }
 
+
+    @Operation(summary = "La proforma numérique ou la préfacture numérique générée pour une commande par son Identifiant interne", tags = "Order", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Order.class)))),
+            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+    @GetMapping("/invoice/{internalReference:[0-9]+}")
+    public ResponseEntity<?> generateInvoiceByInternalReference(@PathVariable Long internalReference) throws JRException, IOException {
+        Order order = iOrderService.getByInternalReference(internalReference).get();
+        Client client = iClientService.getClientByInternalReference(order.getIdClient()).get();
+        byte[] data = generateInvoice(order, client);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=invoice-" + order.getClientReference() + ".pdf");
+
+        return ResponseEntity.ok().headers(headers).contentType(MediaType.APPLICATION_PDF).body(data);
+    }
+
     @Operation(summary = "Supprimer une commande", tags = "Order", responses = {
             @ApiResponse(responseCode = "200", description = "Client deleted successfully", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : access denied", content = @Content(mediaType = "Application/Json")),
@@ -477,4 +750,133 @@ public class OrderRest {
         Page<Order> list = iOrderService.getAllOrders(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(list);
     }
+
+    private byte[] generateInvoice(Order order, Client client) throws JRException, IOException {
+        List<Product> products = iProductService.getProductsByIdOrder(order.getInternalReference());
+
+        ProductDTO productDTO = new ProductDTO();
+        List<ProductDTO> productDTOList = new ArrayList<>();
+
+        for(Product product : products){
+            productDTO = new ProductDTO();
+            productDTO.setQuantityNotebook(product.getQuantityNotebook());
+            productDTO.setPrice(iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get().getAmount()+"");
+            productDTO.setProduct("Carnet N-"+product.getInternalReference());
+            productDTOList.add(productDTO);
+        }
+        /* Map to hold Jasper report Parameters*/
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("products", productDTOList);
+        parameters.put("NetAggregateAmount", order.getNetAggregateAmount()+"");
+        parameters.put("tax", order.getTax()+"");
+        parameters.put("TTCAggregateAmount", order.getTTCAggregateAmount()+"");
+        parameters.put("completeName", client.getCompleteName());
+        parameters.put("companyName", client.getCompanyName());
+        parameters.put("address", client.getAddress());
+        parameters.put("phone", client.getPhone()+"");
+        parameters.put("email", client.getEmail());
+        parameters.put("clientReference", order.getClientReference()+"");
+        parameters.put("idcommand", order.getInternalReference()+"");
+        parameters.put("the_date", new Date());
+        parameters.put("logo", appContext.getResource("classpath:/templates/logo.jpeg").getFile().getAbsolutePath());
+        /* read jrxl fille and creat jasperdesign object*/
+        InputStream input = new FileInputStream(appContext.getResource("classpath:/templates/invoice.jrxml").getFile());
+
+        JasperDesign jasperDesign = JRXmlLoader.load(input);
+
+        /* compiling jrxml with help of JasperReport class*/
+        JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+
+        /* Using jasperReport objet to generate PDF*/
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
+
+        /*convert PDF to byte type*/
+        return JasperExportManager.exportReportToPdf(jasperPrint);
     }
+
+    private byte[] generateReceived(Order order, Client client) throws JRException, IOException {
+        List<Product> products = iProductService.getProductsByIdOrder(order.getInternalReference());
+
+        ProductDTO productDTO = new ProductDTO();
+        List<ProductDTO> productDTOList = new ArrayList<>();
+
+        for(Product product : products){
+            productDTO = new ProductDTO();
+            productDTO.setQuantityNotebook(product.getQuantityNotebook());
+            productDTO.setPrice(iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get().getAmount()+"");
+            productDTO.setProduct("Carnet N-"+product.getInternalReference());
+            productDTOList.add(productDTO);
+        }
+        /* Map to hold Jasper report Parameters*/
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("products", productDTOList);
+        parameters.put("NetAggregateAmount", order.getNetAggregateAmount()+"");
+        parameters.put("tax", order.getTax()+"");
+        parameters.put("TTCAggregateAmount", order.getTTCAggregateAmount()+"");
+        parameters.put("completeName", client.getCompleteName());
+        parameters.put("companyName", client.getCompanyName());
+        parameters.put("address", client.getAddress());
+        parameters.put("phone", client.getPhone()+"");
+        parameters.put("email", client.getEmail());
+        parameters.put("clientReference", order.getClientReference()+"");
+        parameters.put("idcommand", order.getInternalReference()+"");
+        parameters.put("the_date", new Date());
+        parameters.put("logo", appContext.getResource("classpath:/templates/logo.jpeg").getFile().getAbsolutePath());
+        /* read jrxl fille and creat jasperdesign object*/
+        InputStream input = new FileInputStream(appContext.getResource("classpath:/templates/received.jrxml").getFile());
+
+        JasperDesign jasperDesign = JRXmlLoader.load(input);
+
+        /* compiling jrxml with help of JasperReport class*/
+        JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+
+        /* Using jasperReport objet to generate PDF*/
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
+
+        /*convert PDF to byte type*/
+        return JasperExportManager.exportReportToPdf(jasperPrint);
+    }
+
+    private byte[] generateDelivery(Order order, Client client) throws JRException, IOException {
+        List<Product> products = iProductService.getProductsByIdOrder(order.getInternalReference());
+
+        ProductDTO productDTO = new ProductDTO();
+        List<ProductDTO> productDTOList = new ArrayList<>();
+
+        for(Product product : products){
+            productDTO = new ProductDTO();
+            productDTO.setQuantityNotebook(product.getQuantityNotebook());
+            productDTO.setPrice(iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get().getAmount()+"");
+            productDTO.setProduct("Carnet N-"+product.getInternalReference());
+            productDTOList.add(productDTO);
+        }
+        /* Map to hold Jasper report Parameters*/
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("products", productDTOList);
+        parameters.put("NetAggregateAmount", order.getNetAggregateAmount()+"");
+        parameters.put("tax", order.getTax()+"");
+        parameters.put("TTCAggregateAmount", order.getTTCAggregateAmount()+"");
+        parameters.put("completeName", client.getCompleteName());
+        parameters.put("companyName", client.getCompanyName());
+        parameters.put("address", client.getAddress());
+        parameters.put("phone", client.getPhone()+"");
+        parameters.put("email", client.getEmail());
+        parameters.put("clientReference", order.getClientReference()+"");
+        parameters.put("idcommand", order.getInternalReference()+"");
+        parameters.put("the_date", new Date());
+        parameters.put("logo", appContext.getResource("classpath:/templates/logo.jpeg").getFile().getAbsolutePath());
+        /* read jrxl fille and creat jasperdesign object*/
+        InputStream input = new FileInputStream(appContext.getResource("classpath:/templates/delivery.jrxml").getFile());
+
+        JasperDesign jasperDesign = JRXmlLoader.load(input);
+
+        /* compiling jrxml with help of JasperReport class*/
+        JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+
+        /* Using jasperReport objet to generate PDF*/
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
+
+        /*convert PDF to byte type*/
+        return JasperExportManager.exportReportToPdf(jasperPrint);
+    }
+}

@@ -47,7 +47,7 @@ public class CreateOrderDTO {
     @Schema(description = "Délai de livraison")
     private String deliveryTime;
 
-    @Schema(description = "Reference interne de la méthode de pqiement choisie")
+    @Schema(description = "Reference interne de la méthode de paiement choisie")
     private Long IdPaymentMethod;
 
     private String paymentReference;

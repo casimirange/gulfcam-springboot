@@ -12,6 +12,7 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import javax.mail.internet.MimeMessage;
+import javax.mail.util.ByteArrayDataSource;
 import java.nio.charset.StandardCharsets;
 
 @Service
@@ -40,6 +41,10 @@ public class EmailServiceImpl implements IEmailService {
 			mimeMessageHelper.setSubject(emailDto.getSubject());
 			mimeMessageHelper.setReplyTo(emailDto.getReplyTo(),emailDto.getReplyToName());
 			mimeMessageHelper.setText(html, true);
+
+			if(emailDto.getAttachement() != null){
+				mimeMessageHelper.addAttachment("invoice.pdf", new ByteArrayDataSource(emailDto.getAttachement(), "application/pdf"));
+			}
 			emailSender.send(mimeMessage);
 			log.info("Email Successful send to {}", emailDto.getTo());
 		} catch (Exception ex) {

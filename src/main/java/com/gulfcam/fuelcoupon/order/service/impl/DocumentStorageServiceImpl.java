@@ -2,6 +2,7 @@ package com.gulfcam.fuelcoupon.order.service.impl;
 
 import com.gulfcam.fuelcoupon.exception.DocumentsStorageException;
 import com.gulfcam.fuelcoupon.order.entity.DocumentStorageProperties;
+import com.gulfcam.fuelcoupon.order.entity.TypeDocument;
 import com.gulfcam.fuelcoupon.order.repository.IDocumentStoragePropertiesRepo;
 import com.gulfcam.fuelcoupon.order.service.IDocumentStorageService;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +42,7 @@ public class DocumentStorageServiceImpl implements IDocumentStorageService {
     }
     @Override
     @Transactional
-    public String storeFile(MultipartFile file, Long idOrder, String docType) {
+    public String storeFile(MultipartFile file, Long idOrder, String docType, TypeDocument typeDocument) {
         // Normalize file name
         String originalFilename = StringUtils.cleanPath(file.getOriginalFilename());
         String fileName = "";
@@ -62,16 +63,18 @@ public class DocumentStorageServiceImpl implements IDocumentStorageService {
             Path targetLocation = this.fileStorageLocation.resolve(fileName);
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
-            DocumentStorageProperties doc = docStorageRepo.checkDocumentByOrderId(idOrder, docType);
+            DocumentStorageProperties doc = docStorageRepo.checkDocumentByOrderId(idOrder, docType, typeDocument.getId());
             if(doc != null) {
                 doc.setDocumentFormat(file.getContentType());
                 doc.setFileName(fileName);
+                doc.setType(typeDocument);
                 docStorageRepo.save(doc);
             } else {
                 DocumentStorageProperties newDoc = new DocumentStorageProperties();
                 newDoc.setOrder(idOrder);
                 newDoc.setDocumentFormat(file.getContentType());
                 newDoc.setFileName(fileName);
+                newDoc.setType(typeDocument);
                 newDoc.setDocumentType(docType);
                 docStorageRepo.save(newDoc);
             }
@@ -101,7 +104,7 @@ public class DocumentStorageServiceImpl implements IDocumentStorageService {
     }
 
     @Override
-    public String getDocumentName(Long idOrder, String docType) {
-        return docStorageRepo.getUploadDocumnetPath(idOrder, docType);
+    public String getDocumentName(Long idOrder, String docType, Long type) {
+        return docStorageRepo.getUploadDocumnetPath(idOrder, docType, type);
     }
 }

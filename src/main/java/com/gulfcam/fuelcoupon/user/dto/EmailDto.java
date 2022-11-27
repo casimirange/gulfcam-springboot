@@ -29,6 +29,8 @@ public class EmailDto {
 
 	private MultipartFile[] files;
 
+	private byte[] attachement;
+
 	private Map<String, Object> props = new HashMap<>();
 
 	public EmailDto(String from,String senderName, String to,String replyTo, Map<String, Object> props, String subject, String template) {
@@ -40,5 +42,16 @@ public class EmailDto {
 		this.subject = subject;
 		this.body = template;
 		this.props = props;
+	}
+
+	public EmailDto(String from,String senderName, String to,String replyTo, Map<String, Object> props, String subject, String template, byte[] attachement) {
+		super();
+		this.from = from;
+		this.senderName = senderName;
+		this.to = to;
+		this.replyTo= replyTo;
+		this.subject = subject;
+		this.body = template;
+		this.attachement = attachement;
 	}
 }

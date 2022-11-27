@@ -50,6 +50,12 @@ public class Order {
     @Column(nullable = true, name = "id_storekeeper")
     private Long idStorekeeper;
 
+    @Column(nullable = true, name = "link_invoice")
+    private String linkInvoice;
+
+    @Column(nullable = true, name = "link_delivery")
+    private String linkDelivery;
+
     @Column(nullable = true, name = "tax")
     private String tax;
 

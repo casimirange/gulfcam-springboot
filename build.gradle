@@ -17,7 +17,10 @@ configurations {
 
 repositories {
 	mavenCentral()
+	maven{url "https://jasperreports.sourceforge.net/maven2/"}
+	maven{url "https://jaspersoft.jfrog.io/jaspersoft/third-party-ce-artifacts/"}
 }
+
 
 ext {
 	set('snippetsDir', file("build/generated-snippets"))
@@ -33,7 +36,6 @@ dependencies {
 	implementation 'org.asciidoctor:asciidoctor-maven-plugin:2.2.2'
 	implementation 'org.projectlombok:lombok:1.18.24'
 	implementation 'com.google.code.gson:gson:2.9.1'
-	implementation 'com.lowagie:itext:4.2.2'
 	implementation 'net.sf.jasperreports:jasperreports:6.20.0'
 	implementation 'org.json:json:20220924'
 	implementation 'org.apache.poi:poi:5.2.3'

@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -31,6 +32,11 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public Page<Product> getProductsByIdOrder(Long idOrder, int page, int size, String sort, String order) {
         return iProductRepo.getProductsByIdOrder(idOrder,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
+    }
+
+    @Override
+    public List<Product> getProductsByIdOrder(Long idOrder) {
+        return iProductRepo.getProductsByIdOrder(idOrder);
     }
 
     @Override
