@@ -107,7 +107,7 @@ public class RequestOppositionRest {
         requestOpposition.setIdManagerCoupon(createRequestOppositionDTO.getIdManagerCoupon());
         requestOpposition.setIdServiceClient(createRequestOppositionDTO.getIdServiceClient());
 
-        Status status = iStatusRepo.findByName(EStatus.STORE_ENABLE).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.STORE_ENABLE +  "  not found"));
+        Status status = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
         requestOpposition.setStatus(status);
 
         iRequestOppositionService.createRequestOpposition(requestOpposition);

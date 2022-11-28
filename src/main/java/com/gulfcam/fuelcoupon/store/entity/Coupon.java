@@ -40,6 +40,9 @@ public class Coupon {
     @Column(nullable = true, name = "id_station")
     private Long idStation;
 
+    @Column(nullable = true, name = "id_type_voucher")
+    private Long idTypeVoucher;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updateAt;

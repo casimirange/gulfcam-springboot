@@ -11,6 +11,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -59,8 +61,11 @@ public class NotebookServiceImpl implements INotebookService {
     }
 
     @Override
-    public void createNotebook(Notebook notebook) {
+    public Map<String, Object> createNotebook(Notebook notebook) {
         iNotebookRepo.save(notebook);
+        Map<String, Object> notebookEncoded = new HashMap<>();
+        notebookEncoded.put("notebook", notebook);
+        return notebookEncoded;
     }
 
     @Override

@@ -11,8 +11,5 @@ public interface ICartonRepo extends JpaRepository<Carton, Long> {
 
     Page<Carton> getCartonsByIdStoreHouse(Long idStoreHouse, Pageable pageable);
     Page<Carton> getCartonsByIdStoreKeeper(Long idStoreKeeper, Pageable pageable);
-    Optional<Carton> getCartonBySerialNumber(String serialNumber);
     Optional<Carton> getCartonByInternalReference(Long internalReference);
-
-    boolean existsCartonBySerialNumber(String serialNumber);
 }

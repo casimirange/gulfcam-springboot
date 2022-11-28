@@ -24,9 +24,11 @@ public class Notebook {
     @Column(unique = true)
     private Long internalReference;
 
-    @NotNull
-    @Column(unique = true)
+    @Column(unique = false)
     private String serialNumber;
+
+    @Column(unique = false)
+    private String plage_coupon;
 
     @Column(nullable = true, name = "id_store_keeper")
     private Long idStoreKeeper;

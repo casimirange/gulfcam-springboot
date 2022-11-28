@@ -26,8 +26,28 @@ public class Carton {
     private Long internalReference;
 
     @NotNull
-    @Column(unique = true)
-    private String serialNumber;
+    @Column(unique = false)
+    private int serialTo;
+
+    @NotNull
+    @Column(unique = false)
+    private int number;
+
+    @NotNull
+    @Column(unique = false)
+    private int serialFrom;
+
+    @NotNull
+    @Column(unique = false)
+    private int typeVoucher;
+
+    @NotNull
+    @Column(unique = true, name = "carton_from")
+    private int from;
+
+    @NotNull
+    @Column(unique = true, name = "carton_to")
+    private int to;
 
     @Column(nullable = true, name = "id_store_keeper")
     private Long idStoreKeeper;

@@ -97,7 +97,7 @@ public class StorehouseRest {
         storehouse.setIdStore(createStorehouseDTO.getIdStore());
         storehouse.setType(createStorehouseDTO.getType());
 
-        Status status = iStatusRepo.findByName(EStatus.STORE_ENABLE).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.STORE_ENABLE +  "  not found"));
+        Status status = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
         storehouse.setStatus(status);
 
         iStorehouseService.createStorehouse(storehouse);

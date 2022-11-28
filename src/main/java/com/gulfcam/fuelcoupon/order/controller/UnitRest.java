@@ -116,7 +116,7 @@ public class UnitRest {
         unit.setIdStore(createUnitDTO.getIdStore());
         unit.setQuantityNotebook(createUnitDTO.getQuantityNotebook());
 
-        Status status = iStatusRepo.findByName(EStatus.STORE_ENABLE).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.STORE_ENABLE +  "  not found"));
+        Status status = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
         unit.setStatus(status);
 
         iUnitService.createUnit(unit);

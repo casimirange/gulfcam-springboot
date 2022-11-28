@@ -5,9 +5,13 @@ import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
 import com.gulfcam.fuelcoupon.store.dto.CreateCartonDTO;
 import com.gulfcam.fuelcoupon.store.entity.Carton;
+import com.gulfcam.fuelcoupon.store.entity.Coupon;
+import com.gulfcam.fuelcoupon.store.entity.Notebook;
 import com.gulfcam.fuelcoupon.store.entity.Storehouse;
 import com.gulfcam.fuelcoupon.store.repository.ICartonRepo;
 import com.gulfcam.fuelcoupon.store.service.ICartonService;
+import com.gulfcam.fuelcoupon.store.service.ICouponService;
+import com.gulfcam.fuelcoupon.store.service.INotebookService;
 import com.gulfcam.fuelcoupon.store.service.IStorehouseService;
 import com.gulfcam.fuelcoupon.user.entity.Users;
 import com.gulfcam.fuelcoupon.user.service.IEmailService;
@@ -38,6 +42,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @Tag(name = "Carton")
@@ -57,6 +63,12 @@ public class CartonRest {
 
     @Autowired
     ICartonService iCartonService;
+
+    @Autowired
+    ICouponService iCouponService;
+
+    @Autowired
+    INotebookService iNotebookService;
 
     @Autowired
     IStorehouseService iStorehouseService;
@@ -90,11 +102,6 @@ public class CartonRest {
         Users storeKeeper = new Users();
         Storehouse storehouse = new Storehouse();
 
-        if (iCartonService.existsCartonBySerialNumber(createCartonDTO.getSerialNumber())) {
-            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
-                    messageSource.getMessage("messages.serial_exists", null, LocaleContextHolder.getLocale())));
-        }
-
         if (createCartonDTO.getIdStoreHouse()  != null) {
             if(!iStorehouseService.getByInternalReference(createCartonDTO.getIdStoreHouse()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
@@ -113,15 +120,57 @@ public class CartonRest {
         Carton carton = new Carton();
         carton.setInternalReference(jwtUtils.generateInternalReference());
         carton.setCreatedAt(LocalDateTime.now());
-        carton.setSerialNumber(createCartonDTO.getSerialNumber());
+        carton.setFrom(createCartonDTO.getFrom());
+        carton.setSerialFrom(createCartonDTO.getSerialFrom());
+        carton.setSerialTo(createCartonDTO.getSerialTo());
+        carton.setNumber(createCartonDTO.getNumber());
+        carton.setTo(createCartonDTO.getTo());
+        carton.setTypeVoucher(createCartonDTO.getTypeVoucher());
         carton.setIdStoreHouse(createCartonDTO.getIdStoreHouse());
         carton.setIdStoreKeeper(createCartonDTO.getIdStoreKeeper());
 
-        Status status = iStatusRepo.findByName(EStatus.STORE_ENABLE).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.STORE_ENABLE +  "  not found"));
+        Status status = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
         carton.setStatus(status);
 
-        iCartonService.createCarton(carton);
+
+        Map<String, Object> CartonEncoded = new HashMap<>();
+        CartonEncoded = iCartonService.createCarton(carton);
+        carton = (Carton) CartonEncoded.get("carton");
+        generateCoupon(carton);
         return ResponseEntity.ok(carton);
+    }
+
+    private void generateCoupon(Carton carton){
+
+
+        int numberCouponByCarton = (carton.getFrom()-carton.getTo())/10;
+        for(int i=carton.getTo(); i<= numberCouponByCarton; i++){
+            Notebook notebook = new Notebook();
+            notebook.setInternalReference(jwtUtils.generateInternalReference());
+            notebook.setCreatedAt(LocalDateTime.now());
+            notebook.setSerialNumber("DE "+carton.getTypeVoucher()+"-"+carton.getSerialTo()+"  "+"A "+carton.getTypeVoucher()+"-"+carton.getSerialFrom()+" ");
+            notebook.setIdCarton(carton.getInternalReference());
+            notebook.setIdStoreKeeper(carton.getIdStoreKeeper());
+            Status status = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
+            notebook.setStatus(status);
+
+            Map<String, Object> notebookEncoded = new HashMap<>();
+            notebookEncoded = iNotebookService.createNotebook(notebook);
+            notebook = (Notebook) notebookEncoded.get("notebook");
+
+            for(int y=0; y<=10; y++){
+                Coupon coupon = new Coupon();
+                coupon.setInternalReference(jwtUtils.generateInternalReference());
+                coupon.setCreatedAt(LocalDateTime.now());
+                coupon.setIdNotebook(notebook.getInternalReference());
+                coupon.setSerialNumber(i+"");
+                coupon.setIdNotebook(notebook.getInternalReference());
+                Status statusCoupon = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
+                coupon.setStatus(statusCoupon);
+                iCouponService.createCoupon(coupon);
+            }
+
+        }
     }
 
     @Operation(summary = "Modification des informations pour un Carton", tags = "Carton", responses = {
@@ -156,7 +205,12 @@ public class CartonRest {
                         messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
         }
         carton.setUpdateAt(LocalDateTime.now());
-        carton.setSerialNumber(createCartonDTO.getSerialNumber());
+        carton.setFrom(createCartonDTO.getFrom());
+        carton.setSerialFrom(createCartonDTO.getSerialFrom());
+        carton.setSerialTo(createCartonDTO.getSerialTo());
+        carton.setNumber(createCartonDTO.getNumber());
+        carton.setTo(createCartonDTO.getTo());
+        carton.setTypeVoucher(createCartonDTO.getTypeVoucher());
         if(createCartonDTO.getIdStoreHouse() != null)
             carton.setIdStoreHouse(createCartonDTO.getIdStoreHouse());
         if(createCartonDTO.getIdStoreKeeper() != null)
@@ -201,16 +255,6 @@ public class CartonRest {
         Page<Carton> cartons = iCartonService.getCartonsByIdStoreHouse(idStoreHouse,
                 Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(cartons);
-    }
-
-    @Operation(summary = "Recupérer Un Carton par son Numéro de série", tags = "Carton", responses = {
-            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Carton.class)))),
-            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
-            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
-    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/serial/{serialNumber}")
-    public ResponseEntity<Carton> getCartonBySerialNumber(@PathVariable String serialNumber) {
-        return ResponseEntity.ok(iCartonService.getCartonBySerialNumber(serialNumber).get());
     }
 
     @Operation(summary = "Recupérer Un Carton par sa reference interne", tags = "Carton", responses = {

@@ -11,6 +11,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -49,18 +51,11 @@ public class CartonServiceImpl implements ICartonService {
     }
 
     @Override
-    public Optional<Carton> getCartonBySerialNumber(String serialNumber) {
-        return iCartonRepo.getCartonBySerialNumber(serialNumber);
-    }
-
-    @Override
-    public boolean existsCartonBySerialNumber(String serialNumber) {
-        return iCartonRepo.existsCartonBySerialNumber(serialNumber);
-    }
-
-    @Override
-    public void createCarton(Carton carton) {
+    public Map<String, Object> createCarton(Carton carton) {
         iCartonRepo.save(carton);
+        Map<String, Object> cartonEncoded = new HashMap<>();
+        cartonEncoded.put("carton", carton);
+        return cartonEncoded;
     }
 
     @Override

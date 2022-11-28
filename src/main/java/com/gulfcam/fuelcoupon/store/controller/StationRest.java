@@ -91,7 +91,7 @@ public class StationRest {
         station.setDesignation(createStationDTO.getDesignation());
         station.setLocalization(createStationDTO.getLocalization());
         station.setDesignation(createStationDTO.getDesignation());
-        Status status = iStatusRepo.findByName(EStatus.STORE_ENABLE).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.STORE_ENABLE +  "  not found"));
+        Status status = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
         station.setStatus(status);
 
         iStationService.createStation(station);
