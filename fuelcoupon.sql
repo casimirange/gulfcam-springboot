@@ -36,7 +36,7 @@ CREATE TABLE `carton` (
   UNIQUE KEY `UK_6lhdm9qw3mtfkf8n94rqa2dfd` (`serial_number`),
   KEY `FK66g4868lnn65s3k4duuf2qaee` (`status_id`),
   CONSTRAINT `FK66g4868lnn65s3k4duuf2qaee` FOREIGN KEY (`status_id`) REFERENCES `status` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -74,7 +74,7 @@ CREATE TABLE `client` (
   UNIQUE KEY `UK_rfgp2wknf07r4xfx2dcddvplw` (`gulfcam_account_number`),
   KEY `FKp0a3n51hy6x2psr7e2acc4xlt` (`type_client_id`),
   CONSTRAINT `FKp0a3n51hy6x2psr7e2acc4xlt` FOREIGN KEY (`type_client_id`) REFERENCES `type_client` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -110,7 +110,7 @@ CREATE TABLE `coupon` (
   UNIQUE KEY `UK_pe7cr4yk2t5reoqgfti38gtku` (`serial_number`),
   KEY `FK8k21mk3l7ebh9ctkbsoipe3un` (`status_id`),
   CONSTRAINT `FK8k21mk3l7ebh9ctkbsoipe3un` FOREIGN KEY (`status_id`) REFERENCES `status` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -131,7 +131,7 @@ DROP TABLE IF EXISTS `hibernate_sequence`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `hibernate_sequence` (
   `next_val` bigint DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -165,7 +165,7 @@ CREATE TABLE `item` (
   UNIQUE KEY `UK_sqc8ip03ij0f6a66pqnaii32o` (`internal_reference`),
   KEY `FKa5r9sug9g4f4kif98va9ro3l2` (`status_id`),
   CONSTRAINT `FKa5r9sug9g4f4kif98va9ro3l2` FOREIGN KEY (`status_id`) REFERENCES `status` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -198,7 +198,7 @@ CREATE TABLE `notebook` (
   UNIQUE KEY `UK_23f45tax2jukr0f891c80v4c9` (`serial_number`),
   KEY `FK1nwhwuuhy0m4g0i9mq9ea0jlq` (`status_id`),
   CONSTRAINT `FK1nwhwuuhy0m4g0i9mq9ea0jlq` FOREIGN KEY (`status_id`) REFERENCES `status` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -221,7 +221,7 @@ CREATE TABLE `old_password` (
   `old_password_id` bigint NOT NULL AUTO_INCREMENT,
   `password` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`old_password_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -251,7 +251,7 @@ CREATE TABLE `order_documents` (
   PRIMARY KEY (`document_id`),
   KEY `FKjjrbuanpij0dadsc5nk8aswws` (`type_id`),
   CONSTRAINT `FKjjrbuanpij0dadsc5nk8aswws` FOREIGN KEY (`type_id`) REFERENCES `type_document` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -301,7 +301,7 @@ CREATE TABLE `orders` (
   UNIQUE KEY `UK_3juxhhs8ty8vs5f2v8dkqp2k9` (`client_reference`),
   KEY `FKjiqtdoncm83ebe7alrdhcqda7` (`status_id`),
   CONSTRAINT `FKjiqtdoncm83ebe7alrdhcqda7` FOREIGN KEY (`status_id`) REFERENCES `status_order` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -332,7 +332,7 @@ CREATE TABLE `payment_method` (
   UNIQUE KEY `UK_mk80kemq3lk9lymwrq6wu32x6` (`internal_reference`),
   KEY `FKrfrxi6rwsbaua5ur2d3newkm5` (`status_id`),
   CONSTRAINT `FKrfrxi6rwsbaua5ur2d3newkm5` FOREIGN KEY (`status_id`) REFERENCES `status` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -365,7 +365,7 @@ CREATE TABLE `product` (
   UNIQUE KEY `UK_mpkwqjdbq7k7ldumyaohwslfl` (`internal_reference`),
   KEY `FK8556hocjcb04st51nt8yknfbg` (`status_id`),
   CONSTRAINT `FK8556hocjcb04st51nt8yknfbg` FOREIGN KEY (`status_id`) REFERENCES `status` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -399,7 +399,7 @@ CREATE TABLE `request_opposition` (
   UNIQUE KEY `UK_qycxxafg734bhbhjyht9cbi6m` (`internal_reference`),
   KEY `FKapt4ejdmnj9xxpb0ry2ql0yvl` (`status_id`),
   CONSTRAINT `FKapt4ejdmnj9xxpb0ry2ql0yvl` FOREIGN KEY (`status_id`) REFERENCES `status` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -422,7 +422,7 @@ CREATE TABLE `revinfo` (
   `rev` int NOT NULL AUTO_INCREMENT,
   `revtstmp` bigint DEFAULT NULL,
   PRIMARY KEY (`rev`)
-) ENGINE=InnoDB AUTO_INCREMENT=116 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=116 ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -447,7 +447,7 @@ CREATE TABLE `role_user` (
   `description` varchar(255) DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -478,7 +478,7 @@ CREATE TABLE `role_user_aud` (
   PRIMARY KEY (`id`,`rev`),
   KEY `FKmekm5p4mgukwph71pr4lso18k` (`rev`),
   CONSTRAINT `FKmekm5p4mgukwph71pr4lso18k` FOREIGN KEY (`rev`) REFERENCES `revinfo` (`rev`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -512,7 +512,7 @@ CREATE TABLE `station` (
   UNIQUE KEY `UK_qrdhnkimbvdgv1mubuv2iqipb` (`pin_code`),
   KEY `FK6nku4juvjv9vmp9b5lvhyoixk` (`status_id`),
   CONSTRAINT `FK6nku4juvjv9vmp9b5lvhyoixk` FOREIGN KEY (`status_id`) REFERENCES `status` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -536,7 +536,7 @@ CREATE TABLE `status` (
   `description` varchar(255) DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -567,7 +567,7 @@ CREATE TABLE `status_aud` (
   PRIMARY KEY (`id`,`rev`),
   KEY `FKm4t88904viu7aii6h9paj0njh` (`rev`),
   CONSTRAINT `FKm4t88904viu7aii6h9paj0njh` FOREIGN KEY (`rev`) REFERENCES `revinfo` (`rev`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -591,7 +591,7 @@ CREATE TABLE `status_order` (
   `description` varchar(255) DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -622,7 +622,7 @@ CREATE TABLE `status_order_aud` (
   PRIMARY KEY (`id`,`rev`),
   KEY `FKfxuakw6pj5craycx4tr9q4ma6` (`rev`),
   CONSTRAINT `FKfxuakw6pj5craycx4tr9q4ma6` FOREIGN KEY (`rev`) REFERENCES `revinfo` (`rev`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -646,7 +646,7 @@ CREATE TABLE `status_user` (
   `description` varchar(255) DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -677,7 +677,7 @@ CREATE TABLE `status_user_aud` (
   PRIMARY KEY (`id`,`rev`),
   KEY `FKr1k5qf3v8r9tj5e28s1p61y7k` (`rev`),
   CONSTRAINT `FKr1k5qf3v8r9tj5e28s1p61y7k` FOREIGN KEY (`rev`) REFERENCES `revinfo` (`rev`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -706,7 +706,7 @@ CREATE TABLE `stock_movement` (
   `type` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UK_50nr5id2746hbrt4twy27eipf` (`internal_reference`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -736,7 +736,7 @@ CREATE TABLE `store` (
   UNIQUE KEY `UK_hh8dr1su39mp6ok39l3qdhjr6` (`internal_reference`),
   KEY `FKgvk0xc0tpfmtwa4cx61gs2uh6` (`status_id`),
   CONSTRAINT `FKgvk0xc0tpfmtwa4cx61gs2uh6` FOREIGN KEY (`status_id`) REFERENCES `status` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -771,7 +771,7 @@ CREATE TABLE `store_aud` (
   PRIMARY KEY (`id`,`rev`),
   KEY `FKt2lr04608p8l6g6cpsvym2jkg` (`rev`),
   CONSTRAINT `FKt2lr04608p8l6g6cpsvym2jkg` FOREIGN KEY (`rev`) REFERENCES `revinfo` (`rev`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -802,7 +802,7 @@ CREATE TABLE `storehouse` (
   UNIQUE KEY `UK_cgj8qvuhick7qmtq8ekidxgfy` (`internal_reference`),
   KEY `FKf701jn8ctbjl3n7cmy40p9u7u` (`status_id`),
   CONSTRAINT `FKf701jn8ctbjl3n7cmy40p9u7u` FOREIGN KEY (`status_id`) REFERENCES `status` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -833,7 +833,7 @@ CREATE TABLE `ticket` (
   UNIQUE KEY `UK_8foxbj7qju3p46idwsy8arehc` (`internal_reference`),
   KEY `FK7h1wcba93khggbl1ahgwjlssu` (`status_id`),
   CONSTRAINT `FK7h1wcba93khggbl1ahgwjlssu` FOREIGN KEY (`status_id`) REFERENCES `status` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -856,7 +856,7 @@ CREATE TABLE `type_account` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -885,7 +885,7 @@ CREATE TABLE `type_account_aud` (
   PRIMARY KEY (`id`,`rev`),
   KEY `FK4ae429tcvi7bhh9w4d53hiwn5` (`rev`),
   CONSTRAINT `FK4ae429tcvi7bhh9w4d53hiwn5` FOREIGN KEY (`rev`) REFERENCES `revinfo` (`rev`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -908,7 +908,7 @@ CREATE TABLE `type_client` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -937,7 +937,7 @@ CREATE TABLE `type_client_aud` (
   PRIMARY KEY (`id`,`rev`),
   KEY `FKd2oenpv8qaahmvyu93jr7j0fq` (`rev`),
   CONSTRAINT `FKd2oenpv8qaahmvyu93jr7j0fq` FOREIGN KEY (`rev`) REFERENCES `revinfo` (`rev`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -960,7 +960,7 @@ CREATE TABLE `type_document` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -989,7 +989,7 @@ CREATE TABLE `type_document_aud` (
   PRIMARY KEY (`id`,`rev`),
   KEY `FK6xyqn7nwrpm0d9cm6fdkag338` (`rev`),
   CONSTRAINT `FK6xyqn7nwrpm0d9cm6fdkag338` FOREIGN KEY (`rev`) REFERENCES `revinfo` (`rev`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1020,7 +1020,7 @@ CREATE TABLE `type_voucher` (
   UNIQUE KEY `UK_6tcw6e9i1ktxa7mmpdbm9jeii` (`internal_reference`),
   KEY `FKe14knvy5v4yerdtrt3opktpao` (`status_id`),
   CONSTRAINT `FKe14knvy5v4yerdtrt3opktpao` FOREIGN KEY (`status_id`) REFERENCES `status` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1053,7 +1053,7 @@ CREATE TABLE `unit` (
   UNIQUE KEY `UK_9a6s9nu9vfb1sr5knee5ylji3` (`internal_reference`),
   KEY `FKdbllvdqqkem5lvlli2aoj8hcb` (`status_id`),
   CONSTRAINT `FKdbllvdqqkem5lvlli2aoj8hcb` FOREIGN KEY (`status_id`) REFERENCES `status` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1113,7 +1113,7 @@ CREATE TABLE `users` (
   CONSTRAINT `FKm4r9e2kjfeab5rlypfm33j6t0` FOREIGN KEY (`update_by_user_id`) REFERENCES `users` (`user_id`),
   CONSTRAINT `FKoearyurqehgjrq001s69sysmb` FOREIGN KEY (`type_account_id`) REFERENCES `type_account` (`id`),
   CONSTRAINT `FKpcsj08dbah77s3pprdt49kleh` FOREIGN KEY (`created_by_user_id`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1185,7 +1185,7 @@ CREATE TABLE `users_aud` (
   PRIMARY KEY (`user_id`,`rev`),
   KEY `FKc4vk4tui2la36415jpgm9leoq` (`rev`),
   CONSTRAINT `FKc4vk4tui2la36415jpgm9leoq` FOREIGN KEY (`rev`) REFERENCES `revinfo` (`rev`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1212,7 +1212,7 @@ CREATE TABLE `users_old_passwords` (
   KEY `FKklcfn538nciu2ymyslmqfijjj` (`users_user_id`),
   CONSTRAINT `FKklcfn538nciu2ymyslmqfijjj` FOREIGN KEY (`users_user_id`) REFERENCES `users` (`user_id`),
   CONSTRAINT `FKq30ibe1si8uenio0e085hop26` FOREIGN KEY (`old_passwords_old_password_id`) REFERENCES `old_password` (`old_password_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1238,7 +1238,7 @@ CREATE TABLE `users_roles` (
   KEY `FKoxrfvt1v6mvuofck1ohyri56n` (`roles_id`),
   CONSTRAINT `FKmaps3ffbyjaxkt50q1c7s7v5j` FOREIGN KEY (`users_user_id`) REFERENCES `users` (`user_id`),
   CONSTRAINT `FKoxrfvt1v6mvuofck1ohyri56n` FOREIGN KEY (`roles_id`) REFERENCES `role_user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1265,7 +1265,7 @@ CREATE TABLE `users_roles_aud` (
   `revtype` tinyint DEFAULT NULL,
   PRIMARY KEY (`rev`,`users_user_id`,`roles_id`),
   CONSTRAINT `FKktxqr55ntd0j2i228uj8sq6j9` FOREIGN KEY (`rev`) REFERENCES `revinfo` (`rev`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
