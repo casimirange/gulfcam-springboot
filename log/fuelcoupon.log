@@ -7820,3 +7820,611 @@ Caused by: java.sql.SQLSyntaxErrorException: You have an error in your SQL synta
 2022-11-28 09:14:58.876  WARN 30594 --- [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=37m28s255ms).
 2022-11-28 09:20:56.427  WARN 30594 --- [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m57s551ms).
 2022-11-28 09:27:14.304  WARN 30594 --- [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=6m17s877ms).
+2022-11-29 08:54:11.950  INFO 37572 --- [restartedMain] c.g.fuelcoupon.FuelcouponApplication     : Starting FuelcouponApplication using Java 11.0.16 on DESKTOP-JMR591K with PID 37572 (C:\Users\Administrator\Documents\Gulfcam\fuelcoupon\build\classes\java\main started by Arnold in C:\Users\Administrator\Documents\Gulfcam\fuelcoupon)
+2022-11-29 08:54:11.953  INFO 37572 --- [restartedMain] c.g.fuelcoupon.FuelcouponApplication     : No active profile set, falling back to 1 default profile: "default"
+2022-11-29 08:54:12.032  INFO 37572 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2022-11-29 08:54:13.566  INFO 37572 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2022-11-29 08:54:13.853  INFO 37572 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 273 ms. Found 27 JPA repository interfaces.
+2022-11-29 08:54:15.634  INFO 37572 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2022-11-29 08:54:15.652  INFO 37572 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-11-29 08:54:15.653  INFO 37572 --- [restartedMain] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.68]
+2022-11-29 08:54:15.967  INFO 37572 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-11-29 08:54:15.967  INFO 37572 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 3933 ms
+2022-11-29 08:54:16.692  INFO 37572 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2022-11-29 08:54:16.749  INFO 37572 --- [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.12.Final
+2022-11-29 08:54:16.908  INFO 37572 --- [restartedMain] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2022-11-29 08:54:17.024  INFO 37572 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2022-11-29 08:54:17.231  INFO 37572 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2022-11-29 08:54:17.244  INFO 37572 --- [restartedMain] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+2022-11-29 08:54:17.281  INFO 37572 --- [restartedMain] o.h.e.boot.internal.EnversServiceImpl    : Envers integration enabled? : true
+2022-11-29 08:54:19.258 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table carton add column carton_from integer not null
+2022-11-29 08:54:19.287 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table carton add column number integer not null
+2022-11-29 08:54:19.310 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table carton add column serial_from integer not null
+2022-11-29 08:54:19.337 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table carton add column serial_to integer not null
+2022-11-29 08:54:19.360 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table carton add column carton_to integer not null
+2022-11-29 08:54:19.380 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table carton add column type_voucher integer not null
+2022-11-29 08:54:19.408 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table coupon add column id_type_voucher bigint
+2022-11-29 08:54:19.431 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table notebook add column plage_coupon varchar(255)
+2022-11-29 08:54:19.454 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : create table settingproperties (id bigint not null, key varchar(255), value varchar(255), primary key (id)) engine=InnoDB
+2022-11-29 08:54:19.492  WARN 37572 --- [restartedMain] o.h.t.s.i.ExceptionHandlerLoggedImpl     : GenerationTarget encountered exception accepting command : Error executing DDL "create table settingproperties (id bigint not null, key varchar(255), value varchar(255), primary key (id)) engine=InnoDB" via JDBC Statement
+
+org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "create table settingproperties (id bigint not null, key varchar(255), value varchar(255), primary key (id)) engine=InnoDB" via JDBC Statement
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:67) ~[hibernate-core-5.6.12.Final.jar:5.6.12.Final]
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlString(AbstractSchemaMigrator.java:581) ~[hibernate-core-5.6.12.Final.jar:5.6.12.Final]
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlStrings(AbstractSchemaMigrator.java:526) ~[hibernate-core-5.6.12.Final.jar:5.6.12.Final]
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.createTable(AbstractSchemaMigrator.java:293) ~[hibernate-core-5.6.12.Final.jar:5.6.12.Final]
+	at org.hibernate.tool.schema.internal.GroupedSchemaMigratorImpl.performTablesMigration(GroupedSchemaMigratorImpl.java:74) ~[hibernate-core-5.6.12.Final.jar:5.6.12.Final]
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.performMigration(AbstractSchemaMigrator.java:220) ~[hibernate-core-5.6.12.Final.jar:5.6.12.Final]
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:123) ~[hibernate-core-5.6.12.Final.jar:5.6.12.Final]
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:196) ~[hibernate-core-5.6.12.Final.jar:5.6.12.Final]
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:85) ~[hibernate-core-5.6.12.Final.jar:5.6.12.Final]
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:335) ~[hibernate-core-5.6.12.Final.jar:5.6.12.Final]
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:471) ~[hibernate-core-5.6.12.Final.jar:5.6.12.Final]
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1498) ~[hibernate-core-5.6.12.Final.jar:5.6.12.Final]
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:58) ~[spring-orm-5.3.23.jar:5.3.23]
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:365) ~[spring-orm-5.3.23.jar:5.3.23]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:409) ~[spring-orm-5.3.23.jar:5.3.23]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:396) ~[spring-orm-5.3.23.jar:5.3.23]
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:341) ~[spring-orm-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1863) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1800) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:620) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:233) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveNamedBean(DefaultListableBeanFactory.java:1284) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveNamedBean(DefaultListableBeanFactory.java:1245) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveBean(DefaultListableBeanFactory.java:494) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.getBean(DefaultListableBeanFactory.java:349) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.getBean(DefaultListableBeanFactory.java:342) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.orm.jpa.EntityManagerFactoryUtils.findEntityManagerFactory(EntityManagerFactoryUtils.java:121) ~[spring-orm-5.3.23.jar:5.3.23]
+	at org.springframework.orm.jpa.EntityManagerFactoryAccessor.setBeanFactory(EntityManagerFactoryAccessor.java:155) ~[spring-orm-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeAwareMethods(AbstractAutowireCapableBeanFactory.java:1826) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1791) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:620) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:276) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1391) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1311) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:887) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:541) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1352) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1195) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:582) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:276) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.addCandidateEntry(DefaultListableBeanFactory.java:1609) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.findAutowireCandidates(DefaultListableBeanFactory.java:1573) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveMultipleBeans(DefaultListableBeanFactory.java:1462) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1349) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1311) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredMethodElement.resolveMethodArguments(AutowiredAnnotationBeanPostProcessor.java:759) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredMethodElement.inject(AutowiredAnnotationBeanPostProcessor.java:719) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:119) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:399) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1431) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:619) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:410) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1352) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1195) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:582) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:276) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1391) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1311) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredMethodElement.resolveMethodArguments(AutowiredAnnotationBeanPostProcessor.java:759) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredMethodElement.inject(AutowiredAnnotationBeanPostProcessor.java:719) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:119) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:399) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1431) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:619) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:410) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1352) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1195) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:582) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:213) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.getOrderedBeansOfType(ServletContextInitializerBeans.java:212) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.addAsRegistrationBean(ServletContextInitializerBeans.java:175) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.addAsRegistrationBean(ServletContextInitializerBeans.java:170) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.addAdaptableBeans(ServletContextInitializerBeans.java:155) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.<init>(ServletContextInitializerBeans.java:87) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.getServletContextInitializerBeans(ServletWebServerApplicationContext.java:260) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.selfInitialize(ServletWebServerApplicationContext.java:234) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.web.embedded.tomcat.TomcatStarter.onStartup(TomcatStarter.java:53) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.apache.catalina.core.StandardContext.startInternal(StandardContext.java:5220) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:183) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1396) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1386) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264) ~[na:na]
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:140) ~[na:na]
+	at org.apache.catalina.core.ContainerBase.startInternal(ContainerBase.java:919) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.apache.catalina.core.StandardHost.startInternal(StandardHost.java:835) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:183) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1396) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1386) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264) ~[na:na]
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:140) ~[na:na]
+	at org.apache.catalina.core.ContainerBase.startInternal(ContainerBase.java:919) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.apache.catalina.core.StandardEngine.startInternal(StandardEngine.java:265) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:183) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.apache.catalina.core.StandardService.startInternal(StandardService.java:432) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:183) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.apache.catalina.core.StandardServer.startInternal(StandardServer.java:930) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:183) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.apache.catalina.startup.Tomcat.start(Tomcat.java:486) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.initialize(TomcatWebServer.java:123) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.<init>(TomcatWebServer.java:104) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory.getTomcatWebServer(TomcatServletWebServerFactory.java:479) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory.getWebServer(TomcatServletWebServerFactory.java:211) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.createWebServer(ServletWebServerApplicationContext.java:182) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.onRefresh(ServletWebServerApplicationContext.java:160) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:577) ~[spring-context-5.3.23.jar:5.3.23]
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:145) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:745) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:420) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:307) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1317) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1306) ~[spring-boot-2.6.13.jar:2.6.13]
+	at com.gulfcam.fuelcoupon.FuelcouponApplication.main(FuelcouponApplication.java:19) ~[main/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566) ~[na:na]
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:49) ~[spring-boot-devtools-2.6.13.jar:2.6.13]
+Caused by: java.sql.SQLSyntaxErrorException: Erreur de syntaxe près de 'varchar(255), value varchar(255), primary key (id)) engine=InnoDB' à la ligne 1
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:120) ~[mysql-connector-j-8.0.31.jar:8.0.31]
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122) ~[mysql-connector-j-8.0.31.jar:8.0.31]
+	at com.mysql.cj.jdbc.StatementImpl.executeInternal(StatementImpl.java:763) ~[mysql-connector-j-8.0.31.jar:8.0.31]
+	at com.mysql.cj.jdbc.StatementImpl.execute(StatementImpl.java:648) ~[mysql-connector-j-8.0.31.jar:8.0.31]
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:94) ~[HikariCP-4.0.3.jar:na]
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java) ~[HikariCP-4.0.3.jar:na]
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:54) ~[hibernate-core-5.6.12.Final.jar:5.6.12.Final]
+	... 152 common frames omitted
+
+2022-11-29 08:54:19.506 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table carton drop index UK_m26m9jdqh20uxfhgr3qerdot8
+2022-11-29 08:54:19.508 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table carton add constraint UK_m26m9jdqh20uxfhgr3qerdot8 unique (carton_from)
+2022-11-29 08:54:19.538 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table carton drop index UK_15jtsmdh0vqsqo018qur1ix1i
+2022-11-29 08:54:19.540 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table carton add constraint UK_15jtsmdh0vqsqo018qur1ix1i unique (carton_to)
+2022-11-29 08:54:19.573 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table settingproperties drop index UK_kttc4yuci32d5wgj8n0jq6jbo
+2022-11-29 08:54:19.575 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table settingproperties add constraint UK_kttc4yuci32d5wgj8n0jq6jbo unique (key)
+2022-11-29 08:54:19.582 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table carton add constraint FK66g4868lnn65s3k4duuf2qaee foreign key (status_id) references status (id)
+2022-11-29 08:54:19.634 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table coupon add constraint FK8k21mk3l7ebh9ctkbsoipe3un foreign key (status_id) references status (id)
+2022-11-29 08:54:19.657 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table item add constraint FKa5r9sug9g4f4kif98va9ro3l2 foreign key (status_id) references status (id)
+2022-11-29 08:54:19.685 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table notebook add constraint FK1nwhwuuhy0m4g0i9mq9ea0jlq foreign key (status_id) references status (id)
+2022-11-29 08:54:19.726 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table request_opposition add constraint FKapt4ejdmnj9xxpb0ry2ql0yvl foreign key (status_id) references status (id)
+2022-11-29 08:54:19.777 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table role_user_aud add constraint FKmekm5p4mgukwph71pr4lso18k foreign key (rev) references revinfo (rev)
+2022-11-29 08:54:19.814 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table station add constraint FK6nku4juvjv9vmp9b5lvhyoixk foreign key (status_id) references status (id)
+2022-11-29 08:54:19.853 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table status_aud add constraint FKm4t88904viu7aii6h9paj0njh foreign key (rev) references revinfo (rev)
+2022-11-29 08:54:19.876 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table status_order_aud add constraint FKfxuakw6pj5craycx4tr9q4ma6 foreign key (rev) references revinfo (rev)
+2022-11-29 08:54:19.901 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table status_user_aud add constraint FKr1k5qf3v8r9tj5e28s1p61y7k foreign key (rev) references revinfo (rev)
+2022-11-29 08:54:19.929 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table storehouse add constraint FKf701jn8ctbjl3n7cmy40p9u7u foreign key (status_id) references status (id)
+2022-11-29 08:54:19.963 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table ticket add constraint FK7h1wcba93khggbl1ahgwjlssu foreign key (status_id) references status (id)
+2022-11-29 08:54:19.997 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table type_account_aud add constraint FK4ae429tcvi7bhh9w4d53hiwn5 foreign key (rev) references revinfo (rev)
+2022-11-29 08:54:20.031 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table type_client_aud add constraint FKd2oenpv8qaahmvyu93jr7j0fq foreign key (rev) references revinfo (rev)
+2022-11-29 08:54:20.058 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table type_document_aud add constraint FK6xyqn7nwrpm0d9cm6fdkag338 foreign key (rev) references revinfo (rev)
+2022-11-29 08:54:20.088 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table unit add constraint FKdbllvdqqkem5lvlli2aoj8hcb foreign key (status_id) references status (id)
+2022-11-29 08:54:20.138 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table users_aud add constraint FKc4vk4tui2la36415jpgm9leoq foreign key (rev) references revinfo (rev)
+2022-11-29 08:54:20.172 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table users_old_passwords add constraint FKq30ibe1si8uenio0e085hop26 foreign key (old_passwords_old_password_id) references old_password (old_password_id)
+2022-11-29 08:54:20.206 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table users_old_passwords add constraint FKklcfn538nciu2ymyslmqfijjj foreign key (users_user_id) references users (user_id)
+2022-11-29 08:54:20.233 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table users_roles add constraint FKoxrfvt1v6mvuofck1ohyri56n foreign key (roles_id) references role_user (id)
+2022-11-29 08:54:20.264 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table users_roles add constraint FKmaps3ffbyjaxkt50q1c7s7v5j foreign key (users_user_id) references users (user_id)
+2022-11-29 08:54:20.287 DEBUG 37572 --- [restartedMain] org.hibernate.SQL                        : alter table users_roles_aud add constraint FKktxqr55ntd0j2i228uj8sq6j9 foreign key (rev) references revinfo (rev)
+2022-11-29 08:54:20.320  INFO 37572 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2022-11-29 08:54:20.334  INFO 37572 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2022-11-29 08:54:21.359 DEBUG 37572 --- [restartedMain] o.s.b.w.s.ServletContextInitializerBeans : Mapping filters: springSecurityFilterChain urls=[/*] order=-100, filterRegistrationBean urls=[/*] order=2147483647, filterRegistrationBean urls=[/*] order=2147483647, characterEncodingFilter urls=[/*] order=-2147483648, formContentFilter urls=[/*] order=-9900, requestContextFilter urls=[/*] order=-105, authenticationJwtTokenFilter urls=[/*] order=2147483647
+2022-11-29 08:54:21.360 DEBUG 37572 --- [restartedMain] o.s.b.w.s.ServletContextInitializerBeans : Mapping servlets: dispatcherServlet urls=[/]
+2022-11-29 08:54:21.391 DEBUG 37572 --- [restartedMain] o.s.w.s.r.ResourceUrlEncodingFilter      : Filter 'resourceUrlEncodingFilter' configured for use
+2022-11-29 08:54:22.226  WARN 37572 --- [restartedMain] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'orderRest': Unsatisfied dependency expressed through field 'iDocumentStorageService'; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'documentStorageServiceImpl' defined in file [C:\Users\Administrator\Documents\Gulfcam\fuelcoupon\build\classes\java\main\com\gulfcam\fuelcoupon\order\service\impl\DocumentStorageServiceImpl.class]: Bean instantiation via constructor failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [com.gulfcam.fuelcoupon.order.service.impl.DocumentStorageServiceImpl]: Constructor threw exception; nested exception is com.gulfcam.fuelcoupon.exception.DocumentsStorageException: Could not create the directory where the uploaded files will be stored.
+2022-11-29 08:54:22.231  INFO 37572 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2022-11-29 08:54:22.236  INFO 37572 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2022-11-29 08:54:22.261  INFO 37572 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2022-11-29 08:54:22.264  INFO 37572 --- [restartedMain] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+2022-11-29 08:54:22.280  INFO 37572 --- [restartedMain] ConditionEvaluationReportLoggingListener : 
+
+Error starting ApplicationContext. To display the conditions report re-run your application with 'debug' enabled.
+2022-11-29 08:54:22.316 ERROR 37572 --- [restartedMain] o.s.boot.SpringApplication               : Application run failed
+
+org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'orderRest': Unsatisfied dependency expressed through field 'iDocumentStorageService'; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'documentStorageServiceImpl' defined in file [C:\Users\Administrator\Documents\Gulfcam\fuelcoupon\build\classes\java\main\com\gulfcam\fuelcoupon\order\service\impl\DocumentStorageServiceImpl.class]: Bean instantiation via constructor failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [com.gulfcam.fuelcoupon.order.service.impl.DocumentStorageServiceImpl]: Constructor threw exception; nested exception is com.gulfcam.fuelcoupon.exception.DocumentsStorageException: Could not create the directory where the uploaded files will be stored.
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:659) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:639) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:119) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:399) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1431) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:619) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:955) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:918) ~[spring-context-5.3.23.jar:5.3.23]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:583) ~[spring-context-5.3.23.jar:5.3.23]
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:145) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:745) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:420) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:307) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1317) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1306) ~[spring-boot-2.6.13.jar:2.6.13]
+	at com.gulfcam.fuelcoupon.FuelcouponApplication.main(FuelcouponApplication.java:19) ~[main/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566) ~[na:na]
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:49) ~[spring-boot-devtools-2.6.13.jar:2.6.13]
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'documentStorageServiceImpl' defined in file [C:\Users\Administrator\Documents\Gulfcam\fuelcoupon\build\classes\java\main\com\gulfcam\fuelcoupon\order\service\impl\DocumentStorageServiceImpl.class]: Bean instantiation via constructor failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [com.gulfcam.fuelcoupon.order.service.impl.DocumentStorageServiceImpl]: Constructor threw exception; nested exception is com.gulfcam.fuelcoupon.exception.DocumentsStorageException: Could not create the directory where the uploaded files will be stored.
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:315) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:296) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1372) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1222) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:582) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:276) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1391) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1311) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:656) ~[spring-beans-5.3.23.jar:5.3.23]
+	... 25 common frames omitted
+Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [com.gulfcam.fuelcoupon.order.service.impl.DocumentStorageServiceImpl]: Constructor threw exception; nested exception is com.gulfcam.fuelcoupon.exception.DocumentsStorageException: Could not create the directory where the uploaded files will be stored.
+	at org.springframework.beans.BeanUtils.instantiateClass(BeanUtils.java:224) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:117) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:311) ~[spring-beans-5.3.23.jar:5.3.23]
+	... 38 common frames omitted
+Caused by: com.gulfcam.fuelcoupon.exception.DocumentsStorageException: Could not create the directory where the uploaded files will be stored.
+	at com.gulfcam.fuelcoupon.order.service.impl.DocumentStorageServiceImpl.<init>(DocumentStorageServiceImpl.java:39) ~[main/:na]
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45) ~[na:na]
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:490) ~[na:na]
+	at org.springframework.beans.BeanUtils.instantiateClass(BeanUtils.java:211) ~[spring-beans-5.3.23.jar:5.3.23]
+	... 40 common frames omitted
+Caused by: java.nio.file.AccessDeniedException: C:\Users\arnoldkom
+	at java.base/sun.nio.fs.WindowsException.translateToIOException(WindowsException.java:89) ~[na:na]
+	at java.base/sun.nio.fs.WindowsException.rethrowAsIOException(WindowsException.java:103) ~[na:na]
+	at java.base/sun.nio.fs.WindowsException.rethrowAsIOException(WindowsException.java:108) ~[na:na]
+	at java.base/sun.nio.fs.WindowsFileSystemProvider.createDirectory(WindowsFileSystemProvider.java:509) ~[na:na]
+	at java.base/java.nio.file.Files.createDirectory(Files.java:690) ~[na:na]
+	at java.base/java.nio.file.Files.createAndCheckIsDirectory(Files.java:797) ~[na:na]
+	at java.base/java.nio.file.Files.createDirectories(Files.java:783) ~[na:na]
+	at com.gulfcam.fuelcoupon.order.service.impl.DocumentStorageServiceImpl.<init>(DocumentStorageServiceImpl.java:37) ~[main/:na]
+	... 45 common frames omitted
+
+2022-11-29 08:55:32.167  INFO 32996 --- [restartedMain] c.g.fuelcoupon.FuelcouponApplication     : Starting FuelcouponApplication using Java 11.0.16 on DESKTOP-JMR591K with PID 32996 (C:\Users\Administrator\Documents\Gulfcam\fuelcoupon\build\classes\java\main started by Arnold in C:\Users\Administrator\Documents\Gulfcam\fuelcoupon)
+2022-11-29 08:55:32.169  INFO 32996 --- [restartedMain] c.g.fuelcoupon.FuelcouponApplication     : No active profile set, falling back to 1 default profile: "default"
+2022-11-29 08:55:32.235  INFO 32996 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2022-11-29 08:55:33.746  INFO 32996 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2022-11-29 08:55:34.034  INFO 32996 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 278 ms. Found 27 JPA repository interfaces.
+2022-11-29 08:55:35.757  INFO 32996 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2022-11-29 08:55:35.769  INFO 32996 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-11-29 08:55:35.770  INFO 32996 --- [restartedMain] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.68]
+2022-11-29 08:55:36.021  INFO 32996 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-11-29 08:55:36.021  INFO 32996 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 3785 ms
+2022-11-29 08:55:36.633  INFO 32996 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2022-11-29 08:55:36.696  INFO 32996 --- [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.12.Final
+2022-11-29 08:55:36.857  INFO 32996 --- [restartedMain] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2022-11-29 08:55:36.994  INFO 32996 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2022-11-29 08:55:37.206  INFO 32996 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2022-11-29 08:55:37.219  INFO 32996 --- [restartedMain] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+2022-11-29 08:55:37.261  INFO 32996 --- [restartedMain] o.h.e.boot.internal.EnversServiceImpl    : Envers integration enabled? : true
+2022-11-29 08:55:39.284 DEBUG 32996 --- [restartedMain] org.hibernate.SQL                        : create table settingproperties (id bigint not null, key varchar(255), value varchar(255), primary key (id)) engine=InnoDB
+2022-11-29 08:55:39.331  WARN 32996 --- [restartedMain] o.h.t.s.i.ExceptionHandlerLoggedImpl     : GenerationTarget encountered exception accepting command : Error executing DDL "create table settingproperties (id bigint not null, key varchar(255), value varchar(255), primary key (id)) engine=InnoDB" via JDBC Statement
+
+org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "create table settingproperties (id bigint not null, key varchar(255), value varchar(255), primary key (id)) engine=InnoDB" via JDBC Statement
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:67) ~[hibernate-core-5.6.12.Final.jar:5.6.12.Final]
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlString(AbstractSchemaMigrator.java:581) ~[hibernate-core-5.6.12.Final.jar:5.6.12.Final]
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlStrings(AbstractSchemaMigrator.java:526) ~[hibernate-core-5.6.12.Final.jar:5.6.12.Final]
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.createTable(AbstractSchemaMigrator.java:293) ~[hibernate-core-5.6.12.Final.jar:5.6.12.Final]
+	at org.hibernate.tool.schema.internal.GroupedSchemaMigratorImpl.performTablesMigration(GroupedSchemaMigratorImpl.java:74) ~[hibernate-core-5.6.12.Final.jar:5.6.12.Final]
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.performMigration(AbstractSchemaMigrator.java:220) ~[hibernate-core-5.6.12.Final.jar:5.6.12.Final]
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:123) ~[hibernate-core-5.6.12.Final.jar:5.6.12.Final]
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:196) ~[hibernate-core-5.6.12.Final.jar:5.6.12.Final]
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:85) ~[hibernate-core-5.6.12.Final.jar:5.6.12.Final]
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:335) ~[hibernate-core-5.6.12.Final.jar:5.6.12.Final]
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:471) ~[hibernate-core-5.6.12.Final.jar:5.6.12.Final]
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1498) ~[hibernate-core-5.6.12.Final.jar:5.6.12.Final]
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:58) ~[spring-orm-5.3.23.jar:5.3.23]
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:365) ~[spring-orm-5.3.23.jar:5.3.23]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:409) ~[spring-orm-5.3.23.jar:5.3.23]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:396) ~[spring-orm-5.3.23.jar:5.3.23]
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:341) ~[spring-orm-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1863) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1800) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:620) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:233) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveNamedBean(DefaultListableBeanFactory.java:1284) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveNamedBean(DefaultListableBeanFactory.java:1245) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveBean(DefaultListableBeanFactory.java:494) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.getBean(DefaultListableBeanFactory.java:349) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.getBean(DefaultListableBeanFactory.java:342) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.orm.jpa.EntityManagerFactoryUtils.findEntityManagerFactory(EntityManagerFactoryUtils.java:121) ~[spring-orm-5.3.23.jar:5.3.23]
+	at org.springframework.orm.jpa.EntityManagerFactoryAccessor.setBeanFactory(EntityManagerFactoryAccessor.java:155) ~[spring-orm-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeAwareMethods(AbstractAutowireCapableBeanFactory.java:1826) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1791) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:620) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:276) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1391) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1311) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:887) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:541) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1352) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1195) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:582) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:276) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.addCandidateEntry(DefaultListableBeanFactory.java:1609) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.findAutowireCandidates(DefaultListableBeanFactory.java:1573) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveMultipleBeans(DefaultListableBeanFactory.java:1462) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1349) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1311) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredMethodElement.resolveMethodArguments(AutowiredAnnotationBeanPostProcessor.java:759) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredMethodElement.inject(AutowiredAnnotationBeanPostProcessor.java:719) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:119) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:399) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1431) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:619) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:410) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1352) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1195) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:582) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:276) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1391) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1311) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredMethodElement.resolveMethodArguments(AutowiredAnnotationBeanPostProcessor.java:759) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredMethodElement.inject(AutowiredAnnotationBeanPostProcessor.java:719) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:119) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:399) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1431) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:619) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:410) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1352) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1195) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:582) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:213) ~[spring-beans-5.3.23.jar:5.3.23]
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.getOrderedBeansOfType(ServletContextInitializerBeans.java:212) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.addAsRegistrationBean(ServletContextInitializerBeans.java:175) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.addAsRegistrationBean(ServletContextInitializerBeans.java:170) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.addAdaptableBeans(ServletContextInitializerBeans.java:155) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.<init>(ServletContextInitializerBeans.java:87) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.getServletContextInitializerBeans(ServletWebServerApplicationContext.java:260) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.selfInitialize(ServletWebServerApplicationContext.java:234) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.web.embedded.tomcat.TomcatStarter.onStartup(TomcatStarter.java:53) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.apache.catalina.core.StandardContext.startInternal(StandardContext.java:5220) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:183) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1396) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1386) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264) ~[na:na]
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:140) ~[na:na]
+	at org.apache.catalina.core.ContainerBase.startInternal(ContainerBase.java:919) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.apache.catalina.core.StandardHost.startInternal(StandardHost.java:835) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:183) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1396) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1386) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264) ~[na:na]
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:140) ~[na:na]
+	at org.apache.catalina.core.ContainerBase.startInternal(ContainerBase.java:919) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.apache.catalina.core.StandardEngine.startInternal(StandardEngine.java:265) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:183) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.apache.catalina.core.StandardService.startInternal(StandardService.java:432) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:183) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.apache.catalina.core.StandardServer.startInternal(StandardServer.java:930) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:183) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.apache.catalina.startup.Tomcat.start(Tomcat.java:486) ~[tomcat-embed-core-9.0.68.jar:9.0.68]
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.initialize(TomcatWebServer.java:123) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.<init>(TomcatWebServer.java:104) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory.getTomcatWebServer(TomcatServletWebServerFactory.java:479) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory.getWebServer(TomcatServletWebServerFactory.java:211) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.createWebServer(ServletWebServerApplicationContext.java:182) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.onRefresh(ServletWebServerApplicationContext.java:160) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:577) ~[spring-context-5.3.23.jar:5.3.23]
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:145) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:745) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:420) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:307) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1317) ~[spring-boot-2.6.13.jar:2.6.13]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1306) ~[spring-boot-2.6.13.jar:2.6.13]
+	at com.gulfcam.fuelcoupon.FuelcouponApplication.main(FuelcouponApplication.java:19) ~[main/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566) ~[na:na]
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:49) ~[spring-boot-devtools-2.6.13.jar:2.6.13]
+Caused by: java.sql.SQLSyntaxErrorException: Erreur de syntaxe près de 'varchar(255), value varchar(255), primary key (id)) engine=InnoDB' à la ligne 1
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:120) ~[mysql-connector-j-8.0.31.jar:8.0.31]
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122) ~[mysql-connector-j-8.0.31.jar:8.0.31]
+	at com.mysql.cj.jdbc.StatementImpl.executeInternal(StatementImpl.java:763) ~[mysql-connector-j-8.0.31.jar:8.0.31]
+	at com.mysql.cj.jdbc.StatementImpl.execute(StatementImpl.java:648) ~[mysql-connector-j-8.0.31.jar:8.0.31]
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:94) ~[HikariCP-4.0.3.jar:na]
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java) ~[HikariCP-4.0.3.jar:na]
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:54) ~[hibernate-core-5.6.12.Final.jar:5.6.12.Final]
+	... 152 common frames omitted
+
+2022-11-29 08:55:39.335 DEBUG 32996 --- [restartedMain] org.hibernate.SQL                        : alter table settingproperties drop index UK_kttc4yuci32d5wgj8n0jq6jbo
+2022-11-29 08:55:39.337 DEBUG 32996 --- [restartedMain] org.hibernate.SQL                        : alter table settingproperties add constraint UK_kttc4yuci32d5wgj8n0jq6jbo unique (key)
+2022-11-29 08:55:39.342 DEBUG 32996 --- [restartedMain] org.hibernate.SQL                        : alter table carton add constraint FK66g4868lnn65s3k4duuf2qaee foreign key (status_id) references status (id)
+2022-11-29 08:55:39.407 DEBUG 32996 --- [restartedMain] org.hibernate.SQL                        : alter table coupon add constraint FK8k21mk3l7ebh9ctkbsoipe3un foreign key (status_id) references status (id)
+2022-11-29 08:55:39.432 DEBUG 32996 --- [restartedMain] org.hibernate.SQL                        : alter table item add constraint FKa5r9sug9g4f4kif98va9ro3l2 foreign key (status_id) references status (id)
+2022-11-29 08:55:39.459 DEBUG 32996 --- [restartedMain] org.hibernate.SQL                        : alter table notebook add constraint FK1nwhwuuhy0m4g0i9mq9ea0jlq foreign key (status_id) references status (id)
+2022-11-29 08:55:39.503 DEBUG 32996 --- [restartedMain] org.hibernate.SQL                        : alter table request_opposition add constraint FKapt4ejdmnj9xxpb0ry2ql0yvl foreign key (status_id) references status (id)
+2022-11-29 08:55:39.546 DEBUG 32996 --- [restartedMain] org.hibernate.SQL                        : alter table role_user_aud add constraint FKmekm5p4mgukwph71pr4lso18k foreign key (rev) references revinfo (rev)
+2022-11-29 08:55:39.579 DEBUG 32996 --- [restartedMain] org.hibernate.SQL                        : alter table station add constraint FK6nku4juvjv9vmp9b5lvhyoixk foreign key (status_id) references status (id)
+2022-11-29 08:55:39.618 DEBUG 32996 --- [restartedMain] org.hibernate.SQL                        : alter table status_aud add constraint FKm4t88904viu7aii6h9paj0njh foreign key (rev) references revinfo (rev)
+2022-11-29 08:55:39.651 DEBUG 32996 --- [restartedMain] org.hibernate.SQL                        : alter table status_order_aud add constraint FKfxuakw6pj5craycx4tr9q4ma6 foreign key (rev) references revinfo (rev)
+2022-11-29 08:55:39.680 DEBUG 32996 --- [restartedMain] org.hibernate.SQL                        : alter table status_user_aud add constraint FKr1k5qf3v8r9tj5e28s1p61y7k foreign key (rev) references revinfo (rev)
+2022-11-29 08:55:39.711 DEBUG 32996 --- [restartedMain] org.hibernate.SQL                        : alter table storehouse add constraint FKf701jn8ctbjl3n7cmy40p9u7u foreign key (status_id) references status (id)
+2022-11-29 08:55:39.744 DEBUG 32996 --- [restartedMain] org.hibernate.SQL                        : alter table ticket add constraint FK7h1wcba93khggbl1ahgwjlssu foreign key (status_id) references status (id)
+2022-11-29 08:55:39.773 DEBUG 32996 --- [restartedMain] org.hibernate.SQL                        : alter table type_account_aud add constraint FK4ae429tcvi7bhh9w4d53hiwn5 foreign key (rev) references revinfo (rev)
+2022-11-29 08:55:39.808 DEBUG 32996 --- [restartedMain] org.hibernate.SQL                        : alter table type_client_aud add constraint FKd2oenpv8qaahmvyu93jr7j0fq foreign key (rev) references revinfo (rev)
+2022-11-29 08:55:39.835 DEBUG 32996 --- [restartedMain] org.hibernate.SQL                        : alter table type_document_aud add constraint FK6xyqn7nwrpm0d9cm6fdkag338 foreign key (rev) references revinfo (rev)
+2022-11-29 08:55:39.866 DEBUG 32996 --- [restartedMain] org.hibernate.SQL                        : alter table unit add constraint FKdbllvdqqkem5lvlli2aoj8hcb foreign key (status_id) references status (id)
+2022-11-29 08:55:39.908 DEBUG 32996 --- [restartedMain] org.hibernate.SQL                        : alter table users_aud add constraint FKc4vk4tui2la36415jpgm9leoq foreign key (rev) references revinfo (rev)
+2022-11-29 08:55:39.953 DEBUG 32996 --- [restartedMain] org.hibernate.SQL                        : alter table users_old_passwords add constraint FKq30ibe1si8uenio0e085hop26 foreign key (old_passwords_old_password_id) references old_password (old_password_id)
+2022-11-29 08:55:39.988 DEBUG 32996 --- [restartedMain] org.hibernate.SQL                        : alter table users_old_passwords add constraint FKklcfn538nciu2ymyslmqfijjj foreign key (users_user_id) references users (user_id)
+2022-11-29 08:55:40.025 DEBUG 32996 --- [restartedMain] org.hibernate.SQL                        : alter table users_roles add constraint FKoxrfvt1v6mvuofck1ohyri56n foreign key (roles_id) references role_user (id)
+2022-11-29 08:55:40.058 DEBUG 32996 --- [restartedMain] org.hibernate.SQL                        : alter table users_roles add constraint FKmaps3ffbyjaxkt50q1c7s7v5j foreign key (users_user_id) references users (user_id)
+2022-11-29 08:55:40.088 DEBUG 32996 --- [restartedMain] org.hibernate.SQL                        : alter table users_roles_aud add constraint FKktxqr55ntd0j2i228uj8sq6j9 foreign key (rev) references revinfo (rev)
+2022-11-29 08:55:40.125  INFO 32996 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2022-11-29 08:55:40.141  INFO 32996 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2022-11-29 08:55:41.566 DEBUG 32996 --- [restartedMain] o.s.b.w.s.ServletContextInitializerBeans : Mapping filters: springSecurityFilterChain urls=[/*] order=-100, filterRegistrationBean urls=[/*] order=2147483647, filterRegistrationBean urls=[/*] order=2147483647, characterEncodingFilter urls=[/*] order=-2147483648, formContentFilter urls=[/*] order=-9900, requestContextFilter urls=[/*] order=-105, authenticationJwtTokenFilter urls=[/*] order=2147483647
+2022-11-29 08:55:41.567 DEBUG 32996 --- [restartedMain] o.s.b.w.s.ServletContextInitializerBeans : Mapping servlets: dispatcherServlet urls=[/]
+2022-11-29 08:55:41.616 DEBUG 32996 --- [restartedMain] o.s.w.s.r.ResourceUrlEncodingFilter      : Filter 'resourceUrlEncodingFilter' configured for use
+2022-11-29 08:55:43.511 DEBUG 32996 --- [restartedMain] s.w.s.m.m.a.RequestMappingHandlerMapping : 142 mappings in 'requestMappingHandlerMapping'
+2022-11-29 08:55:44.616 DEBUG 32996 --- [restartedMain] o.s.w.s.handler.SimpleUrlHandlerMapping  : Patterns [/webjars/**, /**, /swagger-ui*/**] in 'resourceHandlerMapping'
+2022-11-29 08:55:44.712  INFO 32996 --- [restartedMain] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@3f18a508, org.springframework.security.web.context.SecurityContextPersistenceFilter@1d4c4939, org.springframework.security.web.header.HeaderWriterFilter@5982959a, org.springframework.web.filter.CorsFilter@5702c183, org.springframework.security.web.authentication.logout.LogoutFilter@76bdfb9c, com.gulfcam.fuelcoupon.authentication.service.AuthTokenFilter@da1ab4f, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@64395930, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@403d2cf6, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@7e2c4c85, org.springframework.security.web.session.SessionManagementFilter@1d44f319, org.springframework.security.web.access.ExceptionTranslationFilter@6718bbd4, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@3dc27a32]
+2022-11-29 08:55:44.906 DEBUG 32996 --- [restartedMain] s.w.s.m.m.a.RequestMappingHandlerAdapter : ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+2022-11-29 08:55:44.967 DEBUG 32996 --- [restartedMain] .m.m.a.ExceptionHandlerExceptionResolver : ControllerAdvice beans: 3 @ExceptionHandler, 1 ResponseBodyAdvice
+2022-11-29 08:55:45.614 DEBUG 32996 --- [restartedMain] o.s.w.s.v.f.FreeMarkerConfigurer         : File system access not preferred: using SpringTemplateLoader
+2022-11-29 08:55:45.824  INFO 32996 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2022-11-29 08:55:45.912  INFO 32996 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+2022-11-29 08:55:45.931  INFO 32996 --- [restartedMain] c.g.fuelcoupon.FuelcouponApplication     : Started FuelcouponApplication in 14.361 seconds (JVM running for 16.151)
+2022-11-29 08:58:44.289  INFO 32996 --- [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2022-11-29 08:58:44.292  INFO 32996 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2022-11-29 08:58:44.292 DEBUG 32996 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Detected StandardServletMultipartResolver
+2022-11-29 08:58:44.292 DEBUG 32996 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Detected AcceptHeaderLocaleResolver
+2022-11-29 08:58:44.293 DEBUG 32996 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Detected FixedThemeResolver
+2022-11-29 08:58:44.296 DEBUG 32996 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@362fa855
+2022-11-29 08:58:44.296 DEBUG 32996 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Detected org.springframework.web.servlet.support.SessionFlashMapManager@43405cb4
+2022-11-29 08:58:44.297 DEBUG 32996 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+2022-11-29 08:58:44.297  INFO 32996 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 5 ms
+2022-11-29 08:58:44.335 DEBUG 32996 --- [http-nio-8080-exec-1] o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/], classpath [resources/], classpath [static/], classpath [public/], ServletContext [/]]
+2022-11-29 08:58:44.347 DEBUG 32996 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : GET "/", parameters={}
+2022-11-29 08:58:44.352 DEBUG 32996 --- [http-nio-8080-exec-1] o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/], classpath [resources/], classpath [static/], classpath [public/], ServletContext [/]]
+2022-11-29 08:58:44.358 DEBUG 32996 --- [http-nio-8080-exec-1] o.s.w.s.r.ResourceHttpRequestHandler     : Resource not found
+2022-11-29 08:58:44.359 DEBUG 32996 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed 404 NOT_FOUND
+2022-11-29 08:58:44.364 DEBUG 32996 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : "ERROR" dispatch for GET "/error", parameters={}
+2022-11-29 08:58:44.368 DEBUG 32996 --- [http-nio-8080-exec-1] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController#errorHtml(HttpServletRequest, HttpServletResponse)
+2022-11-29 08:58:44.428 DEBUG 32996 --- [http-nio-8080-exec-1] o.s.w.s.v.ContentNegotiatingViewResolver : Selected 'text/html' given [text/html, text/html;q=0.8]
+2022-11-29 08:58:44.434 DEBUG 32996 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Exiting from "ERROR" dispatch, status 404
+2022-11-29 08:58:44.642 DEBUG 32996 --- [http-nio-8080-exec-2] o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/], classpath [resources/], classpath [static/], classpath [public/], ServletContext [/]]
+2022-11-29 08:58:44.642 DEBUG 32996 --- [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : GET "/favicon.ico", parameters={}
+2022-11-29 08:58:44.644 DEBUG 32996 --- [http-nio-8080-exec-2] o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/], classpath [resources/], classpath [static/], classpath [public/], ServletContext [/]]
+2022-11-29 08:58:44.647 DEBUG 32996 --- [http-nio-8080-exec-2] o.s.w.s.r.ResourceHttpRequestHandler     : Resource not found
+2022-11-29 08:58:44.648 DEBUG 32996 --- [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed 404 NOT_FOUND
+2022-11-29 08:58:44.650 DEBUG 32996 --- [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : "ERROR" dispatch for GET "/error", parameters={}
+2022-11-29 08:58:44.651 DEBUG 32996 --- [http-nio-8080-exec-2] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController#error(HttpServletRequest)
+2022-11-29 08:58:44.669 DEBUG 32996 --- [http-nio-8080-exec-2] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json;q=0.8', given [image/avif, image/webp, image/apng, image/svg+xml, image/*, */*;q=0.8] and supported [application/json, application/*+json, application/json, application/*+json, application/xml;charset=UTF-8, text/xml;charset=UTF-8, application/*+xml;charset=UTF-8, application/xml;charset=UTF-8, text/xml;charset=UTF-8, application/*+xml;charset=UTF-8]
+2022-11-29 08:58:44.670 DEBUG 32996 --- [http-nio-8080-exec-2] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [{timestamp=Tue Nov 29 08:58:44 WAT 2022, status=404, error=Not Found, message=No message available,  (truncated)...]
+2022-11-29 08:58:44.728 DEBUG 32996 --- [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Exiting from "ERROR" dispatch, status 404
+2022-11-29 08:59:00.564 DEBUG 32996 --- [http-nio-8080-exec-5] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.springdoc.webmvc.api.OpenApiWebMvcResource#openapiJson(HttpServletRequest, String, Locale)
+2022-11-29 08:59:00.565 DEBUG 32996 --- [http-nio-8080-exec-5] o.s.web.servlet.DispatcherServlet        : GET "/api-docs", parameters={}
+2022-11-29 08:59:00.566 DEBUG 32996 --- [http-nio-8080-exec-5] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.springdoc.webmvc.api.OpenApiWebMvcResource#openapiJson(HttpServletRequest, String, Locale)
+2022-11-29 08:59:01.777  INFO 32996 --- [http-nio-8080-exec-5] o.springdoc.api.AbstractOpenApiResource  : Init duration for springdoc-openapi is: 1182 ms
+2022-11-29 08:59:01.817 DEBUG 32996 --- [http-nio-8080-exec-5] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json;q=0.8', given [text/html, application/xhtml+xml, image/avif, image/webp, image/apng, application/xml;q=0.9, application/signed-exchange;v=b3;q=0.9, */*;q=0.8] and supported [application/json]
+2022-11-29 08:59:01.818 DEBUG 32996 --- [http-nio-8080-exec-5] m.m.a.RequestResponseBodyMethodProcessor : Writing ["{"openapi":"3.0.1","info":{"title":"API GULFCAM V1.0","description":"Documentation de l'API","versio (truncated)..."]
+2022-11-29 08:59:01.838 DEBUG 32996 --- [http-nio-8080-exec-5] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2022-11-29 08:59:37.005 DEBUG 32996 --- [http-nio-8080-exec-8] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.springdoc.webmvc.ui.SwaggerWelcomeWebMvc#redirectToUi(HttpServletRequest)
+2022-11-29 08:59:37.006 DEBUG 32996 --- [http-nio-8080-exec-8] o.s.web.servlet.DispatcherServlet        : GET "/api-docs-ui", parameters={}
+2022-11-29 08:59:37.006 DEBUG 32996 --- [http-nio-8080-exec-8] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.springdoc.webmvc.ui.SwaggerWelcomeWebMvc#redirectToUi(HttpServletRequest)
+2022-11-29 08:59:37.033 DEBUG 32996 --- [http-nio-8080-exec-8] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/xhtml+xml', given [text/html, application/xhtml+xml, image/avif, image/webp, image/apng, application/xml;q=0.9, application/signed-exchange;v=b3;q=0.9, */*;q=0.8] and supported [application/json, application/*+json, application/json, application/*+json, application/xml;charset=UTF-8, text/xml;charset=UTF-8, application/*+xml;charset=UTF-8, application/xml;charset=UTF-8, text/xml;charset=UTF-8, application/*+xml;charset=UTF-8]
+2022-11-29 08:59:37.035 DEBUG 32996 --- [http-nio-8080-exec-8] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Nothing to write: null body
+2022-11-29 08:59:37.035 DEBUG 32996 --- [http-nio-8080-exec-8] o.s.web.servlet.DispatcherServlet        : Completed 302 FOUND
+2022-11-29 08:59:37.045 DEBUG 32996 --- [http-nio-8080-exec-9] o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/webjars/]]
+2022-11-29 08:59:37.046 DEBUG 32996 --- [http-nio-8080-exec-9] o.s.web.servlet.DispatcherServlet        : GET "/swagger-ui/index.html", parameters={}
+2022-11-29 08:59:37.047 DEBUG 32996 --- [http-nio-8080-exec-9] o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/webjars/]]
+2022-11-29 08:59:37.054 DEBUG 32996 --- [http-nio-8080-exec-9] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2022-11-29 08:59:37.110 DEBUG 32996 --- [http-nio-8080-exec-10] o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/webjars/]]
+2022-11-29 08:59:37.111 DEBUG 32996 --- [http-nio-8080-exec-1] o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/webjars/]]
+2022-11-29 08:59:37.111 DEBUG 32996 --- [http-nio-8080-exec-10] o.s.web.servlet.DispatcherServlet        : GET "/swagger-ui/swagger-ui.css", parameters={}
+2022-11-29 08:59:37.112 DEBUG 32996 --- [http-nio-8080-exec-2] o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/webjars/]]
+2022-11-29 08:59:37.112 DEBUG 32996 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : GET "/swagger-ui/index.css", parameters={}
+2022-11-29 08:59:37.112 DEBUG 32996 --- [http-nio-8080-exec-3] o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/webjars/]]
+2022-11-29 08:59:37.112 DEBUG 32996 --- [http-nio-8080-exec-4] o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/webjars/]]
+2022-11-29 08:59:37.113 DEBUG 32996 --- [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : GET "/swagger-ui/swagger-ui-bundle.js", parameters={}
+2022-11-29 08:59:37.113 DEBUG 32996 --- [http-nio-8080-exec-10] o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/webjars/]]
+2022-11-29 08:59:37.113 DEBUG 32996 --- [http-nio-8080-exec-3] o.s.web.servlet.DispatcherServlet        : GET "/swagger-ui/swagger-initializer.js", parameters={}
+2022-11-29 08:59:37.113 DEBUG 32996 --- [http-nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : GET "/swagger-ui/swagger-ui-standalone-preset.js", parameters={}
+2022-11-29 08:59:37.114 DEBUG 32996 --- [http-nio-8080-exec-1] o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/webjars/]]
+2022-11-29 08:59:37.114 DEBUG 32996 --- [http-nio-8080-exec-2] o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/webjars/]]
+2022-11-29 08:59:37.114 DEBUG 32996 --- [http-nio-8080-exec-4] o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/webjars/]]
+2022-11-29 08:59:37.115 DEBUG 32996 --- [http-nio-8080-exec-3] o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/webjars/]]
+2022-11-29 08:59:37.122 DEBUG 32996 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2022-11-29 08:59:37.124 DEBUG 32996 --- [http-nio-8080-exec-10] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2022-11-29 08:59:37.132 DEBUG 32996 --- [http-nio-8080-exec-3] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2022-11-29 08:59:37.137 DEBUG 32996 --- [http-nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2022-11-29 08:59:37.147 DEBUG 32996 --- [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2022-11-29 08:59:37.432 DEBUG 32996 --- [http-nio-8080-exec-5] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.springdoc.webmvc.ui.SwaggerConfigResource#openapiJson(HttpServletRequest)
+2022-11-29 08:59:37.433 DEBUG 32996 --- [http-nio-8080-exec-5] o.s.web.servlet.DispatcherServlet        : GET "/api-docs/swagger-config", parameters={}
+2022-11-29 08:59:37.434 DEBUG 32996 --- [http-nio-8080-exec-5] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.springdoc.webmvc.ui.SwaggerConfigResource#openapiJson(HttpServletRequest)
+2022-11-29 08:59:37.435 DEBUG 32996 --- [http-nio-8080-exec-5] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json]
+2022-11-29 08:59:37.435 DEBUG 32996 --- [http-nio-8080-exec-6] o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/webjars/]]
+2022-11-29 08:59:37.435 DEBUG 32996 --- [http-nio-8080-exec-5] m.m.a.RequestResponseBodyMethodProcessor : Writing [{configUrl=/api-docs/swagger-config, oauth2RedirectUrl=http://localhost:8080/swagger-ui/oauth2-redir (truncated)...]
+2022-11-29 08:59:37.435 DEBUG 32996 --- [http-nio-8080-exec-6] o.s.web.servlet.DispatcherServlet        : GET "/swagger-ui/favicon-32x32.png", parameters={}
+2022-11-29 08:59:37.437 DEBUG 32996 --- [http-nio-8080-exec-5] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2022-11-29 08:59:37.438 DEBUG 32996 --- [http-nio-8080-exec-6] o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/webjars/]]
+2022-11-29 08:59:37.443 DEBUG 32996 --- [http-nio-8080-exec-6] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2022-11-29 08:59:37.472 DEBUG 32996 --- [http-nio-8080-exec-7] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.springdoc.webmvc.api.OpenApiWebMvcResource#openapiJson(HttpServletRequest, String, Locale)
+2022-11-29 08:59:37.473 DEBUG 32996 --- [http-nio-8080-exec-7] o.s.web.servlet.DispatcherServlet        : GET "/api-docs", parameters={}
+2022-11-29 08:59:37.473 DEBUG 32996 --- [http-nio-8080-exec-7] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.springdoc.webmvc.api.OpenApiWebMvcResource#openapiJson(HttpServletRequest, String, Locale)
+2022-11-29 08:59:37.480 DEBUG 32996 --- [http-nio-8080-exec-7] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [application/json, */*] and supported [application/json]
+2022-11-29 08:59:37.480 DEBUG 32996 --- [http-nio-8080-exec-7] m.m.a.RequestResponseBodyMethodProcessor : Writing ["{"openapi":"3.0.1","info":{"title":"API GULFCAM V1.0","description":"Documentation de l'API","versio (truncated)..."]
+2022-11-29 08:59:37.483 DEBUG 32996 --- [http-nio-8080-exec-7] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2022-11-29 09:18:13.275  INFO 32996 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2022-11-29 09:18:13.280  INFO 32996 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2022-11-29 09:18:13.296  INFO 32996 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
