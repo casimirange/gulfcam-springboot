@@ -107,7 +107,7 @@ pipeline {
       stage('Deploy on dev server'){
          steps{
             sshagent(credentials : ['connect-ssh-dev-server']) {
-               sh 'ssh -o StrictHostKeyChecking=no -t $USERNAME@$SSH_HOST  "docker pull ${registryProject}:${BUILD_NUMBER} && docker ps -q --filter name=$APPLICATION_NAME | grep -q . && docker stop $APPLICATION_NAME || true && docker rm $APPLICATION_NAME || true && docker run -p 9009:8080 -d --restart=always --name $APPLICATION_NAME --network=local-network ${registryProject}:${BUILD_NUMBER}"'
+               sh 'ssh -o StrictHostKeyChecking=no -t $USERNAME@$SSH_HOST  "docker pull ${registryProject}:${BUILD_NUMBER} && docker ps -q --filter name=$APPLICATION_NAME | grep -q . && docker stop $APPLICATION_NAME || true && docker rm $APPLICATION_NAME || true && docker run -p 9009:8080 -d --restart=always --name $APPLICATION_NAME --network=local-network --memory=500m --memory-reservation=250m ${registryProject}:${BUILD_NUMBER}"'
             }
          }
       }

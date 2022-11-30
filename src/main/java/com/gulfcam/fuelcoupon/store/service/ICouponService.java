@@ -18,5 +18,6 @@ public interface ICouponService {
     void createCoupon(Coupon coupon);
     void deleteCoupon(Coupon coupon);
     boolean existsCouponBySerialNumber(String serialNumber);
+    boolean existsCouponByInternalReference(Long internalReference);
 
 }

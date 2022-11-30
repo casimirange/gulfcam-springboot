@@ -17,4 +17,5 @@ public interface ICouponRepo extends JpaRepository<Coupon, Long> {
     Optional<Coupon> getCouponByInternalReference(Long internalReference);
 
     boolean existsCouponBySerialNumber(String serialNumber);
+    boolean existsCouponByInternalReference(Long internalReference);
 }

@@ -142,9 +142,8 @@ public class CartonRest {
 
     private void generateCoupon(Carton carton){
 
-
-        int numberCouponByCarton = (carton.getFrom()-carton.getTo())/10;
-        for(int i=carton.getTo(); i<= numberCouponByCarton; i++){
+        int numberCouponByCarton = 1 + (carton.getFrom()-carton.getTo())/10;
+        for(int i=carton.getTo(); i< carton.getTo() + 10000; i++){
             Notebook notebook = new Notebook();
             notebook.setInternalReference(jwtUtils.generateInternalReference());
             notebook.setCreatedAt(LocalDateTime.now());
@@ -157,21 +156,31 @@ public class CartonRest {
             Map<String, Object> notebookEncoded = new HashMap<>();
             notebookEncoded = iNotebookService.createNotebook(notebook);
             notebook = (Notebook) notebookEncoded.get("notebook");
-
-            for(int y=0; y<=10; y++){
+            for(int y=0; y<10; y++){
+                int x = 0;
+                x = x + i;
                 Coupon coupon = new Coupon();
-                coupon.setInternalReference(jwtUtils.generateInternalReference());
+                Long ref = jwtUtils.generateInternalReference();
+                if (!iCouponService.existsCouponByInternalReference(ref)){
+                    coupon.setInternalReference(ref);
+                }else {
+                    Long ref2 = jwtUtils.generateInternalReference();
+                    coupon.setInternalReference(ref2);
+                }
                 coupon.setCreatedAt(LocalDateTime.now());
                 coupon.setIdNotebook(notebook.getInternalReference());
-                coupon.setSerialNumber(i+"");
+                coupon.setSerialNumber(x+"");
+
                 coupon.setIdNotebook(notebook.getInternalReference());
                 Status statusCoupon = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
                 coupon.setStatus(statusCoupon);
-                iCouponService.createCoupon(coupon);
-            }
+                iCouponService.createCoupon(coupon);i++;
+            }i--;
+
 
         }
     }
+
 
     @Operation(summary = "Modification des informations pour un Carton", tags = "Carton", responses = {
             @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Carton.class)))),

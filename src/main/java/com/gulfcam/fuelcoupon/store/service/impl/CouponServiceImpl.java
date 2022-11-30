@@ -69,6 +69,11 @@ public class CouponServiceImpl implements ICouponService {
     }
 
     @Override
+    public boolean existsCouponByInternalReference(Long internalReference) {
+        return iCouponRepo.existsCouponByInternalReference(internalReference);
+    }
+
+    @Override
     public void createCoupon(Coupon coupon) {
         iCouponRepo.save(coupon);
     }
