@@ -1,5 +1,6 @@
 package com.gulfcam.fuelcoupon.order.service;
 
+import com.gulfcam.fuelcoupon.order.dto.ResponseOrderDTO;
 import com.gulfcam.fuelcoupon.order.entity.Order;
 import org.springframework.data.domain.Page;
 
@@ -7,7 +8,7 @@ import java.util.Optional;
 
 public interface IOrderService {
 
-    Page<Order> getAllOrders(int page, int size, String sort, String order);
+    Page<ResponseOrderDTO> getAllOrders(int page, int size, String sort, String order);
     Page<Order> getOrdersByClientReference(String clientReference, int page, int size, String sort, String order);
     Page<Order> getOrdersByIdClient(Long idClient, int page, int size, String sort, String order);
     Page<Order> getOrdersByIdFund(Long idFund, int page, int size, String sort, String order);

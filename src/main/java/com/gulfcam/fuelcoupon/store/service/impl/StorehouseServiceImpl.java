@@ -1,15 +1,21 @@
 package com.gulfcam.fuelcoupon.store.service.impl;
+import com.gulfcam.fuelcoupon.store.dto.ResponseStorehouseDTO;
+import com.gulfcam.fuelcoupon.store.entity.Store;
 import com.gulfcam.fuelcoupon.store.entity.Storehouse;
 import com.gulfcam.fuelcoupon.store.repository.IStorehouseRepo;
+import com.gulfcam.fuelcoupon.store.service.IStoreService;
 import com.gulfcam.fuelcoupon.store.service.IStorehouseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -18,6 +24,9 @@ public class StorehouseServiceImpl implements IStorehouseService {
 
     @Autowired
     IStorehouseRepo iStorehouseRepo;
+
+    @Autowired
+    IStoreService iStoreService;
 
     @Autowired
     ResourceBundleMessageSource messageSource;
@@ -29,8 +38,32 @@ public class StorehouseServiceImpl implements IStorehouseService {
     }
 
     @Override
-    public Page<Storehouse> getAllStorehouses(int page, int size, String sort, String order) {
-        return iStorehouseRepo.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
+    public Page<ResponseStorehouseDTO> getAllStorehouses(int page, int size, String sort, String order) {
+
+        List<Storehouse> storehouses = iStorehouseRepo.findAll();
+        ResponseStorehouseDTO responseStorehouseDTO;
+        List<ResponseStorehouseDTO> responseStorehouseDTOList = new ArrayList<>();
+
+        for(Storehouse item: storehouses){
+            Store store = new Store();
+
+            if(item.getIdStore() != null)
+                store = iStoreService.getByInternalReference(item.getIdStore()).get();
+
+            responseStorehouseDTO = new ResponseStorehouseDTO();
+            responseStorehouseDTO.setId(item.getId());
+            responseStorehouseDTO.setStore(store);
+            responseStorehouseDTO.setStatus(item.getStatus());
+            responseStorehouseDTO.setCreateAt(item.getCreateAt());
+            responseStorehouseDTO.setInternalReference(item.getInternalReference());
+            responseStorehouseDTO.setName(item.getName());
+            responseStorehouseDTO.setType(item.getType());
+            responseStorehouseDTO.setUpdateAt(item.getUpdateAt());
+            responseStorehouseDTO.setLocalisationStore((store != null)? store.getLocalization(): "");
+            responseStorehouseDTOList.add(responseStorehouseDTO);
+        }
+        Page<ResponseStorehouseDTO> storehousePage = new PageImpl<>(responseStorehouseDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseStorehouseDTOList.size());
+        return storehousePage;
     }
 
     @Override

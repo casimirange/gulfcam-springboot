@@ -4,6 +4,7 @@ import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
 import com.gulfcam.fuelcoupon.store.dto.CreateStorehouseDTO;
+import com.gulfcam.fuelcoupon.store.dto.ResponseStorehouseDTO;
 import com.gulfcam.fuelcoupon.store.entity.Store;
 import com.gulfcam.fuelcoupon.store.entity.Storehouse;
 import com.gulfcam.fuelcoupon.store.repository.IStorehouseRepo;
@@ -96,6 +97,7 @@ public class StorehouseRest {
         storehouse.setCreateAt(LocalDate.now());
         storehouse.setIdStore(createStorehouseDTO.getIdStore());
         storehouse.setType(createStorehouseDTO.getType());
+        storehouse.setName(createStorehouseDTO.getName());
 
         Status status = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
         storehouse.setStatus(status);
@@ -129,6 +131,7 @@ public class StorehouseRest {
         if (createStorehouseDTO.getIdStore() != null)
             storehouse.setIdStore(createStorehouseDTO.getIdStore());
         storehouse.setType(createStorehouseDTO.getType());
+        storehouse.setName(createStorehouseDTO.getName());
 
         iStorehouseService.createStorehouse(storehouse);
 
@@ -190,7 +193,7 @@ public class StorehouseRest {
                                              @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                              @RequestParam(required = false, defaultValue = "id") String sort,
                                              @RequestParam(required = false, defaultValue = "desc") String order) {
-        Page<Storehouse> list = iStorehouseService.getAllStorehouses(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
+        Page<ResponseStorehouseDTO> list = iStorehouseService.getAllStorehouses(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(list);
     }
     }

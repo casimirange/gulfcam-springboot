@@ -338,19 +338,20 @@ public class AuthenticationRest {
     @PostMapping("/resetOtpCode")
     public ResponseEntity<?> resetCodeConfirmAccount(@Valid @RequestBody ResetOtpCodeDto resetOtpCodeDto) {
         Optional<Users> users = userService.getByEmail(resetOtpCodeDto.getEmail());
-        if (users.get().getStatus().getName().equals(EStatusUser.USER_ENABLED)) {
-            return ResponseEntity.ok().body(new MessageResponseDto(HttpStatus.OK, " your account has already been activated !"));
-        }
+//        if (users.get().getStatus().getName().equals(EStatusUser.USER_ENABLED)) {
+//            return ResponseEntity.ok().body(new MessageResponseDto(HttpStatus.OK, " your account has already been activated !"));
+//        }
         String code = String.valueOf(jwtUtils.generateOtpCode());
-        Users userUpdate = updateExistingUser(users.get().getEmail(), code);
-        String tel1 = userUpdate.getTelephone() != null ? userUpdate.getTelephone() : String.valueOf(userUpdate.getTelephone());
+        Users userUpdate = updateExistingUser(resetOtpCodeDto.getEmail(), code);
+        String telephone = userUpdate.getTelephone() != null ? userUpdate.getTelephone() : String.valueOf(userUpdate.getTelephone());
         String email = userUpdate.getEmail() != null ? userUpdate.getEmail() : String.valueOf(userUpdate.getEmail());
+
         Map<String, Object> emailProps = new HashMap<>();
         emailProps.put("code", code);
-        emailProps.put("telephone", tel1);
+        emailProps.put("telephone", telephone);
         emailProps.put("email", email);
 
-        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, email, "", emailProps, ApplicationConstant.SUBJECT_EMAIL_OPT, ApplicationConstant.TEMPLATE_EMAIL_ENTREPRISE_MEMBRE));
+        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, email, mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_OPT, ApplicationConstant.TEMPLATE_EMAIL_ENTREPRISE_MEMBRE));
         log.info("Email  send successfull for user: " + email);
         log.info("Code OTP : " + code);
 

@@ -122,6 +122,13 @@ public class UserServiceImpl implements IUserService {
 		Users user = getById(userId);
 		user.setEmail(u.getEmail());
 		user.setTelephone(u.getTelephone());
+		user.setFirstName(u.getFirstName());
+		user.setLastName(u.getLastName());
+		user.setTelephone(u.getTelephone());
+		user.setPinCode(u.getPinCode());
+		user.setPosition(u.getPosition());
+		user.setIdStore(u.getIdStore());
+		user.setTypeAccount(u.getTypeAccount());
 		return userRepo.save(user);
 	}
 

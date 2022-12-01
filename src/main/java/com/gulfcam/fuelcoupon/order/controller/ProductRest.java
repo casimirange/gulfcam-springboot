@@ -5,6 +5,7 @@ import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
 import com.gulfcam.fuelcoupon.order.dto.CreateItemDTO;
 import com.gulfcam.fuelcoupon.order.dto.CreateProductDTO;
+import com.gulfcam.fuelcoupon.order.dto.ResponseProductDTO;
 import com.gulfcam.fuelcoupon.order.entity.Item;
 import com.gulfcam.fuelcoupon.order.entity.Order;
 import com.gulfcam.fuelcoupon.order.entity.Product;
@@ -238,7 +239,7 @@ public class ProductRest {
                                              @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                              @RequestParam(required = false, defaultValue = "id") String sort,
                                              @RequestParam(required = false, defaultValue = "desc") String order) {
-        Page<Product> list = iProductService.getAllProducts(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
+        Page<ResponseProductDTO> list = iProductService.getAllProducts(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(list);
     }
     }

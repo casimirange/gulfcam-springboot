@@ -4,6 +4,7 @@ import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
 import com.gulfcam.fuelcoupon.store.dto.CreateCartonDTO;
+import com.gulfcam.fuelcoupon.store.dto.ResponseCartonDTO;
 import com.gulfcam.fuelcoupon.store.entity.Carton;
 import com.gulfcam.fuelcoupon.store.entity.Coupon;
 import com.gulfcam.fuelcoupon.store.entity.Notebook;
@@ -143,7 +144,7 @@ public class CartonRest {
     private void generateCoupon(Carton carton){
 
         int numberCouponByCarton = 1 + (carton.getFrom()-carton.getTo())/10;
-        for(int i=carton.getTo(); i< carton.getTo() + 10000; i++){
+        for(int i=carton.getTo(); i< carton.getFrom(); i++){
             Notebook notebook = new Notebook();
             notebook.setInternalReference(jwtUtils.generateInternalReference());
             notebook.setCreatedAt(LocalDateTime.now());
@@ -161,12 +162,10 @@ public class CartonRest {
                 x = x + i;
                 Coupon coupon = new Coupon();
                 Long ref = jwtUtils.generateInternalReference();
-                if (!iCouponService.existsCouponByInternalReference(ref)){
-                    coupon.setInternalReference(ref);
-                }else {
-                    Long ref2 = jwtUtils.generateInternalReference();
-                    coupon.setInternalReference(ref2);
+                while (!iCouponService.existsCouponByInternalReference(ref)){
+                    ref = jwtUtils.generateInternalReference();
                 }
+                coupon.setInternalReference(ref);
                 coupon.setCreatedAt(LocalDateTime.now());
                 coupon.setIdNotebook(notebook.getInternalReference());
                 coupon.setSerialNumber(x+"");
@@ -303,7 +302,7 @@ public class CartonRest {
                                              @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                              @RequestParam(required = false, defaultValue = "id") String sort,
                                              @RequestParam(required = false, defaultValue = "desc") String order) {
-        Page<Carton> list = iCartonService.getAllCartons(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
+        Page<ResponseCartonDTO> list = iCartonService.getAllCartons(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(list);
     }
     }

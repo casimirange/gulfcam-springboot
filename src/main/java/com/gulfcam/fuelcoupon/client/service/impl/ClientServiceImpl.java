@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -41,6 +42,11 @@ public class ClientServiceImpl implements IClientService {
     @Override
     public Optional<Client> getClientById(Long id) {
         return iClientRepo.findById(id);
+    }
+
+    @Override
+    public List<Client> getClientsByCompanyNameLike(String completeName) {
+        return iClientRepo.getClientsByCompanyNameLike(completeName);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.gulfcam.fuelcoupon.store.controller;
 
 import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
+import com.gulfcam.fuelcoupon.client.entity.Client;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
 import com.gulfcam.fuelcoupon.store.dto.CreateStoreDTO;
 import com.gulfcam.fuelcoupon.store.entity.Store;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @Tag(name = "Magasin")
@@ -120,6 +122,18 @@ public class StoreRest {
     @GetMapping("/{internalReference:[0-9]+}")
     public ResponseEntity<Store> getStoreByInternalReference(@PathVariable Long internalReference) {
         return ResponseEntity.ok(iStoreService.getByInternalReference(internalReference).get());
+    }
+
+
+    @Operation(summary = "Recupérer la liste des magasin comme sa localisation", tags = "Magasin", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Store.class)))),
+            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+    @GetMapping("/{localization}")
+    public ResponseEntity<?> getStoresByLocalizationLike(@PathVariable String localization) {
+        List<Store> stores = iStoreService.getStoresByLocalizationLike(localization);
+        return ResponseEntity.ok(stores);
     }
 
     @Operation(summary = "Supprimer un Magasin", tags = "Magasin", responses = {

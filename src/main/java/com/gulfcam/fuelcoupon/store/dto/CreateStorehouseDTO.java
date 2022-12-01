@@ -13,8 +13,12 @@ public class CreateStorehouseDTO {
     @NotNull(message = "{store.required}")
     private Long idStore;
 
-    @Schema(description = "localisation")
+    @Schema(description = "type")
     @NotNull(message = "{type.required}")
     private String type;
+
+    @Schema(description = "nom de l'entreprôt")
+    @NotNull(message = "{type.required}")
+    private String name;
 
 }

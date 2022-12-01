@@ -1,4 +1,5 @@
-package com.gulfcam.fuelcoupon.store.entity;
+package com.gulfcam.fuelcoupon.store.dto;
+import com.gulfcam.fuelcoupon.store.entity.Store;
 import com.gulfcam.fuelcoupon.utilities.entity.Status;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -9,25 +10,19 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
-@Entity
 @Getter
 @Setter
-@NoArgsConstructor
-public class Storehouse {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class ResponseStorehouseDTO {
+
     private Long id;
 
-    @Schema(description = "Reférence interne", example = "0987698")
-    @NotNull
-    @Column(unique = true)
     private Long internalReference;
 
-    @NotNull
-    @Column(nullable = true, name = "id_store")
-    private Long idStore;
+    private Store store;
 
     private String type;
+
+    private String localisationStore;
 
     private String name;
 
@@ -35,7 +30,6 @@ public class Storehouse {
 
     private LocalDate createAt;
 
-    @ManyToOne
     private Status status;
 
 }
