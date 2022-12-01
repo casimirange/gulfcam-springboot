@@ -130,7 +130,7 @@ public class StoreRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/{localization}")
+    @GetMapping("/like/{localization}")
     public ResponseEntity<?> getStoresByLocalizationLike(@PathVariable String localization) {
         List<Store> stores = iStoreService.getStoresByLocalizationLike(localization);
         return ResponseEntity.ok(stores);

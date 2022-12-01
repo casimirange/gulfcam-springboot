@@ -215,7 +215,7 @@ public class TicketRest {
     @Parameters(value = {
             @Parameter(name = "sort", schema = @Schema(allowableValues = {"id", "createdAt"})),
             @Parameter(name = "order", schema = @Schema(allowableValues = {"asc", "desc"}))})
-    @Operation(summary = "Liste des Tickets", tags = "Carton", responses = {
+    @Operation(summary = "Liste des Tickets", tags = "Ticket", responses = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "404", description = "Ticket not found", content = @Content(mediaType = "Application/Json")),
