@@ -16,6 +16,10 @@ public class CreateNotebookDTO {
     @Schema(description = "reference interne du magasinier")
     private Long idStoreKeeper;
 
+    @Schema(description = "reference interne du type de bon")
+    @NotNull(message = "{typeVoucher.required}")
+    private Long idTypeVoucher;
+
     @Schema(description = "reference interne du carton")
     @NotNull(message = "{carton.required}")
     private Long idCarton;

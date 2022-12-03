@@ -5,6 +5,8 @@ import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.client.entity.Client;
 import com.gulfcam.fuelcoupon.client.service.IClientService;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
+import com.gulfcam.fuelcoupon.order.entity.TypeVoucher;
+import com.gulfcam.fuelcoupon.order.service.ITypeVoucherService;
 import com.gulfcam.fuelcoupon.store.dto.CreateCouponDTO;
 import com.gulfcam.fuelcoupon.store.entity.*;
 import com.gulfcam.fuelcoupon.store.repository.ICouponRepo;
@@ -72,6 +74,9 @@ public class CouponRest {
     IStatusRepo iStatusRepo;
 
     @Autowired
+    ITypeVoucherService iTypeVoucherService;
+
+    @Autowired
     ICouponRepo iCouponRepo;
 
     @Autowired
@@ -101,12 +106,20 @@ public class CouponRest {
         Notebook notebook = new Notebook();
         Station station = new Station();
         Ticket ticket = new Ticket();
+        TypeVoucher typeVoucher = new TypeVoucher();
 
         if (createCouponDTO.getIdClient() != null) {
             if(!iClientService.getClientByInternalReference(createCouponDTO.getIdClient()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.client_exists", null, LocaleContextHolder.getLocale())));
             client = iClientService.getClientByInternalReference(createCouponDTO.getIdClient()).get();
+        }
+
+        if (createCouponDTO.getIdTypeVoucher() != null) {
+            if(!iTypeVoucherService.getByInternalReference(createCouponDTO.getIdTypeVoucher()).isPresent())
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.typeVoucher_exists", null, LocaleContextHolder.getLocale())));
+            typeVoucher = iTypeVoucherService.getByInternalReference(createCouponDTO.getIdTypeVoucher()).get();
         }
 
         if (createCouponDTO.getIdNotebook() != null) {
@@ -135,6 +148,7 @@ public class CouponRest {
         coupon.setCreatedAt(LocalDateTime.now());
         coupon.setSerialNumber(createCouponDTO.getSerialNumber());
         coupon.setIdClient(createCouponDTO.getIdClient());
+        coupon.setIdTypeVoucher(createCouponDTO.getIdTypeVoucher());
         coupon.setIdNotebook(createCouponDTO.getIdNotebook());
         coupon.setIdStation(createCouponDTO.getIdStation());
         coupon.setIdTicket(createCouponDTO.getIdTicket());
@@ -145,6 +159,82 @@ public class CouponRest {
         iCouponService.createCoupon(coupon);
         return ResponseEntity.ok(coupon);
     }
+
+
+
+    @Operation(summary = "Valider les coupon utilisé", tags = "Coupon", responses = {
+            @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Coupon.class)))),
+            @ApiResponse(responseCode = "404", description = "Coupon not found", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
+    @PostMapping("/valid")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+    public ResponseEntity<?> validCoupon(@Valid @RequestBody CreateCouponDTO createCouponDTO) {
+
+        if (iCouponService.existsCouponBySerialNumber(createCouponDTO.getSerialNumber())) {
+            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                    messageSource.getMessage("messages.serial_exists", null, LocaleContextHolder.getLocale())));
+        }
+
+
+        Client client = new Client();
+        Notebook notebook = new Notebook();
+        Station station = new Station();
+        Ticket ticket = new Ticket();
+        TypeVoucher typeVoucher = new TypeVoucher();
+
+        if (createCouponDTO.getIdClient() != null) {
+            if(!iClientService.getClientByInternalReference(createCouponDTO.getIdClient()).isPresent())
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.client_exists", null, LocaleContextHolder.getLocale())));
+            client = iClientService.getClientByInternalReference(createCouponDTO.getIdClient()).get();
+        }
+
+        if (createCouponDTO.getIdTypeVoucher() != null) {
+            if(!iTypeVoucherService.getByInternalReference(createCouponDTO.getIdTypeVoucher()).isPresent())
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.typeVoucher_exists", null, LocaleContextHolder.getLocale())));
+            typeVoucher = iTypeVoucherService.getByInternalReference(createCouponDTO.getIdTypeVoucher()).get();
+        }
+
+        if (createCouponDTO.getIdNotebook() != null) {
+            if(!iNotebookService.getByInternalReference(createCouponDTO.getIdNotebook()).isPresent())
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.notebook_exists", null, LocaleContextHolder.getLocale())));
+            notebook = iNotebookService.getByInternalReference(createCouponDTO.getIdNotebook()).get();
+        }
+
+        if (createCouponDTO.getIdStation() != null) {
+            if(!iStationService.getByInternalReference(createCouponDTO.getIdStation()).isPresent())
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.station_exists", null, LocaleContextHolder.getLocale())));
+            station = iStationService.getByInternalReference(createCouponDTO.getIdStation()).get();
+        }
+
+        if (createCouponDTO.getIdTicket() != null) {
+            if(!iTicketService.getByInternalReference(createCouponDTO.getIdTicket()).isPresent())
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.ticket_exists", null, LocaleContextHolder.getLocale())));
+            ticket = iTicketService.getByInternalReference(createCouponDTO.getIdTicket()).get();
+        }
+
+        Coupon coupon = new Coupon();
+        coupon.setInternalReference(jwtUtils.generateInternalReference());
+        coupon.setCreatedAt(LocalDateTime.now());
+        coupon.setSerialNumber(createCouponDTO.getSerialNumber());
+        coupon.setIdClient(createCouponDTO.getIdClient());
+        coupon.setIdTypeVoucher(createCouponDTO.getIdTypeVoucher());
+        coupon.setIdNotebook(createCouponDTO.getIdNotebook());
+        coupon.setIdStation(createCouponDTO.getIdStation());
+        coupon.setIdTicket(createCouponDTO.getIdTicket());
+
+        Status status = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
+        coupon.setStatus(status);
+
+        iCouponService.createCoupon(coupon);
+        return ResponseEntity.ok(coupon);
+    }
+
 
     @Operation(summary = "Modification des informations pour un Coupon", tags = "Coupon", responses = {
             @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Coupon.class)))),
@@ -167,6 +257,14 @@ public class CouponRest {
         Notebook notebook = new Notebook();
         Station station = new Station();
         Ticket ticket = new Ticket();
+
+        TypeVoucher typeVoucher = new TypeVoucher();
+        if (createCouponDTO.getIdTypeVoucher() != null) {
+            if(!iTypeVoucherService.getByInternalReference(createCouponDTO.getIdTypeVoucher()).isPresent())
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.typeVoucher_exists", null, LocaleContextHolder.getLocale())));
+            typeVoucher = iTypeVoucherService.getByInternalReference(createCouponDTO.getIdTypeVoucher()).get();
+        }
 
         if (createCouponDTO.getIdClient() != null) {
             if(!iClientService.getClientByInternalReference(createCouponDTO.getIdClient()).isPresent())
@@ -206,6 +304,8 @@ public class CouponRest {
             coupon.setIdStation(createCouponDTO.getIdStation());
         if (createCouponDTO.getIdTicket() != null)
             coupon.setIdTicket(createCouponDTO.getIdTicket());
+        if (createCouponDTO.getIdTypeVoucher() != null)
+            coupon.setIdTypeVoucher(createCouponDTO.getIdTypeVoucher());
 
         iCouponService.createCoupon(coupon);
 

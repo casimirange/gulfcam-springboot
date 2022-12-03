@@ -9,14 +9,31 @@ import org.springframework.context.annotation.Configuration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @SpringBootApplication
 @EnableConfigurationProperties({DocumentStorageProperties.class})
 @Configuration
+@EnableAsync
 public class FuelcouponApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(FuelcouponApplication.class, args);
+	}
+
+	@Bean
+	public TaskExecutor threadPoolTaskExecutor() {
+
+		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+		executor.setQueueCapacity(100);
+		executor.setMaxPoolSize(2);
+		executor.setCorePoolSize(2);
+		executor.setThreadNamePrefix("poolThread-");
+		executor.initialize();
+
+		return executor;
 	}
 
 	@Bean

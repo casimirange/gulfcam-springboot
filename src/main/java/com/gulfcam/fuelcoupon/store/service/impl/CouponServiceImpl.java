@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -31,6 +32,11 @@ public class CouponServiceImpl implements ICouponService {
     @Override
     public Page<Coupon> getAllCoupons(int page, int size, String sort, String order) {
         return iCouponRepo.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
+    }
+
+    @Override
+    public List<Coupon> getCouponsByIdRequestOpposition(Long idRequestOpposition) {
+        return iCouponRepo.getCouponsByIdRequestOpposition(idRequestOpposition);
     }
 
     @Override
@@ -76,6 +82,11 @@ public class CouponServiceImpl implements ICouponService {
     @Override
     public void createCoupon(Coupon coupon) {
         iCouponRepo.save(coupon);
+    }
+
+    @Override
+    public void createAllCoupon(List<Coupon> coupon) {
+        iCouponRepo.saveAll(coupon);
     }
 
     @Override

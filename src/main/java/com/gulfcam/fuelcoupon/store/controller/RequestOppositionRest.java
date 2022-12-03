@@ -2,11 +2,20 @@ package com.gulfcam.fuelcoupon.store.controller;
 
 import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
+import com.gulfcam.fuelcoupon.client.entity.Client;
+import com.gulfcam.fuelcoupon.client.service.IClientService;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
+import com.gulfcam.fuelcoupon.order.service.ITypeVoucherService;
 import com.gulfcam.fuelcoupon.store.dto.CreateRequestOppositionDTO;
+import com.gulfcam.fuelcoupon.store.dto.ResponseCouponMailDTO;
+import com.gulfcam.fuelcoupon.store.entity.Coupon;
 import com.gulfcam.fuelcoupon.store.entity.RequestOpposition;
 import com.gulfcam.fuelcoupon.store.repository.IRequestOppositionRepo;
+import com.gulfcam.fuelcoupon.store.service.ICouponService;
+import com.gulfcam.fuelcoupon.store.service.INotebookService;
 import com.gulfcam.fuelcoupon.store.service.IRequestOppositionService;
+import com.gulfcam.fuelcoupon.store.service.IStationService;
+import com.gulfcam.fuelcoupon.user.dto.EmailDto;
 import com.gulfcam.fuelcoupon.user.entity.Users;
 import com.gulfcam.fuelcoupon.user.service.IEmailService;
 import com.gulfcam.fuelcoupon.user.service.IUserService;
@@ -36,6 +45,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @Tag(name = "Demande d'opposition")
@@ -58,6 +71,15 @@ public class RequestOppositionRest {
 
     @Autowired
     IUserService iUserService;
+
+    @Autowired
+    IClientService iClientService;
+
+    @Autowired
+    ICouponService iCouponService;
+
+    @Autowired
+    ITypeVoucherService iTypeVoucherService;
 
     @Autowired
     IStatusRepo iStatusRepo;
@@ -84,6 +106,17 @@ public class RequestOppositionRest {
 
         Users managerCoupon = new Users();
         Users serviceClient = new Users();
+        ResponseCouponMailDTO responseCouponMailDTO;
+        Coupon coupon;
+        Client client = new Client();
+
+        if (createRequestOppositionDTO.getIdClient()  != null) {
+            if(!iClientService.getClientByInternalReference(createRequestOppositionDTO.getIdClient()).isPresent())
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.client_exists", null, LocaleContextHolder.getLocale())));
+            client = iClientService.getClientByInternalReference(createRequestOppositionDTO.getIdClient()).get();
+
+        }
 
         if (createRequestOppositionDTO.getIdManagerCoupon() != null) {
             managerCoupon = iUserService.getByInternalReference(createRequestOppositionDTO.getIdManagerCoupon());
@@ -106,11 +139,106 @@ public class RequestOppositionRest {
         requestOpposition.setReason(createRequestOppositionDTO.getReason());
         requestOpposition.setIdManagerCoupon(createRequestOppositionDTO.getIdManagerCoupon());
         requestOpposition.setIdServiceClient(createRequestOppositionDTO.getIdServiceClient());
-
+        requestOpposition.setIdClient(createRequestOppositionDTO.getIdClient());
         Status status = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
         requestOpposition.setStatus(status);
 
         iRequestOppositionService.createRequestOpposition(requestOpposition);
+        List<ResponseCouponMailDTO> couponList = new ArrayList<>();
+        for (int i = 0; i<= createRequestOppositionDTO.getSerialCoupons().size(); i++){
+            coupon = iCouponService.getCouponBySerialNumber(createRequestOppositionDTO.getSerialCoupons().get(i)).get();
+
+            if(createRequestOppositionDTO.getIdClient() == coupon.getIdClient()){
+                responseCouponMailDTO= new ResponseCouponMailDTO();
+                responseCouponMailDTO.setIdTypeVoucher(iTypeVoucherService.getByInternalReference(coupon.getIdTypeVoucher()).get());
+                responseCouponMailDTO.setInternalReference(coupon.getInternalReference());
+                responseCouponMailDTO.setStatus(coupon.getStatus());
+                responseCouponMailDTO.setSerialNumber(coupon.getSerialNumber());
+                Status statusCoupon= iStatusRepo.findByName(EStatus.SUSPENDED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.SUSPENDED +  "  not found"));
+                coupon.setStatus(statusCoupon);
+                coupon.setIdRequestOpposition(requestOpposition.getInternalReference());
+                coupon.setUpdateAt(LocalDateTime.now());
+                iCouponService.createCoupon(coupon);
+                couponList.add(responseCouponMailDTO);
+            }
+        }
+
+        Map<String, Object> emailProps = new HashMap<>();
+        emailProps.put("client", client.getInternalReference()+" - "+client.getCompleteName()+" - "+client.getEmail()+" - "+client.getTypeClient()+" - "+client.getPhone());
+        emailProps.put("description", requestOpposition.getDescription());
+        emailProps.put("raison", requestOpposition.getReason());
+        emailProps.put("couponList", couponList);
+        if(createRequestOppositionDTO.getIdManagerCoupon() != null){
+            Users storeKeeper = iUserService.getByInternalReference(createRequestOppositionDTO.getIdManagerCoupon());
+            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, storeKeeper.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_DEMANDE_OPPOSITION+" #"+requestOpposition, ApplicationConstant.TEMPLATE_EMAIL_DEMANDE_OPPOSITION));
+        }
+        if(createRequestOppositionDTO.getIdServiceClient() != null){
+            Users storeKeeper = iUserService.getByInternalReference(createRequestOppositionDTO.getIdServiceClient());
+            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, storeKeeper.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_DEMANDE_OPPOSITION+" #"+requestOpposition, ApplicationConstant.TEMPLATE_EMAIL_DEMANDE_OPPOSITION));
+        }
+
+        return ResponseEntity.ok(requestOpposition);
+    }
+
+
+    @Operation(summary = "validation d'une Demande d'opposition", tags = "Demande d'opposition", responses = {
+            @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = RequestOpposition.class)))),
+            @ApiResponse(responseCode = "404", description = "RequestOpposition not found", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
+    @PostMapping("/{internalReference:[0-9]+}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+    public ResponseEntity<?> validRequestOpposition(@PathVariable Long internalReference) {
+
+        if (!iRequestOppositionService.getByInternalReference(internalReference).isPresent()) {
+            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                    messageSource.getMessage("messages.requestopposition_exists", null, LocaleContextHolder.getLocale())));
+        }
+        RequestOpposition requestOpposition = iRequestOppositionService.getByInternalReference(internalReference).get();
+
+        Client client = iClientService.getClientByInternalReference(requestOpposition.getIdClient()).get();
+        Coupon coupon = new Coupon();
+        ResponseCouponMailDTO responseCouponMailDTO;
+
+        requestOpposition.setUpdateAt(LocalDateTime.now());
+        Status status = iStatusRepo.findByName(EStatus.ACTIVATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.ACTIVATED +  "  not found"));
+        requestOpposition.setStatus(status);
+
+        iRequestOppositionService.createRequestOpposition(requestOpposition);
+
+        List<Coupon> couponList = iCouponService.getCouponsByIdRequestOpposition(requestOpposition.getInternalReference());
+        List<ResponseCouponMailDTO> couponResponseMailList = new ArrayList<>();
+        for (Coupon item: couponList){
+            coupon = item;
+            Status statusCoupon= iStatusRepo.findByName(EStatus.CANCELED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CANCELED +  "  not found"));
+            coupon.setStatus(statusCoupon);
+            coupon.setUpdateAt(LocalDateTime.now());
+            iCouponService.createCoupon(coupon);
+            responseCouponMailDTO= new ResponseCouponMailDTO();
+            responseCouponMailDTO.setIdTypeVoucher(iTypeVoucherService.getByInternalReference(coupon.getIdTypeVoucher()).get());
+            responseCouponMailDTO.setInternalReference(coupon.getInternalReference());
+            responseCouponMailDTO.setStatus(coupon.getStatus());
+            responseCouponMailDTO.setSerialNumber(coupon.getSerialNumber());
+            couponResponseMailList.add(responseCouponMailDTO);
+        }
+
+        Map<String, Object> emailProps = new HashMap<>();
+        emailProps.put("client", client.getInternalReference()+" - "+client.getCompleteName()+" - "+client.getEmail()+" - "+client.getTypeClient()+" - "+client.getPhone());
+        emailProps.put("description", requestOpposition.getDescription());
+        emailProps.put("raison", requestOpposition.getReason());
+        emailProps.put("couponList", couponResponseMailList);
+        if(requestOpposition.getIdManagerCoupon() != null){
+            Users storeKeeper = iUserService.getByInternalReference(requestOpposition.getIdManagerCoupon());
+            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, storeKeeper.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_DEMANDE_OPPOSITION+" #"+requestOpposition+" - VALIDÉE", ApplicationConstant.TEMPLATE_EMAIL_DEMANDE_OPPOSITION));
+        }
+        if(requestOpposition.getIdServiceClient() != null){
+            Users storeKeeper = iUserService.getByInternalReference(requestOpposition.getIdServiceClient());
+            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, storeKeeper.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_DEMANDE_OPPOSITION+" #"+requestOpposition+" - VALIDÉE", ApplicationConstant.TEMPLATE_EMAIL_DEMANDE_OPPOSITION));
+        }
+        if(requestOpposition.getIdClient() != null){
+            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_DEMANDE_OPPOSITION+" #"+requestOpposition+" - VALIDÉE", ApplicationConstant.TEMPLATE_EMAIL_DEMANDE_OPPOSITION));
+        }
+
         return ResponseEntity.ok(requestOpposition);
     }
 
@@ -131,7 +259,15 @@ public class RequestOppositionRest {
 
         Users managerCoupon = new Users();
         Users serviceClient = new Users();
+        Client client = new Client();
 
+        if (createRequestOppositionDTO.getIdClient()  != null) {
+            if(!iClientService.getClientByInternalReference(createRequestOppositionDTO.getIdClient()).isPresent())
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.client_exists", null, LocaleContextHolder.getLocale())));
+            client = iClientService.getClientByInternalReference(createRequestOppositionDTO.getIdClient()).get();
+
+        }
         if (createRequestOppositionDTO.getIdManagerCoupon() != null) {
             managerCoupon = iUserService.getByInternalReference(createRequestOppositionDTO.getIdManagerCoupon());
             if(managerCoupon.getUserId() == null)
@@ -153,6 +289,8 @@ public class RequestOppositionRest {
             requestOpposition.setIdManagerCoupon(createRequestOppositionDTO.getIdManagerCoupon());
         if (createRequestOppositionDTO.getIdServiceClient() != null)
             requestOpposition.setIdServiceClient(createRequestOppositionDTO.getIdServiceClient());
+        if (createRequestOppositionDTO.getIdClient() != null)
+            requestOpposition.setIdClient(createRequestOppositionDTO.getIdClient());
 
         iRequestOppositionService.createRequestOpposition(requestOpposition);
 

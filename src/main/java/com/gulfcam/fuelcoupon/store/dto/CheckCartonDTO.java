@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
-public class CreateCartonDTO {
+public class CheckCartonDTO {
 
     @Schema(description = "debut numéro de série du carton: exemple 0000001 ou 1300001 ")
     @NotNull(message = "{serialNumber.required}")
@@ -20,21 +20,6 @@ public class CreateCartonDTO {
     @Schema(allowableValues = {"10000", "3000", "5000"}, description = "Type de Bon: exemple 10000, 5000, 3000 (ce sont les premiers chiffres en debut des numero de serie) ")
     @NotNull(message = "{typeVoucher.required}")
     private int typeVoucher;
-
-    @Schema(description = "reference interne du magasinier")
-    private Long idStoreKeeper;
-
-    @Schema(description = "reference interne de l'entrepôt de stockage")
-    @NotNull(message = "{storehouse.required}")
-    private Long idStoreHouseStockage;
-
-    @Schema(description = "reference interne de l'entrepôt de vente")
-    @NotNull(message = "{storehouse.required}")
-    private Long idStoreHouseSell;
-
-    @Schema(description = "Numéro de carton: Exmple 101 ou 130 ")
-    @NotNull(message = "{serialNumber.required}")
-    private int number;
 
     @Schema(description = "debut de plage de coupon: exemple 0000001 ou 1300001 ")
     @NotNull(message = "{serialNumber.required}")

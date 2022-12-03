@@ -13,7 +13,7 @@ public interface ICartonService {
     Page<Carton> getCartonsByIdStoreHouse(Long idStoreHouse, int page, int size, String sort, String order);
     Page<Carton> getCartonsByIdStoreKeeper(Long idStoreKeeper, int page, int size, String sort, String order);
     Optional<Carton> getCartonById(Long id);
-    Map<String, Object> createCarton(Carton carton);
+    Map<String, Object> createCarton(Carton carton, Long idStoreHouseSell, int diffCarton);
     void deleteCarton(Carton carton);
     Optional<Carton> getByInternalReference(Long internelReference);
 

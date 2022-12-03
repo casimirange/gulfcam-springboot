@@ -11,6 +11,7 @@ public interface ITypeVoucherService {
     Page<TypeVoucher> getAllTypeVouchers(int page, int size, String sort, String order);
     Optional<TypeVoucher> getTypeVoucherById(Long id);
     Optional<TypeVoucher> getByInternalReference(Long internelReference);
+    Optional<TypeVoucher> getTypeVoucherByAmountEquals(float amount);
     void createTypeVoucher(TypeVoucher typeVoucher);
     void deleteTypeVoucher(TypeVoucher typeVoucher);
 

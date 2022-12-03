@@ -23,6 +23,10 @@ public class CreateCouponDTO {
     @NotNull(message = "{notebook.required}")
     private Long idNotebook;
 
+    @Schema(description = "reference interne du type de bon")
+    @NotNull(message = "{typeVoucher.required}")
+    private Long idTypeVoucher;
+
     @Schema(description = "reference interne de la station")
     private Long idStation;
 

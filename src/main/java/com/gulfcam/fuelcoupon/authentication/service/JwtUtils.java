@@ -108,7 +108,7 @@ public class JwtUtils {
 	}
 
 	public Long generateInternalReference() {
-		Long internalReference =  Long.parseLong((100 + new Random().nextInt(900)) + RandomStringUtils.random(4, 35, 125, false, true, null, new SecureRandom()));
+		Long internalReference =  Long.parseLong((1000 + new Random().nextInt(9000)) + RandomStringUtils.random(5, 40, 150, false, true, null, new SecureRandom()));
 		return internalReference;
 	}
 

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -66,6 +67,11 @@ public class NotebookServiceImpl implements INotebookService {
         Map<String, Object> notebookEncoded = new HashMap<>();
         notebookEncoded.put("notebook", notebook);
         return notebookEncoded;
+    }
+
+    @Override
+    public void createAllNotebook(List<Notebook> notebook) {
+        iNotebookRepo.saveAll(notebook);
     }
 
     @Override

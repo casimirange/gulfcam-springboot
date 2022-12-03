@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ICouponRepo extends JpaRepository<Coupon, Long> {
@@ -13,6 +14,7 @@ public interface ICouponRepo extends JpaRepository<Coupon, Long> {
     Page<Coupon> getCouponsByIdClient(Long idClient, Pageable pageable);
     Page<Coupon> getCouponsByIdNotebook(Long idNotebook, Pageable pageable);
     Page<Coupon> getCouponsByIdTicket(Long idTicket, Pageable pageable);
+    List<Coupon> getCouponsByIdRequestOpposition(Long idRequestOpposition);
     Optional<Coupon> getCouponBySerialNumber(String serialNumber);
     Optional<Coupon> getCouponByInternalReference(Long internalReference);
 

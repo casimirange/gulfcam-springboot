@@ -36,6 +36,9 @@ public class Notebook {
     @Column(nullable = true, name = "id_carton")
     private Long idCarton;
 
+    @Column(nullable = true, name = "id_type_voucher")
+    private Long idTypeVoucher;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updateAt;

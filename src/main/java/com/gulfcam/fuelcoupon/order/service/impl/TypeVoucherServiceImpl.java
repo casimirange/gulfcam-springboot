@@ -39,6 +39,11 @@ public class TypeVoucherServiceImpl implements ITypeVoucherService {
     }
 
     @Override
+    public Optional<TypeVoucher> getTypeVoucherByAmountEquals(float amount) {
+        return iTypeVoucherRepo.getTypeVoucherByAmountEquals(amount);
+    }
+
+    @Override
     public void createTypeVoucher(TypeVoucher paymentMethod) {
         iTypeVoucherRepo.save(paymentMethod);
     }

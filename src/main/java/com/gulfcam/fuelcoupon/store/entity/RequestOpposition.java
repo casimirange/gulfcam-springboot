@@ -35,6 +35,9 @@ public class RequestOpposition {
     @Column(nullable = true, name = "id_service_client")
     private Long idServiceClient;
 
+    @Column(nullable = true, name = "id_client")
+    private Long idClient;
+
     @Column(nullable = true, name = "id_manager_coupon")
     private Long idManagerCoupon;
 

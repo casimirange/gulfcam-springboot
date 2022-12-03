@@ -3,15 +3,25 @@ package com.gulfcam.fuelcoupon.store.controller;
 import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
+import com.gulfcam.fuelcoupon.order.entity.Item;
+import com.gulfcam.fuelcoupon.order.entity.TypeVoucher;
+import com.gulfcam.fuelcoupon.order.entity.Unit;
+import com.gulfcam.fuelcoupon.order.service.IItemService;
+import com.gulfcam.fuelcoupon.order.service.ITypeVoucherService;
+import com.gulfcam.fuelcoupon.order.service.IUnitService;
 import com.gulfcam.fuelcoupon.store.dto.CreateStockMovementDTO;
 import com.gulfcam.fuelcoupon.store.entity.StockMovement;
 import com.gulfcam.fuelcoupon.store.entity.Store;
 import com.gulfcam.fuelcoupon.store.entity.Storehouse;
 import com.gulfcam.fuelcoupon.store.repository.IStokMovementRepo;
-import com.gulfcam.fuelcoupon.store.service.IStockMovementService;
-import com.gulfcam.fuelcoupon.store.service.IStoreService;
-import com.gulfcam.fuelcoupon.store.service.IStorehouseService;
+import com.gulfcam.fuelcoupon.store.service.*;
+import com.gulfcam.fuelcoupon.user.dto.EmailDto;
+import com.gulfcam.fuelcoupon.user.entity.Users;
 import com.gulfcam.fuelcoupon.user.service.IEmailService;
+import com.gulfcam.fuelcoupon.user.service.IUserService;
+import com.gulfcam.fuelcoupon.utilities.entity.EStatus;
+import com.gulfcam.fuelcoupon.utilities.entity.Status;
+import com.gulfcam.fuelcoupon.utilities.repository.IStatusRepo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -27,12 +37,16 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @Tag(name = "Mouvement en stock")
@@ -60,6 +74,18 @@ public class StockMovementRest {
     IStorehouseService iStorehouseService;
 
     @Autowired
+    IStatusRepo iStatusRepo;
+
+    @Autowired
+    ITypeVoucherService iTypeVoucherService;
+
+    @Autowired
+    IItemService iItemService;
+
+    @Autowired
+    IUserService iUserService;
+
+    @Autowired
     IStokMovementRepo iStokMovementRepo;
 
     @Autowired
@@ -70,7 +96,7 @@ public class StockMovementRest {
     @Value("${mail.replyTo[0]}")
     String mailReplyTo;
 
-    @Operation(summary = "création des informations pour un Mouvement en stock", tags = "Mouvement en stock", responses = {
+    @Operation(summary = "Ordre de transfert de cartons inter magasins", tags = "Mouvement en stock", responses = {
             @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = StockMovement.class)))),
             @ApiResponse(responseCode = "404", description = "StockMovement not found", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json")),
@@ -95,29 +121,71 @@ public class StockMovementRest {
                         messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
             store2 = iStoreService.getByInternalReference(createStockMovementDTO.getIdStore1()).get();
         }
-        if (createStockMovementDTO.getIdStoreHouse1() != null) {
-            if(!iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouse1()).isPresent())
+        if (createStockMovementDTO.getIdStoreHouseStockage1() != null) {
+            if(!iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouseStockage1()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.storehouse_exists", null, LocaleContextHolder.getLocale())));
-            storehouse1 = iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouse1()).get();
+            storehouse1 = iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouseStockage1()).get();
         }
-        if (createStockMovementDTO.getIdStoreHouse2() != null) {
-            if(!iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouse2()).isPresent())
+        if (createStockMovementDTO.getIdStoreHouseStockage2() != null) {
+            if(!iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouseStockage2()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.storehouse_exists", null, LocaleContextHolder.getLocale())));
-            storehouse2 = iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouse2()).get();
+            storehouse2 = iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouseStockage2()).get();
         }
         StockMovement stockMovement = new StockMovement();
         stockMovement.setInternalReference(jwtUtils.generateInternalReference());
         stockMovement.setType(createStockMovementDTO.getType());
         stockMovement.setIdStore1(createStockMovementDTO.getIdStore1());
         stockMovement.setIdStore2(createStockMovementDTO.getIdStore2());
-        stockMovement.setIdStoreHouse1(createStockMovementDTO.getIdStoreHouse1());
-        stockMovement.setIdStoreHouse2(createStockMovementDTO.getIdStoreHouse2());
+        stockMovement.setIdStoreHouse1(createStockMovementDTO.getIdStoreHouseStockage1());
+        stockMovement.setIdStoreHouse2(createStockMovementDTO.getIdStoreHouseStockage2());
 
         iStockMovementService.createStockMovement(stockMovement);
+
+        Item item = new Item();
+
+        TypeVoucher typeVoucher = iTypeVoucherService.getTypeVoucherByAmountEquals(createStockMovementDTO.getTypeVoucher()).get();
+        item.setQuantityCarton(-createStockMovementDTO.getQuantityCarton());
+        item.setIdTypeVoucher(typeVoucher.getInternalReference());
+        item.setQuantityNotebook(0);
+        item.setIdStoreHouse(createStockMovementDTO.getIdStoreHouseStockage1());
+        item.setInternalReference(jwtUtils.generateInternalReference());
+        Status statusItemStockage1 = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
+        item.setStatus(statusItemStockage1);
+        item.setCreatedAt(LocalDateTime.now());
+
+        iItemService.createItem(item);
+
+        item = new Item();
+        item.setQuantityCarton(createStockMovementDTO.getQuantityCarton());
+        item.setIdTypeVoucher(typeVoucher.getInternalReference());
+        item.setQuantityNotebook(0);
+        item.setIdStoreHouse(createStockMovementDTO.getIdStoreHouseStockage1());
+        item.setInternalReference(jwtUtils.generateInternalReference());
+        Status statusItemStockage2 = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
+        item.setStatus(statusItemStockage2);
+        item.setCreatedAt(LocalDateTime.now());
+
+        iItemService.createItem(item);
+
+        Map<String, Object> emailProps = new HashMap<>();
+        emailProps.put("quantityCarton", createStockMovementDTO.getQuantityCarton());
+        emailProps.put("typevoucher", typeVoucher.getAmount());
+        emailProps.put("quantityNotebook", 0);
+        emailProps.put("quantityCoupon", 0);
+        emailProps.put("storehouseStockage1", storehouse1.getInternalReference()+" - "+storehouse1.getType()+" - "+storehouse1.getName());
+        emailProps.put("storehouseStockage2", storehouse2.getInternalReference()+" - "+storehouse2.getType()+" - "+storehouse2.getName());
+        emailProps.put("store", store1.getInternalReference()+" - "+store1.getLocalization());
+
+        if(createStockMovementDTO.getIdStoreKeeper() != null){
+            Users storeKeeper = iUserService.getByInternalReference(createStockMovementDTO.getIdStoreKeeper());
+            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, storeKeeper.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_ORDER_TRANSFER, ApplicationConstant.TEMPLATE_EMAIL_ORDER_TRANSFER));
+        }
+
         return ResponseEntity.ok(stockMovement);
     }
+
 
     @Operation(summary = "Modification des informations pour un Mouvement en stock", tags = "Mouvement en stock", responses = {
             @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = StockMovement.class)))),
@@ -149,26 +217,26 @@ public class StockMovementRest {
                         messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
             store2 = iStoreService.getByInternalReference(createStockMovementDTO.getIdStore1()).get();
         }
-        if (createStockMovementDTO.getIdStoreHouse1() != null) {
-            if(!iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouse1()).isPresent())
+        if (createStockMovementDTO.getIdStoreHouseStockage1() != null) {
+            if(!iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouseStockage1()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.storehouse_exists", null, LocaleContextHolder.getLocale())));
-            storehouse1 = iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouse1()).get();
+            storehouse1 = iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouseStockage1()).get();
         }
-        if (createStockMovementDTO.getIdStoreHouse2() != null) {
-            if(!iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouse2()).isPresent())
+        if (createStockMovementDTO.getIdStoreHouseStockage2() != null) {
+            if(!iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouseStockage2()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.storehouse_exists", null, LocaleContextHolder.getLocale())));
-            storehouse2 = iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouse2()).get();
+            storehouse2 = iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouseStockage2()).get();
         }
         if (createStockMovementDTO.getIdStore1() != null)
             stockMovement.setIdStore1(createStockMovementDTO.getIdStore1());
         if (createStockMovementDTO.getIdStore2() != null)
             stockMovement.setIdStore2(createStockMovementDTO.getIdStore2());
-        if (createStockMovementDTO.getIdStoreHouse1() != null)
-            stockMovement.setIdStoreHouse1(createStockMovementDTO.getIdStoreHouse1());
-        if (createStockMovementDTO.getIdStoreHouse2() != null)
-            stockMovement.setIdStoreHouse2(createStockMovementDTO.getIdStoreHouse2());
+        if (createStockMovementDTO.getIdStoreHouseStockage1() != null)
+            stockMovement.setIdStoreHouse1(createStockMovementDTO.getIdStoreHouseStockage1());
+        if (createStockMovementDTO.getIdStoreHouseStockage2() != null)
+            stockMovement.setIdStoreHouse2(createStockMovementDTO.getIdStoreHouseStockage2());
         stockMovement.setType(createStockMovementDTO.getType());
 
         iStockMovementService.createStockMovement(stockMovement);

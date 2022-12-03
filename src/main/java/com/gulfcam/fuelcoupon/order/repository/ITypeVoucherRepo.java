@@ -8,4 +8,5 @@ import java.util.Optional;
 public interface ITypeVoucherRepo extends JpaRepository<TypeVoucher, Long> {
 
     Optional<TypeVoucher> getTypeVoucherByInternalReference(Long internalReference);
+    Optional<TypeVoucher> getTypeVoucherByAmountEquals(float amount);
 }

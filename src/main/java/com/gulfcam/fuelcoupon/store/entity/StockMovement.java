@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -37,5 +38,9 @@ public class StockMovement {
     private Long idStoreHouse2;
 
     private String type;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updateAt;
 
 }

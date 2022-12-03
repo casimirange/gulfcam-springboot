@@ -3,6 +3,8 @@ package com.gulfcam.fuelcoupon.store.controller;
 import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
+import com.gulfcam.fuelcoupon.order.entity.TypeVoucher;
+import com.gulfcam.fuelcoupon.order.service.ITypeVoucherService;
 import com.gulfcam.fuelcoupon.store.dto.CreateNotebookDTO;
 import com.gulfcam.fuelcoupon.store.entity.Carton;
 import com.gulfcam.fuelcoupon.store.entity.Notebook;
@@ -65,6 +67,9 @@ public class NotebookRest {
     ICartonService iCartonService;
 
     @Autowired
+    ITypeVoucherService iTypeVoucherService;
+
+    @Autowired
     IStatusRepo iStatusRepo;
 
     @Autowired
@@ -92,8 +97,16 @@ public class NotebookRest {
                     messageSource.getMessage("messages.serial_exists", null, LocaleContextHolder.getLocale())));
         }
 
+        TypeVoucher typeVoucher = new TypeVoucher();
         Carton carton = new Carton();
         Users storekeeper = new Users();
+
+        if (createNotebookDTO.getIdTypeVoucher() != null) {
+            if(!iTypeVoucherService.getByInternalReference(createNotebookDTO.getIdTypeVoucher()).isPresent())
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.typeVoucher_exists", null, LocaleContextHolder.getLocale())));
+            typeVoucher = iTypeVoucherService.getByInternalReference(createNotebookDTO.getIdCarton()).get();
+        }
 
         if (createNotebookDTO.getIdCarton() != null) {
             if(!iCartonService.getByInternalReference(createNotebookDTO.getIdCarton()).isPresent())
@@ -114,6 +127,7 @@ public class NotebookRest {
         notebook.setCreatedAt(LocalDateTime.now());
         notebook.setSerialNumber(createNotebookDTO.getSerialNumber());
         notebook.setIdCarton(createNotebookDTO.getIdCarton());
+        notebook.setIdTypeVoucher(createNotebookDTO.getIdTypeVoucher());
         notebook.setIdStoreKeeper(createNotebookDTO.getIdStoreKeeper());
 
         Status status = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
@@ -140,12 +154,20 @@ public class NotebookRest {
 
         Carton carton = new Carton();
         Users storekeeper = new Users();
+        TypeVoucher typeVoucher = new TypeVoucher();
 
         if (createNotebookDTO.getIdCarton() != null) {
             if(!iCartonService.getByInternalReference(createNotebookDTO.getIdCarton()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.client_exists", null, LocaleContextHolder.getLocale())));
             carton = iCartonService.getByInternalReference(createNotebookDTO.getIdCarton()).get();
+        }
+
+        if (createNotebookDTO.getIdTypeVoucher() != null) {
+            if(!iTypeVoucherService.getByInternalReference(createNotebookDTO.getIdTypeVoucher()).isPresent())
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.typeVoucher_exists", null, LocaleContextHolder.getLocale())));
+            typeVoucher = iTypeVoucherService.getByInternalReference(createNotebookDTO.getIdCarton()).get();
         }
 
         if (createNotebookDTO.getIdStoreKeeper() != null) {
@@ -160,6 +182,8 @@ public class NotebookRest {
             notebook.setIdCarton(createNotebookDTO.getIdCarton());
         if (createNotebookDTO.getIdStoreKeeper() != null)
             notebook.setIdStoreKeeper(createNotebookDTO.getIdStoreKeeper());
+        if (createNotebookDTO.getIdTypeVoucher() != null)
+            notebook.setIdTypeVoucher(createNotebookDTO.getIdTypeVoucher());
 
         iNotebookService.createNotebook(notebook);
 

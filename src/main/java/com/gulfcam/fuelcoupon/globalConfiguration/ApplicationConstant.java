@@ -14,6 +14,14 @@ public class ApplicationConstant {
 
     public static final String SUBJECT_EMAIL_NEW_ORDER = "GulfCam - Nouvelle Commande : #Ref";
 
+    public static final String SUBJECT_EMAIL_ORDER_STOCKAGE = "GulfCam - Ordre de stockage";
+
+    public static final String SUBJECT_EMAIL_ORDER_SUPPLY = "GulfCam - Ordre d'approvisionnement";
+
+    public static final String SUBJECT_EMAIL_ORDER_TRANSFER= "GulfCam - Ordre de de transfert de cartons";
+
+    public static final String SUBJECT_EMAIL_DEMANDE_OPPOSITION= "GulfCam - Demande d'opposition";
+
     public static final String SUBJECT_EMAIL_MODIFY_ORDER = "GulfCam - Modification de la Commande : #Ref";
 
     public static final String SUBJECT_EMAIL_NEW_INVOICE = "GulfCam - Nouvelle Proforma : #Ref";
@@ -31,6 +39,14 @@ public class ApplicationConstant {
     public static final String TEMPLATE_EMAIL_NEW_USER = "new-user";
 
     public static final String TEMPLATE_EMAIL_NEW_ORDER = "new-order";
+
+    public static final String TEMPLATE_EMAIL_ORDER_STOCKAGE = "order-stockage";
+
+    public static final String TEMPLATE_EMAIL_ORDER_SUPPLY = "order-supply";
+
+    public static final String TEMPLATE_EMAIL_ORDER_TRANSFER = "order-transfer";
+
+    public static final String TEMPLATE_EMAIL_DEMANDE_OPPOSITION = "demande-opposition";
 
     public static final String TEMPLATE_EMAIL_MODIFY_ORDER = "modify-order";
 
