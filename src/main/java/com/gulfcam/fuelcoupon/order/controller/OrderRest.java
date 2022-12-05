@@ -7,10 +7,7 @@ import com.gulfcam.fuelcoupon.client.entity.ETypeClient;
 import com.gulfcam.fuelcoupon.client.entity.TypeClient;
 import com.gulfcam.fuelcoupon.client.service.IClientService;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
-import com.gulfcam.fuelcoupon.order.dto.CreateOrderDTO;
-import com.gulfcam.fuelcoupon.order.dto.ProductDTO;
-import com.gulfcam.fuelcoupon.order.dto.ResponseOrderDTO;
-import com.gulfcam.fuelcoupon.order.dto.UploadFileResponseDto;
+import com.gulfcam.fuelcoupon.order.dto.*;
 import com.gulfcam.fuelcoupon.order.entity.*;
 import com.gulfcam.fuelcoupon.order.repository.IOrderRepo;
 import com.gulfcam.fuelcoupon.order.repository.IStatusOrderRepo;
@@ -564,13 +561,55 @@ public class OrderRest {
         emailProps.put("payementMethode", order.getIdPaymentMethod()+ " - "+iPaymentMethodService.getByInternalReference(order.getIdPaymentMethod()).get().getDesignation());
 
         Users managerCoupon = iUserService.getByInternalReference(idManagerCoupon);
-        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, managerCoupon.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_ORDER+InternalReference+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_ORDER));
+        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, managerCoupon.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_ORDER+InternalReference+" - "+EStatusOrder.ORDER_CANCEL, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_ORDER));
         log.info("Email  send successfull for user: " + managerCoupon.getEmail());
 
-        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_ORDER+InternalReference+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_ORDER));
+        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_ORDER+InternalReference+" - "+EStatusOrder.ORDER_CANCEL, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_ORDER));
         log.info("Email  send successfull for user: " + client.getEmail());
 
         return ResponseEntity.ok(order);
+    }
+
+    @Operation(summary = "Annuler plusieurs commandes", tags = "Order", responses = {
+            @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Order.class)))),
+            @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
+    @PostMapping("/cancel/multi")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+    public ResponseEntity<?> cancelMultiOrder(@Valid @RequestBody CancelMultiOrderDTO cancelMultiOrderDTO) {
+
+        for(int i=0; i<= cancelMultiOrderDTO.getOrders().size(); i++){
+            Order order = iOrderService.getByInternalReference(cancelMultiOrderDTO.getOrders().get(i)).get();
+            Client client = iClientService.getClientByInternalReference(order.getIdClient()).get();
+
+            StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.ORDER_CANCEL).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.ORDER_CANCEL +  "  not found"));
+            order.setStatus(statusOrder);
+            iOrderService.createOrder(order);
+
+            Map<String, Object> emailProps = new HashMap<>();
+            emailProps.put("internalReferenceOrder", cancelMultiOrderDTO.getOrders().get(i));
+            emailProps.put("internalReferenceClient", order.getClientReference());
+            emailProps.put("internalReferenceStore", order.getIdStore());
+            emailProps.put("delivryTime", order.getDeliveryTime());
+            emailProps.put("canal", order.getChannel());
+            emailProps.put("netAmount", order.getNetAggregateAmount());
+            emailProps.put("ttcAmount", order.getTTCAggregateAmount());
+            emailProps.put("status", EStatusOrder.ORDER_CANCEL);
+            emailProps.put("payementMethode", order.getIdPaymentMethod()+ " - "+iPaymentMethodService.getByInternalReference(order.getIdPaymentMethod()).get().getDesignation());
+
+            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_MULTI_ORDER+cancelMultiOrderDTO.getOrders().get(i)+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_ORDER));
+            log.info("Email  send successfull for user: " + client.getEmail());
+
+        }
+
+        Map<String, Object> emailProps = new HashMap<>();
+        emailProps.put("order", cancelMultiOrderDTO.getOrders());
+        Users managerCoupon = iUserService.getByInternalReference(cancelMultiOrderDTO.getIdManagerCoupon());
+        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, managerCoupon.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_MULTI_ORDER+" - "+EStatusOrder.ORDER_CANCEL, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_MULTI_ORDER));
+        log.info("Email  send successfull for user: " + managerCoupon.getEmail());
+
+        return ResponseEntity.ok().body(new MessageResponseDto(HttpStatus.OK, " Les commandes ont été annulé avec succèss !"));
     }
 
     @Operation(summary = "valider le bon de livraison et terminer pour une commande", tags = "Order", responses = {

@@ -30,6 +30,8 @@ public class ApplicationConstant {
 
     public static final String SUBJECT_EMAIL_CANCEL_ORDER = "GulfCam - Annulation de la Commande : #Ref";
 
+    public static final String SUBJECT_EMAIL_CANCEL_MULTI_ORDER = "GulfCam - Annulation en lots des Commandes ";
+
     public static final String SUBJECT_EMAIL_NEW_INVOICE = "GulfCam - Nouvelle Proforma : #Ref";
 
     public static final String SUBJECT_EMAIL_NEW_RECEIVED = "GulfCam - Reçue de paiement : #Ref";
@@ -61,6 +63,8 @@ public class ApplicationConstant {
     public static final String TEMPLATE_EMAIL_MODIFY_ORDER = "modify-order";
 
     public static final String TEMPLATE_EMAIL_CANCEL_ORDER = "cancel-order";
+
+    public static final String TEMPLATE_EMAIL_CANCEL_MULTI_ORDER = "cancel-multi-order";
 
     public static final String TEMPLATE_EMAIL_NEW_INVOICE = "new-invoice";
 
