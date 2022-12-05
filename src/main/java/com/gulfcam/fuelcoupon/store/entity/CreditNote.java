@@ -24,16 +24,6 @@ public class CreditNote {
     @Column(unique = true)
     private Long internalReference;
 
-    private String localization;
-
-    private String designation;
-
-    @NotNull
-    @Column(unique = true)
-    private int pinCode;
-
-    private float balance;
-
     private LocalDateTime createdAt;
 
     private LocalDateTime updateAt;
