@@ -24,6 +24,9 @@ public class CreditNote {
     @Column(unique = true)
     private Long internalReference;
 
+    @Column(nullable = true, name = "id_station")
+    private Long idStation;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updateAt;

@@ -26,6 +26,8 @@ public class ApplicationConstant {
 
     public static final String SUBJECT_EMAIL_ACCEPT_COUPON= "GulfCam - Acceptation du coupon ";
 
+    public static final String SUBJECT_EMAIL_VALID_CREDIT_NOTE= "GulfCam - Validation d'une note de crédit ";
+
     public static final String SUBJECT_EMAIL_MODIFY_ORDER = "GulfCam - Modification de la Commande : #Ref";
 
     public static final String SUBJECT_EMAIL_CANCEL_ORDER = "GulfCam - Annulation de la Commande : #Ref";
@@ -55,6 +57,8 @@ public class ApplicationConstant {
     public static final String TEMPLATE_EMAIL_ORDER_TRANSFER = "order-transfer";
 
     public static final String TEMPLATE_EMAIL_DEMANDE_OPPOSITION = "demande-opposition";
+
+    public static final String TEMPLATE_EMAIL_VALID_CREDIT_NOTE = "valid-credit-note";
 
     public static final String TEMPLATE_EMAIL_CREDIT_NOTE = "credit-note";
 

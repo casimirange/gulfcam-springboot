@@ -10,6 +10,7 @@ public interface ICouponService {
 
     Page<Coupon> getAllCoupons(int page, int size, String sort, String order);
     List<Coupon> getCouponsByIdRequestOpposition(Long idRequestOpposition);
+    List<Coupon> getCouponsByIdCreditNote(Long idCreditNote);
     Page<Coupon> getCouponsByIdStation(Long idStation, int page, int size, String sort, String order);
     Page<Coupon> getCouponsByIdClient(Long idClient, int page, int size, String sort, String order);
     Page<Coupon> getCouponsByIdNotebook(Long idNotebook, int page, int size, String sort, String order);

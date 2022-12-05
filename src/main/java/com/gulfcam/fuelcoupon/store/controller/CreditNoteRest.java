@@ -5,17 +5,21 @@ import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.client.entity.Client;
 import com.gulfcam.fuelcoupon.client.service.IClientService;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
+import com.gulfcam.fuelcoupon.order.entity.TypeVoucher;
 import com.gulfcam.fuelcoupon.order.service.ITypeVoucherService;
 import com.gulfcam.fuelcoupon.store.dto.CreateCreditNoteDTO;
 import com.gulfcam.fuelcoupon.store.dto.CreateRequestOppositionDTO;
 import com.gulfcam.fuelcoupon.store.dto.ResponseCouponMailDTO;
+import com.gulfcam.fuelcoupon.store.dto.ResponseCreditNoteDTO;
 import com.gulfcam.fuelcoupon.store.entity.Coupon;
 import com.gulfcam.fuelcoupon.store.entity.CreditNote;
 import com.gulfcam.fuelcoupon.store.entity.RequestOpposition;
+import com.gulfcam.fuelcoupon.store.entity.Station;
 import com.gulfcam.fuelcoupon.store.repository.IRequestOppositionRepo;
 import com.gulfcam.fuelcoupon.store.service.ICouponService;
 import com.gulfcam.fuelcoupon.store.service.ICreditNoteService;
 import com.gulfcam.fuelcoupon.store.service.IRequestOppositionService;
+import com.gulfcam.fuelcoupon.store.service.IStationService;
 import com.gulfcam.fuelcoupon.user.dto.EmailDto;
 import com.gulfcam.fuelcoupon.user.entity.ETypeAccount;
 import com.gulfcam.fuelcoupon.user.entity.Users;
@@ -75,6 +79,9 @@ public class CreditNoteRest {
     IUserService iUserService;
 
     @Autowired
+    IStationService iStationService;
+
+    @Autowired
     IClientService iClientService;
 
     @Autowired
@@ -112,6 +119,7 @@ public class CreditNoteRest {
 
         CreditNote creditNote = new CreditNote();
         creditNote.setInternalReference(jwtUtils.generateInternalReference());
+        creditNote.setIdStation(createCreditNoteDTO.getIdStation());
         creditNote.setCreatedAt(LocalDateTime.now());
         Status status = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
         creditNote.setStatus(status);
@@ -129,6 +137,7 @@ public class CreditNoteRest {
                 responseCouponMailDTO.setSerialNumber(coupon.getSerialNumber());
                 coupon.setIdCreditNote(creditNote.getInternalReference());
                 coupon.setUpdateAt(LocalDateTime.now());
+                coupon.setIdStation(createCreditNoteDTO.getIdStation());
                 iCouponService.createCoupon(coupon);
                 couponList.add(responseCouponMailDTO);
             }
@@ -161,9 +170,84 @@ public class CreditNoteRest {
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @GetMapping("/{internalReference:[0-9]+}")
-    public ResponseEntity<CreditNote> getByInternalReference(@PathVariable Long internalReference) {
-        return ResponseEntity.ok(iCreditNoteService.getByInternalReference(internalReference).get());
+    public ResponseEntity<ResponseCreditNoteDTO> getByInternalReference(@PathVariable Long internalReference) {
+
+        CreditNote creditNote = iCreditNoteService.getByInternalReference(internalReference).get();
+        ResponseCreditNoteDTO responseCreditNoteDTO = new ResponseCreditNoteDTO();
+
+        responseCreditNoteDTO.setCoupon(iCouponService.getCouponsByIdCreditNote(internalReference));
+        responseCreditNoteDTO.setStation(iStationService.getByInternalReference(creditNote.getIdStation()).get());
+        responseCreditNoteDTO.setInternalReference(creditNote.getInternalReference());
+        responseCreditNoteDTO.setStatus(creditNote.getStatus());
+        responseCreditNoteDTO.setId(creditNote.getId());
+        responseCreditNoteDTO.setUpdateAt(creditNote.getUpdateAt());
+        responseCreditNoteDTO.setCreatedAt(creditNote.getCreatedAt());
+
+        creditNote.setCreatedAt(LocalDateTime.now());
+        Status status = iStatusRepo.findByName(EStatus.ACTIVATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.ACTIVATED +  "  not found"));
+        creditNote.setStatus(status);
+        iCreditNoteService.createCreditNote(creditNote);
+
+
+        return ResponseEntity.ok(responseCreditNoteDTO);
     }
+
+    @Operation(summary = "Valider Une Note de crédit par sa reference interne", tags = "Note de crédit", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = CreditNote.class)))),
+            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+    @GetMapping("/valid/{internalReference:[0-9]+}")
+    public ResponseEntity<ResponseCreditNoteDTO> validCreditNote(@PathVariable Long internalReference) {
+
+        CreditNote creditNote = iCreditNoteService.getByInternalReference(internalReference).get();
+        ResponseCreditNoteDTO responseCreditNoteDTO = new ResponseCreditNoteDTO();
+        float amoutToDebit = 0;
+        creditNote.setUpdateAt(LocalDateTime.now());
+        Status status = iStatusRepo.findByName(EStatus.ACTIVATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.ACTIVATED +  "  not found"));
+        creditNote.setStatus(status);
+        iCreditNoteService.createCreditNote(creditNote);
+
+        List<Coupon> coupons = iCouponService.getCouponsByIdCreditNote(internalReference);
+
+        for(int i=0; i<=coupons.size(); i++){
+            TypeVoucher typeVoucher = iTypeVoucherService.getByInternalReference(coupons.get(i).getIdTypeVoucher()).get();
+            amoutToDebit += typeVoucher.getAmount();
+        }
+        Station station = iStationService.getByInternalReference(creditNote.getIdStation()).get();
+        station.setBalance(station.getBalance()-amoutToDebit);
+        station.setUpdateAt(LocalDateTime.now());
+        iStationService.createStation(station);
+
+        responseCreditNoteDTO.setCoupon(coupons);
+        responseCreditNoteDTO.setStation(station);
+        responseCreditNoteDTO.setInternalReference(creditNote.getInternalReference());
+        responseCreditNoteDTO.setStatus(creditNote.getStatus());
+        responseCreditNoteDTO.setId(creditNote.getId());
+        responseCreditNoteDTO.setUpdateAt(creditNote.getUpdateAt());
+        responseCreditNoteDTO.setCreatedAt(creditNote.getCreatedAt());
+
+
+        Map<String, Object> emailProps = new HashMap<>();
+        emailProps.put("creditnote", creditNote.getInternalReference()+" - "+amoutToDebit+" FCFA - ");
+        emailProps.put("station", station);
+        emailProps.put("amout", amoutToDebit);
+
+        List<Users> usersList = iUserService.getUsers();
+
+        for (Users user : usersList) {
+            if (user.getTypeAccount().getName() == ETypeAccount.MANAGER_STATION) {
+                emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_VALID_CREDIT_NOTE+" #"+creditNote.getInternalReference(), ApplicationConstant.TEMPLATE_EMAIL_VALID_CREDIT_NOTE));
+            }
+            if (user.getTypeAccount().getName() == ETypeAccount.TREASURY) {
+                emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_VALID_CREDIT_NOTE+" #"+creditNote.getInternalReference(), ApplicationConstant.TEMPLATE_EMAIL_VALID_CREDIT_NOTE));
+            }
+        }
+
+        return ResponseEntity.ok(responseCreditNoteDTO);
+    }
+
+
 
     @Operation(summary = "Supprimer une Note de crédit", tags = "Note de crédit", responses = {
             @ApiResponse(responseCode = "200", description = "credit note deleted successfully", content = @Content(mediaType = "Application/Json")),

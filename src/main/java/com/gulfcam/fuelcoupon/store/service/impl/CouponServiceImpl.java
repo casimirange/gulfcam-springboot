@@ -40,6 +40,11 @@ public class CouponServiceImpl implements ICouponService {
     }
 
     @Override
+    public List<Coupon> getCouponsByIdCreditNote(Long idCreditNote) {
+        return iCouponRepo.getCouponsByIdCreditNote(idCreditNote);
+    }
+
+    @Override
     public Page<Coupon> getCouponsByIdStation(Long idStation, int page, int size, String sort, String order) {
         return iCouponRepo.getCouponsByIdStation(idStation,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
     }
