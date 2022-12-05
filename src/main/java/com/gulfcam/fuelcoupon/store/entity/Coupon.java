@@ -34,6 +34,9 @@ public class Coupon {
     @Column(nullable = true, name = "id_request_opposition")
     private Long idRequestOpposition;
 
+    @Column(nullable = true, name = "id_credit_note")
+    private Long idCreditNote;
+
     @Column(nullable = true, name = "id_ticket")
     private Long idTicket;
 

@@ -22,7 +22,13 @@ public class ApplicationConstant {
 
     public static final String SUBJECT_EMAIL_DEMANDE_OPPOSITION= "GulfCam - Demande d'opposition";
 
+    public static final String SUBJECT_EMAIL_CREDIT_NOTE= "GulfCam - Note de credit";
+
+    public static final String SUBJECT_EMAIL_ACCEPT_COUPON= "GulfCam - Acceptation du coupon ";
+
     public static final String SUBJECT_EMAIL_MODIFY_ORDER = "GulfCam - Modification de la Commande : #Ref";
+
+    public static final String SUBJECT_EMAIL_CANCEL_ORDER = "GulfCam - Annulation de la Commande : #Ref";
 
     public static final String SUBJECT_EMAIL_NEW_INVOICE = "GulfCam - Nouvelle Proforma : #Ref";
 
@@ -48,7 +54,13 @@ public class ApplicationConstant {
 
     public static final String TEMPLATE_EMAIL_DEMANDE_OPPOSITION = "demande-opposition";
 
+    public static final String TEMPLATE_EMAIL_CREDIT_NOTE = "credit-note";
+
+    public static final String TEMPLATE_EMAIL_ACCEPT_COUPON = "accept-coupon";
+
     public static final String TEMPLATE_EMAIL_MODIFY_ORDER = "modify-order";
+
+    public static final String TEMPLATE_EMAIL_CANCEL_ORDER = "cancel-order";
 
     public static final String TEMPLATE_EMAIL_NEW_INVOICE = "new-invoice";
 

@@ -124,7 +124,7 @@
                         style="padding: 40px 20px 20px 20px; border-radius: 4px 4px 0px 0px; color: #111111; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 28px; font-weight: 400; letter-spacing: 4px; line-height: 48px;">
                         <h1 style="font-size: 20px; font-weight: 400; margin: 2;"><span
                                 style="color: #cb3232">GULFCAM</span><span
-                                style="color:#d76565 ">&nbsp;Modification de la commande</span></h1>
+                                style="color:#d76565 ">&nbsp;Note de crédit</span></h1>
                         <!--<img src="cid:mail" width="125" height="120" style="display: block; border: 0px;" />-->
                     </td>
                 </tr>
@@ -138,7 +138,7 @@
                     <td bgcolor="#ffffff" align="left"
                         style="padding: 20px 30px 40px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 400; line-height: 25px;">
                         <p style="margin: 0;">Bonjour Mrs/Mme<br>
-                            Une modification a été apportée sur la commande et a été enregistré dans le système
+                            Une note de crédit mise à jour dans le système
                         </p>
                     </td>
                 </tr>
@@ -146,74 +146,41 @@
                     <table cellspacing='0' cellpadding='0' width='100%'>
                         <tr>
                             <td style='font-size: 11px; text-align:center;' class='mobile-center body-padding w320'>
-                                Ref. int. du client
-                            </td>
-                            <td style='font-size: 11px; text-align:center;' class='mobile-center body-padding w320'>
-                                Ref. int. de la commande
-                            </td>
-                            <td style='font-size: 11px; text-align:center;' class='mobile-center body-padding w320'>
-                                Ref. int. du magasin
-                            </td>
-                            <td style='font-size: 11px; text-align:center;' class='mobile-center body-padding w320'>
-                                Temps de livraison
-                            </td>
-                            <td style='font-size: 11px; text-align:center;' class='mobile-center body-padding w320'>
-                                Canal
-                            </td>
-                            <td style='font-size: 11px; text-align:center;' class='mobile-center body-padding w320'>
-                                Status
+                                Client
                             </td>
                         </tr>
                         <tr>
                             <td style='text-align:center;' class='mobile-center body-padding w320'>
-                                <strong th:text="${internalReferenceClient}">
-                            </td>
-                            <td style='text-align:left;' class='mobile-center body-padding w320'>
-                                <strong th:text="${internalReferenceOrder}">
-                            </td>
-                            <td style='text-align:left;' class='mobile-center body-padding w320'>
-                                <strong th:text="${internalReferenceStore}">
-                            </td>
-                            <td style='text-align:left;' class='mobile-center body-padding w320'>
-                                <strong th:text="${delivryTime}">
-                            </td>
-                            <td style='text-align:left;' class='mobile-center body-padding w320'>
-                                <strong th:text="${canal}">
-                            </td>
-                            <td style='text-align:left;' class='mobile-center body-padding w320'>
-                                <strong th:text="${status}">
+                                <strong th:text="${client}">
                             </td>
                         </tr>
                     </table>
-                </tr>
 
+                </tr>
                 <tr>
-                    <table cellspacing='0' cellpadding='0' width='100%' style='margin-top: 20px;'>
+                    Liste des coupons <br>
+                    <table>
+                        <thead>
                         <tr>
-                            <td style='font-size: 11px; text-align:center;' class='mobile-center body-padding w320'>
-                                Montant Net
-                            </td>
-                            <td style='font-size: 11px; text-align:center;' class='mobile-center body-padding w320'>
-                                Montant TTC
-                            </td>
-                            <td style='font-size: 11px; text-align:center;' class='mobile-center body-padding w320'>
-                                Methode de paiement
-                            </td>
+                            <th> Reference interne </th>
+                            <th> Numéro du coupon </th>
+                            <th> Type de bon </th>
+                            <th> Status </th>
                         </tr>
-                        <tr>
-                            <td style='text-align:left;' class='mobile-center body-padding w320'>
-                                <strong th:text="${netAmount}">
-                            </td>
-                            <td style='text-align:left;' class='mobile-center body-padding w320'>
-                                <strong th:text="${ttcAmount}">
-                            </td>
-                            <td style='text-align:left;' class='mobile-center body-padding w320'>
-                                <strong th:text="${payementMethode}">
-                            </td>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${couponList.empty}">
+                            <td colspan="2"> Aucun coupon disponible </td>
                         </tr>
+                        <tr th:each="coupon : ${couponList}">
+                            <td><span th:text="${coupon.internalReference}"> </span></td>
+                            <td><span th:text="${coupon.serialNumber}"> </span></td>
+                            <td><span th:text="${coupon.idTypeVoucher.amount}"> Francs CFA</span></td>
+                            <td><span th:text="${coupon.status.name}"> </span></td>
+                        </tr>
+                        </tbody>
                     </table>
                 </tr>
-
                 <tr>
                     <td bgcolor="#ffffff" align="left"
                         style="padding: 0px 30px 20px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 400; line-height: 25px;">

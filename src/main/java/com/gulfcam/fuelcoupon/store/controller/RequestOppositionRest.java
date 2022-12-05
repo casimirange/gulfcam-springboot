@@ -170,11 +170,11 @@ public class RequestOppositionRest {
         emailProps.put("couponList", couponList);
         if(createRequestOppositionDTO.getIdManagerCoupon() != null){
             Users storeKeeper = iUserService.getByInternalReference(createRequestOppositionDTO.getIdManagerCoupon());
-            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, storeKeeper.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_DEMANDE_OPPOSITION+" #"+requestOpposition, ApplicationConstant.TEMPLATE_EMAIL_DEMANDE_OPPOSITION));
+            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, storeKeeper.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_DEMANDE_OPPOSITION+" #"+requestOpposition.getInternalReference(), ApplicationConstant.TEMPLATE_EMAIL_DEMANDE_OPPOSITION));
         }
         if(createRequestOppositionDTO.getIdServiceClient() != null){
             Users storeKeeper = iUserService.getByInternalReference(createRequestOppositionDTO.getIdServiceClient());
-            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, storeKeeper.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_DEMANDE_OPPOSITION+" #"+requestOpposition, ApplicationConstant.TEMPLATE_EMAIL_DEMANDE_OPPOSITION));
+            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, storeKeeper.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_DEMANDE_OPPOSITION+" #"+requestOpposition.getInternalReference(), ApplicationConstant.TEMPLATE_EMAIL_DEMANDE_OPPOSITION));
         }
 
         return ResponseEntity.ok(requestOpposition);

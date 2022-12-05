@@ -535,6 +535,44 @@ public class OrderRest {
         return ResponseEntity.ok(order);
     }
 
+    @Operation(summary = "Annuler une commande", tags = "Order", responses = {
+            @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Order.class)))),
+            @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
+    @PostMapping("/cancel/{InternalReference:[0-9]+}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+    public ResponseEntity<?> cancelOrder(@PathVariable Long InternalReference, @RequestParam("idManagerCoupon") Long idManagerCoupon) {
+
+        Order order = iOrderService.getByInternalReference(InternalReference).get();
+        Client client = iClientService.getClientByInternalReference(order.getIdClient()).get();
+
+        StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.ORDER_CANCEL).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.ORDER_CANCEL +  "  not found"));
+        order.setStatus(statusOrder);
+        order.setIdManagerCoupon(idManagerCoupon);
+        iOrderService.createOrder(order);
+
+        Map<String, Object> emailProps = new HashMap<>();
+        emailProps.put("internalReferenceOrder", InternalReference);
+        emailProps.put("internalReferenceClient", order.getClientReference());
+        emailProps.put("internalReferenceStore", order.getIdStore());
+        emailProps.put("delivryTime", order.getDeliveryTime());
+        emailProps.put("canal", order.getChannel());
+        emailProps.put("netAmount", order.getNetAggregateAmount());
+        emailProps.put("ttcAmount", order.getTTCAggregateAmount());
+        emailProps.put("status", EStatusOrder.ORDER_CANCEL);
+        emailProps.put("payementMethode", order.getIdPaymentMethod()+ " - "+iPaymentMethodService.getByInternalReference(order.getIdPaymentMethod()).get().getDesignation());
+
+        Users managerCoupon = iUserService.getByInternalReference(idManagerCoupon);
+        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, managerCoupon.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_ORDER+InternalReference+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_ORDER));
+        log.info("Email  send successfull for user: " + managerCoupon.getEmail());
+
+        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_ORDER+InternalReference+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_ORDER));
+        log.info("Email  send successfull for user: " + client.getEmail());
+
+        return ResponseEntity.ok(order);
+    }
+
     @Operation(summary = "valider le bon de livraison et terminer pour une commande", tags = "Order", responses = {
             @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Order.class)))),
             @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "Application/Json")),
