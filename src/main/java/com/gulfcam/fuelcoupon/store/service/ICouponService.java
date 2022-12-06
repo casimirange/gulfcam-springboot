@@ -14,6 +14,7 @@ public interface ICouponService {
     Page<Coupon> getCouponsByIdStation(Long idStation, int page, int size, String sort, String order);
     Page<Coupon> getCouponsByIdClient(Long idClient, int page, int size, String sort, String order);
     Page<Coupon> getCouponsByIdNotebook(Long idNotebook, int page, int size, String sort, String order);
+    List<Coupon> getCouponsByIdNotebook(Long idNotebook);
     Page<Coupon> getCouponsByIdTicket(Long idTicket, int page, int size, String sort, String order);
     Optional<Coupon> getCouponBySerialNumber(String serialNumber);
     Optional<Coupon> getCouponById(Long id);

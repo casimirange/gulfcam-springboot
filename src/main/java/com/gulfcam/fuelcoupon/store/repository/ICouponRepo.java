@@ -15,6 +15,7 @@ public interface ICouponRepo extends JpaRepository<Coupon, Long> {
     Page<Coupon> getCouponsByIdNotebook(Long idNotebook, Pageable pageable);
     Page<Coupon> getCouponsByIdTicket(Long idTicket, Pageable pageable);
     List<Coupon> getCouponsByIdRequestOpposition(Long idRequestOpposition);
+    List<Coupon> getCouponsByIdNotebook(Long idNotebook);
     List<Coupon> getCouponsByIdCreditNote(Long idCreditNote);
     Optional<Coupon> getCouponBySerialNumber(String serialNumber);
     Optional<Coupon> getCouponByInternalReference(Long internalReference);

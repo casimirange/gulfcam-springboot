@@ -344,13 +344,21 @@ public class CouponRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/accept/serial/{serialNumber}")
-    public ResponseEntity<Coupon> acceptCoupon(@Valid @RequestBody AcceptCouponDTO acceptCouponDTO, @PathVariable String serialNumber) {
+    @PostMapping("/accept/serial/{serialNumber}")
+    public ResponseEntity<?> acceptCoupon(@Valid @RequestBody AcceptCouponDTO acceptCouponDTO, @PathVariable String serialNumber) {
+        if (!iCouponService.getCouponBySerialNumber(serialNumber).isPresent()) {
+            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                    messageSource.getMessage("messages.coupon_exists", null, LocaleContextHolder.getLocale())));
+        }
+
         Coupon coupon = iCouponService.getCouponBySerialNumber(serialNumber).get();
 
         Status status = iStatusRepo.findByName(EStatus.USED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.USED +  "  not found"));
         coupon.setStatus(status);
         coupon.setIdStation(acceptCouponDTO.getIdStation());
+        coupon.setUpdateAt(LocalDateTime.now());
+        coupon.setProductionDate(acceptCouponDTO.getProductionDate());
+        coupon.setModulo(acceptCouponDTO.getModulo());
         iCouponService.createCoupon(coupon);
 
         Map<String, Object> emailProps = new HashMap<>();
@@ -370,6 +378,33 @@ public class CouponRest {
         }
 
         return ResponseEntity.ok(coupon);
+    }
+
+    @Operation(summary = "Affectation d'un carnet a un client après validation de la commande par scan d'un numéro de coupon", tags = "Coupon", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Coupon.class)))),
+            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+    @PostMapping("/affect/serial/{serialNumber}")
+    public ResponseEntity<?> affectCoupon(@PathVariable String serialNumber, @RequestParam("idClient") Long idClient) {
+
+        if (!iCouponService.getCouponBySerialNumber(serialNumber).isPresent()) {
+            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                    messageSource.getMessage("messages.coupon_exists", null, LocaleContextHolder.getLocale())));
+        }
+        Coupon coupon = iCouponService.getCouponBySerialNumber(serialNumber).get();
+        List<Coupon> couponList = iCouponService.getCouponsByIdNotebook(coupon.getIdNotebook());
+        Status status = iStatusRepo.findByName(EStatus.ACTIVATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.ACTIVATED +  "  not found"));
+        coupon.setStatus(status);
+        for (Coupon item: couponList){
+            item.setStatus(status);
+            item.setIdClient(idClient);
+            item.setUpdateAt(LocalDateTime.now());
+            item.setIdClient(idClient);
+            iCouponService.createCoupon(item);
+        }
+
+        return ResponseEntity.ok(couponList);
     }
 
     @Operation(summary = "Supprimer un Coupon", tags = "Coupon", responses = {

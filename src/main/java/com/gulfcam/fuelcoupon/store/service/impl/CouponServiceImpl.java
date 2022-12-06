@@ -60,6 +60,11 @@ public class CouponServiceImpl implements ICouponService {
     }
 
     @Override
+    public List<Coupon> getCouponsByIdNotebook(Long idNotebook) {
+        return iCouponRepo.getCouponsByIdNotebook(idNotebook);
+    }
+
+    @Override
     public Page<Coupon> getCouponsByIdTicket(Long idTicket, int page, int size, String sort, String order) {
         return iCouponRepo.getCouponsByIdTicket(idTicket,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
     }

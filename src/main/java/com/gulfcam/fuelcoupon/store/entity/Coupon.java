@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -50,6 +51,11 @@ public class Coupon {
     private Long idTypeVoucher;
 
     private LocalDateTime createdAt;
+
+    @Column(nullable = true, name = "production_date")
+    private LocalDate productionDate;
+
+    private int modulo;
 
     private LocalDateTime updateAt;
 
