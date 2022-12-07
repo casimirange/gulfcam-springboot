@@ -28,6 +28,9 @@ public class Station {
 
     private String designation;
 
+    @Column(nullable = true, name = "id_manager_station")
+    private Long idManagerStation;
+
     @NotNull
     @Column(unique = true)
     private int pinCode;

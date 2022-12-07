@@ -7,7 +7,9 @@ import com.gulfcam.fuelcoupon.store.dto.CreateStationDTO;
 import com.gulfcam.fuelcoupon.store.entity.Station;
 import com.gulfcam.fuelcoupon.store.repository.IStationRepo;
 import com.gulfcam.fuelcoupon.store.service.IStationService;
+import com.gulfcam.fuelcoupon.user.entity.Users;
 import com.gulfcam.fuelcoupon.user.service.IEmailService;
+import com.gulfcam.fuelcoupon.user.service.IUserService;
 import com.gulfcam.fuelcoupon.utilities.entity.EStatus;
 import com.gulfcam.fuelcoupon.utilities.entity.Status;
 import com.gulfcam.fuelcoupon.utilities.repository.IStatusRepo;
@@ -56,6 +58,9 @@ public class StationRest {
     IStationService iStationService;
 
     @Autowired
+    IUserService iUserService;
+
+    @Autowired
     IStatusRepo iStatusRepo;
 
     @Autowired
@@ -82,11 +87,21 @@ public class StationRest {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.pincode_exists", null, LocaleContextHolder.getLocale())));
         }
+        Users managerStation = new Users();
+
+        if (createStationDTO.getManagerStagion()  != null) {
+            managerStation = iUserService.getByInternalReference(createStationDTO.getManagerStagion());
+
+            if(managerStation.getUserId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
+        }
 
         Station station = new Station();
         station.setInternalReference(jwtUtils.generateInternalReference());
         station.setCreatedAt(LocalDateTime.now());
         station.setPinCode(createStationDTO.getPinCode());
+        station.setIdManagerStation(createStationDTO.getManagerStagion());
         station.setBalance(createStationDTO.getBalance());
         station.setDesignation(createStationDTO.getDesignation());
         station.setLocalization(createStationDTO.getLocalization());
@@ -113,6 +128,18 @@ public class StationRest {
         }
         Station station = iStationService.getByInternalReference(internalReference).get();
 
+        Users managerStation = new Users();
+
+        if (createStationDTO.getManagerStagion()  != null) {
+            managerStation = iUserService.getByInternalReference(createStationDTO.getManagerStagion());
+
+            if(managerStation.getUserId() == null)
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
+        }
+
+        if (createStationDTO.getManagerStagion() != null)
+            station.setIdManagerStation(createStationDTO.getManagerStagion());
         station.setUpdateAt(LocalDateTime.now());
         station.setPinCode(createStationDTO.getPinCode());
         station.setBalance(createStationDTO.getBalance());

@@ -14,6 +14,9 @@ public class CreateStationDTO {
     @Schema(description = "Dénomination")
     private String designation;
 
+    @Schema(description = "Reférence interne du gérant de la station")
+    private Long managerStagion;
+
     @Schema(description = "Code PIN")
     @NotNull(message = "{pincode.required}")
     private int pinCode;
