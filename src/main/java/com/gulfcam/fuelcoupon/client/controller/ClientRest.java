@@ -161,15 +161,15 @@ public class ClientRest {
         return ResponseEntity.ok(iClientService.getClientByGulfCamAccountNumber(gulfcamaccountnumber).get());
     }
 
-//    @Operation(summary = "Recupérer Un Client par son ID", tags = "Client", responses = {
-//            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Client.class)))),
-//            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
-//            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
-//    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-//    @GetMapping("/{id:[0-9]+}")
-//    public ResponseEntity<Client> getClientById(@PathVariable Long id) {
-//        return ResponseEntity.ok(iClientService.getClientById(id).get());
-//    }
+    @Operation(summary = "Recupérer Un Client par sa reférence interne", tags = "Client", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Client.class)))),
+            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+    @GetMapping("/{id:[0-9]+}")
+    public ResponseEntity<Client> getClientById(@PathVariable Long internalReference) {
+        return ResponseEntity.ok(iClientService.getClientByInternalReference(internalReference).get());
+    }
 
     @Operation(summary = "Recupérer la liste des client comme son nom complete", tags = "Client", responses = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Client.class)))),
