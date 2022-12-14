@@ -5,7 +5,10 @@ import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.client.entity.Client;
 import com.gulfcam.fuelcoupon.client.service.IClientService;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
+import com.gulfcam.fuelcoupon.order.entity.Item;
 import com.gulfcam.fuelcoupon.order.entity.TypeVoucher;
+import com.gulfcam.fuelcoupon.order.entity.Unit;
+import com.gulfcam.fuelcoupon.order.service.IItemService;
 import com.gulfcam.fuelcoupon.order.service.ITypeVoucherService;
 import com.gulfcam.fuelcoupon.store.dto.AcceptCouponDTO;
 import com.gulfcam.fuelcoupon.store.dto.CreateCouponDTO;
@@ -65,6 +68,9 @@ public class CouponRest {
 
     @Autowired
     ICouponService iCouponService;
+
+    @Autowired
+    IItemService iItemService;
 
     @Autowired
     IClientService iClientService;
@@ -352,7 +358,7 @@ public class CouponRest {
         }
 
         Coupon coupon = iCouponService.getCouponBySerialNumber(serialNumber).get();
-
+        Notebook notebook = iNotebookService.getByInternalReference(coupon.getIdNotebook()).get();
         Status status = iStatusRepo.findByName(EStatus.USED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.USED +  "  not found"));
         coupon.setStatus(status);
         coupon.setIdStation(acceptCouponDTO.getIdStation());
@@ -360,6 +366,17 @@ public class CouponRest {
         coupon.setProductionDate(acceptCouponDTO.getProductionDate());
         coupon.setModulo(acceptCouponDTO.getModulo());
         iCouponService.createCoupon(coupon);
+
+        Item item = new Item();
+        item.setIdTypeVoucher(notebook.getIdTypeVoucher());
+        item.setQuantityNotebook(-1);
+        item.setIdStoreHouse(notebook.getIdStoreHouse());
+        item.setInternalReference(jwtUtils.generateInternalReference());
+        Status statusItem = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
+        item.setStatus(statusItem);
+        item.setCreatedAt(LocalDateTime.now());
+
+        iItemService.createItem(item);
 
         Map<String, Object> emailProps = new HashMap<>();
         TypeVoucher typeVoucher = iTypeVoucherService.getByInternalReference(coupon.getIdTypeVoucher()).get();

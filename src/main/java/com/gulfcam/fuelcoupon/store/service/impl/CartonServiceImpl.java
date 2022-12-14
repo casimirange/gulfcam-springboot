@@ -181,6 +181,7 @@ public class CartonServiceImpl implements ICartonService {
             notebook.setCreatedAt(LocalDateTime.now());
             notebook.setSerialNumber("DE "+carton.getTypeVoucher()+"-"+carton.getSerialTo()+"  "+"A "+carton.getTypeVoucher()+"-"+carton.getSerialFrom()+" ");
             notebook.setIdCarton(carton.getInternalReference());
+            notebook.setIdStoreHouse(idStoreHouseSell);
             notebook.setIdStoreKeeper(carton.getIdStoreKeeper());
             Status status = iStatusRepo.findByName(EStatus.AVAILABLE).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.AVAILABLE +  "  not found"));
             notebook.setStatus(status);
@@ -238,7 +239,7 @@ public class CartonServiceImpl implements ICartonService {
 
         iUnitService.createUnit(unit);
 
-        stockMovement.setType(typeStockage);
+        stockMovement.setType(typeAppro);
         stockMovement.setIdStoreHouse2(idStoreHouseSell);
         stockMovement.setIdStoreHouse1(storehouse.getInternalReference());
         stockMovement.setIdStore2(storehouse.getIdStore());

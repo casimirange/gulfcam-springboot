@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -31,6 +32,11 @@ public class TicketServiceImpl implements ITicketService {
     @Override
     public Page<Ticket> getTicketsByIdRequestOpposition(Long idRequestOpposition, int page, int size, String sort, String order) {
         return iTicketRepo.getTicketsByIdRequestOpposition(idRequestOpposition,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
+    }
+
+    @Override
+    public List<Ticket> getTicketsByIdRequestOpposition(Long idRequestOpposition) {
+        return iTicketRepo.getTicketsByIdRequestOpposition(idRequestOpposition);
     }
 
     @Override

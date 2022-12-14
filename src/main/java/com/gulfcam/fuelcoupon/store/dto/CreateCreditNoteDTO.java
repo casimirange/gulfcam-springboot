@@ -11,11 +11,6 @@ import java.util.List;
 @Setter
 public class CreateCreditNoteDTO {
 
-
-    @Schema(description = "reference interne du client)")
-    @NotNull(message = "{client.required}")
-    private Long idClient;
-
     @Schema(description = "reference interne de la station")
     @NotNull(message = "{idStation.required}")
     private Long idStation;

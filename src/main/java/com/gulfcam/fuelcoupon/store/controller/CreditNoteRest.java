@@ -115,8 +115,6 @@ public class CreditNoteRest {
 
         Coupon coupon;
         ResponseCouponMailDTO responseCouponMailDTO;
-        Client client = iClientService.getClientByInternalReference(createCreditNoteDTO.getIdClient()).get();
-
         CreditNote creditNote = new CreditNote();
         creditNote.setInternalReference(jwtUtils.generateInternalReference());
         creditNote.setIdStation(createCreditNoteDTO.getIdStation());
@@ -126,25 +124,23 @@ public class CreditNoteRest {
 
         iCreditNoteService.createCreditNote(creditNote);
         List<ResponseCouponMailDTO> couponList = new ArrayList<>();
-        for (int i = 0; i<= createCreditNoteDTO.getSerialCoupons().size(); i++){
+        for (int i = 0; i< createCreditNoteDTO.getSerialCoupons().size(); i++){
             coupon = iCouponService.getCouponBySerialNumber(createCreditNoteDTO.getSerialCoupons().get(i)).get();
 
-            if(createCreditNoteDTO.getIdClient() == coupon.getIdClient()){
-                responseCouponMailDTO= new ResponseCouponMailDTO();
-                responseCouponMailDTO.setIdTypeVoucher(iTypeVoucherService.getByInternalReference(coupon.getIdTypeVoucher()).get());
-                responseCouponMailDTO.setInternalReference(coupon.getInternalReference());
-                responseCouponMailDTO.setStatus(coupon.getStatus());
-                responseCouponMailDTO.setSerialNumber(coupon.getSerialNumber());
-                coupon.setIdCreditNote(creditNote.getInternalReference());
-                coupon.setUpdateAt(LocalDateTime.now());
-                coupon.setIdStation(createCreditNoteDTO.getIdStation());
-                iCouponService.createCoupon(coupon);
-                couponList.add(responseCouponMailDTO);
-            }
+            responseCouponMailDTO= new ResponseCouponMailDTO();
+            responseCouponMailDTO.setIdTypeVoucher(iTypeVoucherService.getByInternalReference(coupon.getIdTypeVoucher()).get());
+            responseCouponMailDTO.setInternalReference(coupon.getInternalReference());
+            responseCouponMailDTO.setStatus(coupon.getStatus());
+            responseCouponMailDTO.setSerialNumber(coupon.getSerialNumber());
+            coupon.setIdCreditNote(creditNote.getInternalReference());
+            coupon.setUpdateAt(LocalDateTime.now());
+            coupon.setIdStation(createCreditNoteDTO.getIdStation());
+            iCouponService.createCoupon(coupon);
+            couponList.add(responseCouponMailDTO);
+
         }
 
         Map<String, Object> emailProps = new HashMap<>();
-        emailProps.put("client", client.getInternalReference()+" - "+client.getCompleteName()+" - "+client.getEmail()+" - "+client.getTypeClient()+" - "+client.getPhone());
         emailProps.put("couponList", couponList);
 
         List<Users> usersList = iUserService.getUsers();

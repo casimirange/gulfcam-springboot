@@ -201,7 +201,6 @@ public class OrderRest {
         order.setIdStorekeeper(createOrderDTO.getIdStorekeeper());
         order.setIdStore(createOrderDTO.getIdStore());
         order.setPaymentReference(createOrderDTO.getPaymentReference());
-        order.setReasonForCancellation(createOrderDTO.getReasonForCancellation());
 
         StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.CREATED +  "  not found"));
         order.setStatus(statusOrder);
@@ -347,7 +346,6 @@ public class OrderRest {
         if (createOrderDTO.getIdStore() != null)
             order.setIdStore(createOrderDTO.getIdStore());
         order.setPaymentReference(createOrderDTO.getPaymentReference());
-        order.setReasonForCancellation(createOrderDTO.getReasonForCancellation());
 
         iOrderService.createOrder(order);
 
@@ -539,7 +537,7 @@ public class OrderRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
     @PostMapping("/cancel/{InternalReference:[0-9]+}")
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> cancelOrder(@PathVariable Long InternalReference, @RequestParam("idManagerCoupon") Long idManagerCoupon) {
+    public ResponseEntity<?> cancelOrder(@PathVariable Long InternalReference, @RequestParam("idManagerCoupon") Long idManagerCoupon, @RequestParam("reasonForCancellation")  @Schema(description = "Raison d’annulation") String reasonForCancellation) {
 
         Order order = iOrderService.getByInternalReference(InternalReference).get();
         Client client = iClientService.getClientByInternalReference(order.getIdClient()).get();
@@ -547,6 +545,7 @@ public class OrderRest {
         StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.ORDER_CANCEL).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.ORDER_CANCEL +  "  not found"));
         order.setStatus(statusOrder);
         order.setIdManagerCoupon(idManagerCoupon);
+        order.setReasonForCancellation(reasonForCancellation);
         iOrderService.createOrder(order);
 
         Map<String, Object> emailProps = new HashMap<>();

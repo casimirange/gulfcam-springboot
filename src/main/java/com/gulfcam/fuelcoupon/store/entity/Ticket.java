@@ -25,7 +25,7 @@ public class Ticket {
     private Long internalReference;
 
     @Column(nullable = true, name = "id_request_opposition")
-    private Long IdRequestOpposition;
+    private Long idRequestOpposition;
 
     @NotNull
     @Column(nullable = true, name = "id_coupon")

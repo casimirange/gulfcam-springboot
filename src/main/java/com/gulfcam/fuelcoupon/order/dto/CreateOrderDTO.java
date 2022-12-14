@@ -52,9 +52,6 @@ public class CreateOrderDTO {
 
     private String paymentReference;
 
-    @Schema(description = "Raison d’annulation")
-    private String reasonForCancellation;
-
     private String description;
 
 }

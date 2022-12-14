@@ -30,6 +30,9 @@ public class Notebook {
     @Column(unique = false)
     private String plage_coupon;
 
+    @Column(nullable = true, name = "id_store_house")
+    private Long idStoreHouse;
+
     @Column(nullable = true, name = "id_store_keeper")
     private Long idStoreKeeper;
 
