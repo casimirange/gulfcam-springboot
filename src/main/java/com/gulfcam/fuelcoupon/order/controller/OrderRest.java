@@ -55,6 +55,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 @RestController
@@ -903,7 +904,7 @@ public class OrderRest {
         parameters.put("TTCAggregateAmount", order.getTTCAggregateAmount()+"");
         parameters.put("completeName", client.getCompleteName());
         parameters.put("companyName", client.getCompanyName());
-        parameters.put("dateOrder", dateFor.format(order.getUpdateAt()));
+        parameters.put("dateOrder", dateFor.format(Date.from(order.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant())));
         parameters.put("address", client.getAddress());
         parameters.put("phone", client.getPhone()+"");
         parameters.put("email", client.getEmail());
@@ -950,7 +951,7 @@ public class OrderRest {
         parameters.put("type", testTypeDocument? "PREFACTURE":"PROFORMA");
         parameters.put("NetAggregateAmount", order.getNetAggregateAmount()+"");
         parameters.put("tax", order.getTax()+"");
-        parameters.put("dateOrder", dateFor.format(order.getUpdateAt()));
+        parameters.put("dateOrder", dateFor.format(Date.from(order.getUpdateAt().atZone(ZoneId.systemDefault()).toInstant())));
         parameters.put("TTCAggregateAmount", order.getTTCAggregateAmount()+"");
         parameters.put("completeName", client.getCompleteName());
         parameters.put("companyName", client.getCompanyName());
@@ -994,7 +995,7 @@ public class OrderRest {
         parameters.put("products", productDTOList);
         parameters.put("NetAggregateAmount", order.getNetAggregateAmount()+"");
         parameters.put("tax", order.getTax()+"");
-        parameters.put("dateOrder", dateFor.format(order.getUpdateAt()));
+        parameters.put("dateOrder", dateFor.format(Date.from(order.getUpdateAt().atZone(ZoneId.systemDefault()).toInstant())));
         parameters.put("TTCAggregateAmount", order.getTTCAggregateAmount()+"");
         parameters.put("completeName", client.getCompleteName());
         parameters.put("companyName", client.getCompanyName());

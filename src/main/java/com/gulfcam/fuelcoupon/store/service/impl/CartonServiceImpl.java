@@ -240,7 +240,7 @@ public class CartonServiceImpl implements ICartonService {
 
         iUnitService.createUnit(unit);
 
-        stockMovement.setType(typeAppro);
+        stockMovement.setType((diffCarton > 0)? typeStockage: typeAppro);
         stockMovement.setIdStoreHouse2(idStoreHouseSell);
         stockMovement.setIdStoreHouse1(storehouse.getInternalReference());
         stockMovement.setIdStore2(storehouse.getIdStore());

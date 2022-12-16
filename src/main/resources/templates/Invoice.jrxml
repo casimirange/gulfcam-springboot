@@ -84,10 +84,10 @@
 				<reportElement x="495" y="0" width="50" height="50" uuid="e75e55e2-be1e-4335-9aca-b18445b3db28"/>
 				<imageExpression><![CDATA[$P{logo}]]></imageExpression>
 			</image>
-			<staticText>
+			<textField>
 				<reportElement style="Text" x="0" y="44" width="100" height="30" uuid="fbcd4fb8-995b-4c9b-9ce2-965fcdc5ba2b"/>
-				<text><![CDATA["GULFCAM. \n Douala, CAMEROUN \n" +$P{dateOrder}]]></text>
-			</staticText>
+				<textFieldExpression><![CDATA["GULFCAM. \n Douala, CAMEROUN \n" +$P{dateOrder}]]></textFieldExpression>
+			</textField>
 			<textField>
 				<reportElement x="240" y="30" width="100" height="20" uuid="11b4bdd4-b6e6-4d4a-b26c-cb132d158441">
 					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
