@@ -161,7 +161,7 @@ public class StockMovementRest {
         item.setQuantityCarton(createStockMovementDTO.getQuantityCarton());
         item.setIdTypeVoucher(typeVoucher.getInternalReference());
         item.setQuantityNotebook(0);
-        item.setIdStoreHouse(createStockMovementDTO.getIdStoreHouseStockage1());
+        item.setIdStoreHouse(createStockMovementDTO.getIdStoreHouseStockage2());
         item.setInternalReference(jwtUtils.generateInternalReference());
         Status statusItemStockage2 = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
         item.setStatus(statusItemStockage2);
