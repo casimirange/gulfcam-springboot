@@ -370,6 +370,7 @@ public class OrderRest {
         String fileDownloadUri = api_base_url+"/api/v1.0/order/file/" + InternalReference + "/downloadFile?type=invoice&docType=" + docType;
         order.setLinkInvoice(fileDownloadUri);
         order.setStatus(statusOrder);
+        order.setUpdateAt(LocalDateTime.now());
         order.setIdPaymentMethod(idPaymentMethod);
         order.setIdFund(idFund);
         order.setPaymentReference(paymentReference);
@@ -432,6 +433,7 @@ public class OrderRest {
         byte[] data = generateDelivery(order, client);
         StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.IN_PROCESS_OF_DELIVERY).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.IN_PROCESS_OF_DELIVERY +  "  not found"));
         order.setStatus(statusOrder);
+        order.setUpdateAt(LocalDateTime.now());
         order.setIdManagerCoupon(idManagerCoupon);
         iOrderService.createOrder(order);
 
@@ -531,6 +533,7 @@ public class OrderRest {
         }
         StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.PAID).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.PAID +  "  not found"));
         order.setStatus(statusOrder);
+        order.setUpdateAt(LocalDateTime.now());
         order.setIdManagerCoupon(idManagerCoupon);
         iOrderService.createOrder(order);
 
@@ -575,6 +578,7 @@ public class OrderRest {
 
         StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.ORDER_CANCEL).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.ORDER_CANCEL +  "  not found"));
         order.setStatus(statusOrder);
+        order.setUpdateAt(LocalDateTime.now());
         order.setIdManagerCoupon(idManagerCoupon);
         order.setReasonForCancellation(reasonForCancellation);
         iOrderService.createOrder(order);
@@ -615,6 +619,7 @@ public class OrderRest {
 
             StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.ORDER_CANCEL).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.ORDER_CANCEL +  "  not found"));
             order.setStatus(statusOrder);
+            order.setUpdateAt(LocalDateTime.now());
             iOrderService.createOrder(order);
 
             Map<String, Object> emailProps = new HashMap<>();
@@ -664,6 +669,7 @@ public class OrderRest {
         String fileDownloadUri = api_base_url+"/api/v1.0/order/file/" + InternalReference + "/downloadFile?type=delivery&docType=pdf";
         order.setLinkDelivery(fileDownloadUri);
         order.setStatus(statusOrder);
+        order.setUpdateAt(LocalDateTime.now());
         order.setIdManagerCoupon(idManagerCoupon);
         iOrderService.createOrder(order);
 
@@ -828,14 +834,13 @@ public class OrderRest {
         }
         boolean testTypeDocument = false;
 
-        if(client.getTypeClient().equals(ETypeClient.INSTITUTION)){
+        if(client.getTypeClient().getName().equals(ETypeClient.INSTITUTION)){
             testTypeDocument = true;
         }
-
         Map<String, Object> emailProps2 = new HashMap<>();
         emailProps2.put("Internalreference", internalReference);
-        emailProps2.put("type", testTypeDocument? "PREFACTURE":"PROFORMA");
-        emailProps2.put("completename", client.getCompleteName());
+        emailProps2.put("TypeDocument", testTypeDocument? "PREFACTURE":"PROFORMA");
+        emailProps2.put("CompleteName", client.getCompleteName());
         emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, testTypeDocument ? ApplicationConstant.SUBJECT_EMAIL_NEW_INVOICE2+internalReference: ApplicationConstant.SUBJECT_EMAIL_NEW_INVOICE+internalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_INVOICE, data));
         log.info("Email send successfull for user: " + client.getEmail());
 
@@ -892,19 +897,19 @@ public class OrderRest {
         }
         boolean testTypeDocument = false;
 
-        if(client.getTypeClient().equals(ETypeClient.INSTITUTION)){
+        if(client.getTypeClient().getName().equals(ETypeClient.INSTITUTION)){
             testTypeDocument = true;
         }
         /* Map to hold Jasper report Parameters*/
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("products", productDTOList);
-        parameters.put("type", testTypeDocument? "PREFACTURE":"PROFORMA");
+        parameters.put("typeDocument", testTypeDocument? "PREFACTURE":"PROFORMA");
         parameters.put("NetAggregateAmount", order.getNetAggregateAmount()+"");
         parameters.put("tax", order.getTax()+"");
         parameters.put("TTCAggregateAmount", order.getTTCAggregateAmount()+"");
         parameters.put("completeName", client.getCompleteName());
         parameters.put("companyName", client.getCompanyName());
-        parameters.put("dateOrder", dateFor.format(Date.from(order.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant())));
+        parameters.put("dateOrder", dateFor.format(Date.from(order.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant())).toString());
         parameters.put("address", client.getAddress());
         parameters.put("phone", client.getPhone()+"");
         parameters.put("email", client.getEmail());
@@ -942,7 +947,7 @@ public class OrderRest {
         }
         boolean testTypeDocument = false;
 
-        if(client.getTypeClient().equals(ETypeClient.INSTITUTION)){
+        if(client.getTypeClient().getName().equals(ETypeClient.INSTITUTION)){
             testTypeDocument = true;
         }
         /* Map to hold Jasper report Parameters*/
@@ -951,7 +956,7 @@ public class OrderRest {
         parameters.put("type", testTypeDocument? "PREFACTURE":"PROFORMA");
         parameters.put("NetAggregateAmount", order.getNetAggregateAmount()+"");
         parameters.put("tax", order.getTax()+"");
-        parameters.put("dateOrder", dateFor.format(Date.from(order.getUpdateAt().atZone(ZoneId.systemDefault()).toInstant())));
+        parameters.put("dateOrder", dateFor.format(Date.from(order.getUpdateAt().atZone(ZoneId.systemDefault()).toInstant())).toString());
         parameters.put("TTCAggregateAmount", order.getTTCAggregateAmount()+"");
         parameters.put("completeName", client.getCompleteName());
         parameters.put("companyName", client.getCompanyName());
@@ -995,7 +1000,7 @@ public class OrderRest {
         parameters.put("products", productDTOList);
         parameters.put("NetAggregateAmount", order.getNetAggregateAmount()+"");
         parameters.put("tax", order.getTax()+"");
-        parameters.put("dateOrder", dateFor.format(Date.from(order.getUpdateAt().atZone(ZoneId.systemDefault()).toInstant())));
+        parameters.put("dateOrder", dateFor.format(Date.from(order.getUpdateAt().atZone(ZoneId.systemDefault()).toInstant())).toString());
         parameters.put("TTCAggregateAmount", order.getTTCAggregateAmount()+"");
         parameters.put("completeName", client.getCompleteName());
         parameters.put("companyName", client.getCompanyName());

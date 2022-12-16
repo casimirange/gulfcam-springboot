@@ -1,5 +1,6 @@
 package com.gulfcam.fuelcoupon.client.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,6 +30,7 @@ public class CreateClientDTO {
     @NotNull(message = "{gulfcamAccountNumber.required}")
     private String gulfcamAccountNumber;
 
+    @Schema(required = true, allowableValues = {"PARTICULAR", "ENTREPRISE", "INSTITUTION"}, description = "Type de client")
     @NotNull(message = "{typeClient.required}")
     private String typeClient;
 
