@@ -153,7 +153,7 @@ public class RequestOppositionRest {
         for (int i = 0; i< createRequestOppositionDTO.getSerialCoupons().size(); i++){
             coupon = iCouponService.getCouponBySerialNumber(createRequestOppositionDTO.getSerialCoupons().get(i)).get();
             ticket = new Ticket();
-            if(createRequestOppositionDTO.getIdClient() == coupon.getIdClient()){
+            if(createRequestOppositionDTO.getIdClient().equals(coupon.getIdClient())){
                 responseCouponMailDTO= new ResponseCouponMailDTO();
                 responseCouponMailDTO.setIdTypeVoucher(iTypeVoucherService.getByInternalReference(coupon.getIdTypeVoucher()).get());
                 responseCouponMailDTO.setInternalReference(coupon.getInternalReference());

@@ -166,7 +166,7 @@ public class ClientRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/{id:[0-9]+}")
+    @GetMapping("/{internalReference:[0-9]+}")
     public ResponseEntity<Client> getClientById(@PathVariable Long internalReference) {
         return ResponseEntity.ok(iClientService.getClientByInternalReference(internalReference).get());
     }

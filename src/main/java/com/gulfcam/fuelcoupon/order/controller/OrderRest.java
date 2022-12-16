@@ -53,6 +53,7 @@ import javax.validation.Valid;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -114,6 +115,8 @@ public class OrderRest {
     String mailReplyTo;
     @Value("${app.api.base.url}")
     private String api_base_url;
+
+    SimpleDateFormat dateFor = new SimpleDateFormat("dd/MM/yyyy");
 
     @Operation(summary = "création des informations pour une commande", tags = "Order", responses = {
             @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Order.class)))),
@@ -228,7 +231,7 @@ public class OrderRest {
         emailProps.put("canal", createOrderDTO.getChannel());
         emailProps.put("netAmount", createOrderDTO.getNetAggregateAmount());
         emailProps.put("ttcAmount", createOrderDTO.getTTCAggregateAmount());
-        emailProps.put("payementMethode", createOrderDTO.getIdPaymentMethod()+ " - "+paymentMethod.getDesignation());
+        emailProps.put("payementMethode", (createOrderDTO.getIdPaymentMethod() == null)? "":createOrderDTO.getIdPaymentMethod()+ " - "+paymentMethod.getDesignation());
 
         if(emailToTresury != null){
             emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, emailToTresury, mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_NEW_ORDER+internalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_ORDER));
@@ -239,14 +242,6 @@ public class OrderRest {
             emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, emailToStore, mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_NEW_ORDER+internalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_ORDER));
             log.info("Email  send successfull for user: " + emailToStore);
         }
-
-        byte[] data = generateInvoice(order, client);
-
-        Map<String, Object> emailProps2 = new HashMap<>();
-        emailProps2.put("Internalreference", internalReference);
-        emailProps2.put("completename", client.getCompleteName());
-        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, ApplicationConstant.SUBJECT_EMAIL_NEW_INVOICE+internalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_INVOICE, data));
-        log.info("Email send successfull for user: " + client.getEmail());
 
         iOrderService.createOrder(order);
         return ResponseEntity.ok(order);
@@ -396,7 +391,7 @@ public class OrderRest {
         emailProps.put("netAmount", order.getNetAggregateAmount());
         emailProps.put("ttcAmount", order.getTTCAggregateAmount());
         emailProps.put("status", EStatusOrder.ACCEPTED);
-        emailProps.put("payementMethode", order.getIdPaymentMethod()+ " - "+iPaymentMethodService.getByInternalReference(order.getIdPaymentMethod()).get().getDesignation());
+        emailProps.put("payementMethode", (order.getIdPaymentMethod() == null)? "":order.getIdPaymentMethod()+ " - "+iPaymentMethodService.getByInternalReference(order.getIdPaymentMethod()).get().getDesignation());
 
         List<Users> usersList = iUserService.getUsers();
         for (Users user : usersList) {
@@ -411,7 +406,6 @@ public class OrderRest {
             }
         }
 
-
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=received-" + order.getClientReference() + ".pdf");
 
@@ -425,9 +419,9 @@ public class OrderRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
     @PostMapping("/delivery/{InternalReference:[0-9]+}")
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> devliveryOrder(@PathVariable Long InternalReference, @RequestParam("idManagerCoupon") Long idManagerCoupon) throws JRException, IOException {
+    public ResponseEntity<?> devliveryOrder(@PathVariable Long internalReference, @RequestParam("idManagerCoupon") Long idManagerCoupon) throws JRException, IOException {
 
-        Order order = iOrderService.getByInternalReference(InternalReference).get();
+        Order order = iOrderService.getByInternalReference(internalReference).get();
         Client client = iClientService.getClientByInternalReference(order.getIdClient()).get();
         StatusOrder statusOrderPaid = iStatusOrderRepo.findByName(EStatusOrder.PAID).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.PAID +  "  not found"));
         if (order.getStatus() != statusOrderPaid) {
@@ -445,6 +439,42 @@ public class OrderRest {
 
         return ResponseEntity.ok().headers(headers).contentType(MediaType.APPLICATION_PDF).body(data);
     }
+
+//    @Operation(summary = "Emettre proformat ou pré-facture pour une commande", tags = "Order", responses = {
+//            @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Order.class)))),
+//            @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "Application/Json")),
+//            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json")),
+//            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
+//    @PostMapping("/invoice/{InternalReference:[0-9]+}")
+//    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+//    public ResponseEntity<?> invoiceOrder(@PathVariable Long internalReference) throws JRException, IOException {
+//
+//        Order order = iOrderService.getByInternalReference(internalReference).get();
+//        Client client = iClientService.getClientByInternalReference(order.getIdClient()).get();
+//        StatusOrder statusOrderPaid = iStatusOrderRepo.findByName(EStatusOrder.PAID).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.PAID +  "  not found"));
+//        if (order.getStatus() != statusOrderPaid) {
+//            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+//                    messageSource.getMessage("messages.order_pay_before", null, LocaleContextHolder.getLocale())));
+//        }
+//        List<Product> products = iProductService.getProductsByIdOrder(order.getInternalReference());
+//        if (products.isEmpty()) {
+//            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+//                    messageSource.getMessage("messages.noproduct", null, LocaleContextHolder.getLocale())));
+//        }
+//
+//        byte[] data = generateInvoice(order, client);
+//
+//        Map<String, Object> emailProps2 = new HashMap<>();
+//        emailProps2.put("Internalreference", internalReference);
+//        emailProps2.put("completename", client.getCompleteName());
+//        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, ApplicationConstant.SUBJECT_EMAIL_NEW_INVOICE+internalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_INVOICE, data));
+//        log.info("Email send successfull for user: " + client.getEmail());
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=invoice-" + order.getClientReference() + ".pdf");
+//
+//        return ResponseEntity.ok().headers(headers).contentType(MediaType.APPLICATION_PDF).body(data);
+//    }
 
     @Operation(summary = "Télécharger un document (Bon de commande, reçue ou preuve de paiement) pour une commande", tags = "Order", responses = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json")),
@@ -512,7 +542,7 @@ public class OrderRest {
         emailProps.put("netAmount", order.getNetAggregateAmount());
         emailProps.put("ttcAmount", order.getTTCAggregateAmount());
         emailProps.put("status", EStatusOrder.PAID);
-        emailProps.put("payementMethode", order.getIdPaymentMethod()+ " - "+iPaymentMethodService.getByInternalReference(order.getIdPaymentMethod()).get().getDesignation());
+        emailProps.put("payementMethode", (order.getIdPaymentMethod() == null)? "":order.getIdPaymentMethod()+ " - "+iPaymentMethodService.getByInternalReference(order.getIdPaymentMethod()).get().getDesignation());
 
         List<Users> usersList = iUserService.getUsers();
         for (Users user : usersList) {
@@ -557,7 +587,7 @@ public class OrderRest {
         emailProps.put("netAmount", order.getNetAggregateAmount());
         emailProps.put("ttcAmount", order.getTTCAggregateAmount());
         emailProps.put("status", EStatusOrder.ORDER_CANCEL);
-        emailProps.put("payementMethode", order.getIdPaymentMethod()+ " - "+iPaymentMethodService.getByInternalReference(order.getIdPaymentMethod()).get().getDesignation());
+        emailProps.put("payementMethode", (order.getIdPaymentMethod() == null)? "":order.getIdPaymentMethod()+ " - "+iPaymentMethodService.getByInternalReference(order.getIdPaymentMethod()).get().getDesignation());
 
         Users managerCoupon = iUserService.getByInternalReference(idManagerCoupon);
         emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, managerCoupon.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_ORDER+InternalReference+" - "+EStatusOrder.ORDER_CANCEL, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_ORDER));
@@ -595,7 +625,7 @@ public class OrderRest {
             emailProps.put("netAmount", order.getNetAggregateAmount());
             emailProps.put("ttcAmount", order.getTTCAggregateAmount());
             emailProps.put("status", EStatusOrder.ORDER_CANCEL);
-            emailProps.put("payementMethode", order.getIdPaymentMethod()+ " - "+iPaymentMethodService.getByInternalReference(order.getIdPaymentMethod()).get().getDesignation());
+            emailProps.put("payementMethode", (order.getIdPaymentMethod() == null)? "":order.getIdPaymentMethod()+ " - "+iPaymentMethodService.getByInternalReference(order.getIdPaymentMethod()).get().getDesignation());
 
             emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_MULTI_ORDER+cancelMultiOrderDTO.getOrders().get(i)+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_ORDER));
             log.info("Email  send successfull for user: " + client.getEmail());
@@ -790,6 +820,24 @@ public class OrderRest {
         Order order = iOrderService.getByInternalReference(internalReference).get();
         Client client = iClientService.getClientByInternalReference(order.getIdClient()).get();
         byte[] data = generateInvoice(order, client);
+        List<Product> products = iProductService.getProductsByIdOrder(order.getInternalReference());
+        if (products.isEmpty()) {
+            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                    messageSource.getMessage("messages.noproduct", null, LocaleContextHolder.getLocale())));
+        }
+        boolean testTypeDocument = false;
+
+        if(client.getTypeClient().equals(ETypeClient.INSTITUTION)){
+            testTypeDocument = true;
+        }
+
+        Map<String, Object> emailProps2 = new HashMap<>();
+        emailProps2.put("Internalreference", internalReference);
+        emailProps2.put("type", testTypeDocument? "PREFACTURE":"PROFORMA");
+        emailProps2.put("completename", client.getCompleteName());
+        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, testTypeDocument ? ApplicationConstant.SUBJECT_EMAIL_NEW_INVOICE2+internalReference: ApplicationConstant.SUBJECT_EMAIL_NEW_INVOICE+internalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_INVOICE, data));
+        log.info("Email send successfull for user: " + client.getEmail());
+
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=invoice-" + order.getClientReference() + ".pdf");
@@ -841,18 +889,25 @@ public class OrderRest {
             productDTO.setProduct("Carnet N-"+product.getInternalReference());
             productDTOList.add(productDTO);
         }
+        boolean testTypeDocument = false;
+
+        if(client.getTypeClient().equals(ETypeClient.INSTITUTION)){
+            testTypeDocument = true;
+        }
         /* Map to hold Jasper report Parameters*/
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("products", productDTOList);
+        parameters.put("type", testTypeDocument? "PREFACTURE":"PROFORMA");
         parameters.put("NetAggregateAmount", order.getNetAggregateAmount()+"");
         parameters.put("tax", order.getTax()+"");
         parameters.put("TTCAggregateAmount", order.getTTCAggregateAmount()+"");
         parameters.put("completeName", client.getCompleteName());
         parameters.put("companyName", client.getCompanyName());
+        parameters.put("dateOrder", dateFor.format(order.getUpdateAt()));
         parameters.put("address", client.getAddress());
         parameters.put("phone", client.getPhone()+"");
         parameters.put("email", client.getEmail());
-        parameters.put("clientReference", order.getClientReference()+"");
+        parameters.put("clientReference", (order.getClientReference() == null) ? client.getInternalReference(): order.getClientReference()+"");
         parameters.put("idcommand", order.getInternalReference()+"");
         parameters.put("the_date", new Date());
         parameters.put("logo", appContext.getResource("classpath:/templates/logo.jpeg").getFile().getAbsolutePath());
@@ -884,18 +939,25 @@ public class OrderRest {
             productDTO.setProduct("Carnet N-"+product.getInternalReference());
             productDTOList.add(productDTO);
         }
+        boolean testTypeDocument = false;
+
+        if(client.getTypeClient().equals(ETypeClient.INSTITUTION)){
+            testTypeDocument = true;
+        }
         /* Map to hold Jasper report Parameters*/
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("products", productDTOList);
+        parameters.put("type", testTypeDocument? "PREFACTURE":"PROFORMA");
         parameters.put("NetAggregateAmount", order.getNetAggregateAmount()+"");
         parameters.put("tax", order.getTax()+"");
+        parameters.put("dateOrder", dateFor.format(order.getUpdateAt()));
         parameters.put("TTCAggregateAmount", order.getTTCAggregateAmount()+"");
         parameters.put("completeName", client.getCompleteName());
         parameters.put("companyName", client.getCompanyName());
         parameters.put("address", client.getAddress());
         parameters.put("phone", client.getPhone()+"");
         parameters.put("email", client.getEmail());
-        parameters.put("clientReference", order.getClientReference()+"");
+        parameters.put("clientReference", (order.getClientReference() == null) ? client.getInternalReference(): order.getClientReference() +"");
         parameters.put("idcommand", order.getInternalReference()+"");
         parameters.put("the_date", new Date());
         parameters.put("logo", appContext.getResource("classpath:/templates/logo.jpeg").getFile().getAbsolutePath());
@@ -932,13 +994,14 @@ public class OrderRest {
         parameters.put("products", productDTOList);
         parameters.put("NetAggregateAmount", order.getNetAggregateAmount()+"");
         parameters.put("tax", order.getTax()+"");
+        parameters.put("dateOrder", dateFor.format(order.getUpdateAt()));
         parameters.put("TTCAggregateAmount", order.getTTCAggregateAmount()+"");
         parameters.put("completeName", client.getCompleteName());
         parameters.put("companyName", client.getCompanyName());
         parameters.put("address", client.getAddress());
         parameters.put("phone", client.getPhone()+"");
         parameters.put("email", client.getEmail());
-        parameters.put("clientReference", order.getClientReference()+"");
+        parameters.put("clientReference", (order.getClientReference() == null) ? client.getInternalReference(): order.getClientReference()+"");
         parameters.put("idcommand", order.getInternalReference()+"");
         parameters.put("the_date", new Date());
         parameters.put("logo", appContext.getResource("classpath:/templates/logo.jpeg").getFile().getAbsolutePath());

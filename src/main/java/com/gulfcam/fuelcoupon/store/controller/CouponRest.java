@@ -350,7 +350,7 @@ public class CouponRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @PostMapping("/accept/serial/{serialNumber}")
+    @PutMapping("/accept/serial/{serialNumber}")
     public ResponseEntity<?> acceptCoupon(@Valid @RequestBody AcceptCouponDTO acceptCouponDTO, @PathVariable String serialNumber) {
         if (!iCouponService.getCouponBySerialNumber(serialNumber).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,

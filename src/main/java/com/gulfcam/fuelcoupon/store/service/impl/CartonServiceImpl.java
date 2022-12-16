@@ -179,6 +179,7 @@ public class CartonServiceImpl implements ICartonService {
             Notebook notebook = new Notebook();
             notebook.setInternalReference(jwtUtils.generateInternalReference());
             notebook.setCreatedAt(LocalDateTime.now());
+            notebook.setPlage_coupon("");
             notebook.setSerialNumber("DE "+carton.getTypeVoucher()+"-"+carton.getSerialTo()+"  "+"A "+carton.getTypeVoucher()+"-"+carton.getSerialFrom()+" ");
             notebook.setIdCarton(carton.getInternalReference());
             notebook.setIdStoreHouse(idStoreHouseSell);

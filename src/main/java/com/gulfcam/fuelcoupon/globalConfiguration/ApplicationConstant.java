@@ -36,6 +36,8 @@ public class ApplicationConstant {
 
     public static final String SUBJECT_EMAIL_NEW_INVOICE = "GulfCam - Nouvelle Proforma : #Ref";
 
+    public static final String SUBJECT_EMAIL_NEW_INVOICE2 = "GulfCam - Nouvelle Préfacture : #Ref";
+
     public static final String SUBJECT_EMAIL_NEW_RECEIVED = "GulfCam - Reçue de paiement : #Ref";
 
     public static final String SUBJECT_EMAIL_PAY_TEMPORAIRE = "GulfCam - Accès Temporaire";
