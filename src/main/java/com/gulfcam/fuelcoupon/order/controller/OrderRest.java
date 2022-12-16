@@ -419,7 +419,7 @@ public class OrderRest {
             @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
-    @PostMapping("/delivery/{InternalReference:[0-9]+}")
+    @PostMapping("/delivery/{internalReference:[0-9]+}")
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     public ResponseEntity<?> devliveryOrder(@PathVariable Long internalReference, @RequestParam("idManagerCoupon") Long idManagerCoupon) throws JRException, IOException {
 

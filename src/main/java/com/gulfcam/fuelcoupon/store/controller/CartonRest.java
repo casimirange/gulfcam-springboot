@@ -100,7 +100,7 @@ public class CartonRest {
     @Value("${mail.replyTo[0]}")
     String mailReplyTo;
 
-    @Operation(summary = "création des informations pour un Carton", tags = "Carton", responses = {
+    @Operation(summary = "création des informations pour un Carton ou Ordre de stockage", tags = "Carton", responses = {
             @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Carton.class)))),
             @ApiResponse(responseCode = "404", description = "Carton not found", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json")),
