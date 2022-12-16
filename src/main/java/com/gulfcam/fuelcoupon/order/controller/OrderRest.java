@@ -851,6 +851,30 @@ public class OrderRest {
         return ResponseEntity.ok().headers(headers).contentType(MediaType.APPLICATION_PDF).body(data);
     }
 
+    @Operation(summary = "le reçu de paiement et le bon de livraison numérique générée pour une commande par son Identifiant interne", tags = "Order", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Order.class)))),
+            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+    @PostMapping("/document/{internalReference:[0-9]+}")
+    public ResponseEntity<?> generateInvoiceOrDelivery(@PathVariable Long internalReference, @Schema(required = true, allowableValues = {"INVOICE", "DELIVERY"}, description = "Type de document") @RequestParam("type") String type) throws JRException, IOException {
+        Order order = iOrderService.getByInternalReference(internalReference).get();
+        Client client = iClientService.getClientByInternalReference(order.getIdClient()).get();
+
+        byte[] data;
+        HttpHeaders headers = new HttpHeaders();
+
+        if(type.equalsIgnoreCase("DELIVERY")){
+            data = generateDelivery(order, client);
+            headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=delivery-" + order.getClientReference() + ".pdf");
+        }else{
+            data = generateReceived(order, client);
+            headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=receive-" + order.getClientReference() + ".pdf");
+        }
+
+        return ResponseEntity.ok().headers(headers).contentType(MediaType.APPLICATION_PDF).body(data);
+    }
+
     @Operation(summary = "Supprimer une commande", tags = "Order", responses = {
             @ApiResponse(responseCode = "200", description = "Client deleted successfully", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : access denied", content = @Content(mediaType = "Application/Json")),
@@ -956,7 +980,7 @@ public class OrderRest {
         parameters.put("type", testTypeDocument? "PREFACTURE":"PROFORMA");
         parameters.put("NetAggregateAmount", order.getNetAggregateAmount()+"");
         parameters.put("tax", order.getTax()+"");
-        parameters.put("dateOrder", dateFor.format(Date.from(order.getUpdateAt().atZone(ZoneId.systemDefault()).toInstant())).toString());
+        parameters.put("dateOrder", dateFor.format(Date.from((order.getUpdateAt() == null) ? order.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant():  order.getUpdateAt().atZone(ZoneId.systemDefault()).toInstant())).toString());
         parameters.put("TTCAggregateAmount", order.getTTCAggregateAmount()+"");
         parameters.put("completeName", client.getCompleteName());
         parameters.put("companyName", client.getCompanyName());
@@ -1000,7 +1024,7 @@ public class OrderRest {
         parameters.put("products", productDTOList);
         parameters.put("NetAggregateAmount", order.getNetAggregateAmount()+"");
         parameters.put("tax", order.getTax()+"");
-        parameters.put("dateOrder", dateFor.format(Date.from(order.getUpdateAt().atZone(ZoneId.systemDefault()).toInstant())).toString());
+        parameters.put("dateOrder", dateFor.format(Date.from((order.getUpdateAt() == null) ? order.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant():  order.getUpdateAt().atZone(ZoneId.systemDefault()).toInstant())).toString());
         parameters.put("TTCAggregateAmount", order.getTTCAggregateAmount()+"");
         parameters.put("completeName", client.getCompleteName());
         parameters.put("companyName", client.getCompanyName());

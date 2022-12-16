@@ -78,13 +78,13 @@
 	<parameter name="logo" class="java.lang.String"/>
 	<parameter name="dateOrder" class="java.lang.String"/>
 	<title>
-		<band height="85" splitType="Stretch">
+		<band height="150" splitType="Stretch">
 			<image>
 				<reportElement x="495" y="0" width="50" height="50" uuid="e75e55e2-be1e-4335-9aca-b18445b3db28"/>
 				<imageExpression><![CDATA[$P{logo}]]></imageExpression>
 			</image>
 			<textField>
-				<reportElement style="Text" x="0" y="44" width="100" height="30" uuid="fbcd4fb8-995b-4c9b-9ce2-965fcdc5ba2b"/>
+				<reportElement style="Text" x="0" y="44" width="100" height="60" uuid="fbcd4fb8-995b-4c9b-9ce2-965fcdc5ba2b"/>
 				<textFieldExpression><![CDATA["GULFCAM. \n Douala, CAMEROUN \n" +$P{dateOrder}]]></textFieldExpression>
 			</textField>
 			<textField>
@@ -215,6 +215,31 @@
 					</jr:column>
 				</jr:table>
 			</componentElement>
+
+			<textField>
+				<reportElement style="Text" positionType="Float" x="415" y="260" width="58" height="20" uuid="7839a7dd-71d6-4eb8-941d-b79e18cad1b5">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Montant global TTC"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Text" positionType="Float" x="474" y="260" width="80" height="20" uuid="e8611a0c-e0e2-49f7-a6a5-2fd397ee786a">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TTCAggregateAmount}+" FCFA"]]></textFieldExpression>
+			</textField>
 			<textField pattern="MMMMM dd, yyyy">
 				<reportElement style="Text" x="170" y="40" width="60" height="10" uuid="cbff1b94-f983-4878-bb31-28b4ef123ae3"/>
 				<textElement textAlignment="Left" verticalAlignment="Bottom">
@@ -236,6 +261,31 @@
 				<textElement textAlignment="Left" verticalAlignment="Top"/>
 				<textFieldExpression><![CDATA["Numéro de reference Client:\n"
 + $P{clientReference}]]></textFieldExpression>
+			</textField>
+
+			<textField>
+				<reportElement style="Text" positionType="Float" x="415" y="240" width="58" height="10" uuid="ee53cdd2-007b-4dd5-880a-41c46b2885ce">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Tax"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Text" positionType="Float" x="474" y="240" width="80" height="10" uuid="22622347-6c92-494b-a00c-1680a1fa5a87">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{tax}]]></textFieldExpression>
 			</textField>
 			<line>
 				<reportElement positionType="Float" x="415" y="255" width="140" height="1" uuid="47482c28-352e-4bc0-af56-834244ae199b">
