@@ -27,6 +27,10 @@ public class EmailDto {
 
 	private String replyToName;
 
+	private String namefile;
+
+	private String contentType;
+
 	private MultipartFile[] files;
 
 	private byte[] attachement;
@@ -53,5 +57,18 @@ public class EmailDto {
 		this.subject = subject;
 		this.body = template;
 		this.attachement = attachement;
+	}
+
+	public EmailDto(String from,String senderName, String to,String replyTo, Map<String, Object> props, String subject, String template, byte[] attachement, String namefile, String contentType) {
+		super();
+		this.from = from;
+		this.senderName = senderName;
+		this.to = to;
+		this.replyTo= replyTo;
+		this.subject = subject;
+		this.body = template;
+		this.attachement = attachement;
+		this.namefile = namefile;
+		this.contentType = contentType;
 	}
 }

@@ -13,7 +13,7 @@ public class CreateStorehouseDTO {
     @NotNull(message = "{store.required}")
     private Long idStore;
 
-    @Schema(description = "type")
+    @Schema(required = true, allowableValues = {"vente", "stockage"}, description = "Type d'entrepôt (vente / stockage)")
     @NotNull(message = "{type.required}")
     private String type;
 

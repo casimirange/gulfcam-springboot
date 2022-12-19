@@ -50,6 +50,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -694,6 +695,31 @@ public class OrderRest {
 
 
         return ResponseEntity.ok(order);
+    }
+
+    @Operation(summary = "Recupérer la liste des commandes par client sous forme de fichier excel et envoyé par Mail", tags = "Order", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Order.class)))),
+            @ApiResponse(responseCode = "404", description = "Client not found", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+    @GetMapping("/export/excel/client/{idClient:[0-9]+}")
+    public ResponseEntity<?> exportOrdersByIdClient(@PathVariable Long idClient) {
+        Client client = iClientService.getClientByInternalReference(idClient).get();
+        ByteArrayInputStream data = iOrderService.exportOrdersByIdClient(idClient);
+
+        Map<String, Object> emailProps2 = new HashMap<>();
+        emailProps2.put("Internalreference", idClient);
+        emailProps2.put("CompleteName", client.getCompleteName());
+        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, ApplicationConstant.SUBJECT_EMAIL_EXPORT_ORDERS_EXCEL, ApplicationConstant.TEMPLATE_EMAIL_EXPORT_ORDER_EXCEL, data.readAllBytes(),"export-commandes-" + idClient + ".xlsx", "application/vnd.ms-excel"));
+        log.info("Email send successfull for user: " + client.getEmail());
+
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=export-commandes-" + idClient + ".xlsx");
+        headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
+
+        return ResponseEntity.ok().headers(headers).body(data.readAllBytes());
     }
 
     @Operation(summary = "Recupérer la liste des commandes par client", tags = "Order", responses = {

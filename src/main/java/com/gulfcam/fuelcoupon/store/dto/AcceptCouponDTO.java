@@ -12,6 +12,7 @@ import java.time.LocalDate;
 public class AcceptCouponDTO {
 
     @Schema(description = "Reference interne de la station")
+    @NotNull(message = "{station.required}")
     private Long idStation;
 
     @Schema(description = "Modulo du coupon")

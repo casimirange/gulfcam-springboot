@@ -5,9 +5,7 @@ import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.client.entity.Client;
 import com.gulfcam.fuelcoupon.client.service.IClientService;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
-import com.gulfcam.fuelcoupon.order.entity.Item;
-import com.gulfcam.fuelcoupon.order.entity.TypeVoucher;
-import com.gulfcam.fuelcoupon.order.entity.Unit;
+import com.gulfcam.fuelcoupon.order.entity.*;
 import com.gulfcam.fuelcoupon.order.service.IItemService;
 import com.gulfcam.fuelcoupon.order.service.ITypeVoucherService;
 import com.gulfcam.fuelcoupon.store.dto.AcceptCouponDTO;
@@ -39,12 +37,15 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.ByteArrayInputStream;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -271,6 +272,32 @@ public class CouponRest {
         return ResponseEntity.ok(cartons);
     }
 
+    @Operation(summary = "Recupérer la liste des Coupons par Client sous forme de fichier excel et envoyé par Mail", tags = "Coupon", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Coupon.class)))),
+            @ApiResponse(responseCode = "404", description = "Coupon not found", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+    @GetMapping("/export/excel/client/{idClient:[0-9]+}")
+    public ResponseEntity<?> exportCouponsByIdClient(@PathVariable Long idClient) {
+
+        Client client = iClientService.getClientByInternalReference(idClient).get();
+        ByteArrayInputStream data = iCouponService.exportCouponsByIdClient(idClient);
+
+        Map<String, Object> emailProps2 = new HashMap<>();
+        emailProps2.put("internalreference", idClient);
+        emailProps2.put("HttpHeaders", client.getCompleteName());
+        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, ApplicationConstant.SUBJECT_EMAIL_EXPORT_COUPONS_EXCEL, ApplicationConstant.TEMPLATE_EMAIL_EXPORT_COUPON_EXCEL, data.readAllBytes(), "export-coupons-" + idClient + ".xlsx", "application/vnd.ms-excel"));
+        log.info("Email send successfull for user: " + client.getEmail());
+
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=export-coupons-" + idClient + ".xlsx");
+        headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
+
+        return ResponseEntity.ok().headers(headers).body(data.readAllBytes());
+    }
+
     @Operation(summary = "Recupérer la liste des Coupons par Station", tags = "Coupon", responses = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Coupon.class)))),
             @ApiResponse(responseCode = "404", description = "Coupon not found", content = @Content(mediaType = "Application/Json")),
@@ -358,6 +385,12 @@ public class CouponRest {
         }
 
         Coupon coupon = iCouponService.getCouponBySerialNumber(serialNumber).get();
+        Status statusCouponActived = iStatusRepo.findByName(EStatus.ACTIVATED).orElseThrow(()-> new ResourceNotFoundException("Statut du coupon:  "  +  EStatus.ACTIVATED +  "  not found"));
+        if (coupon.getStatus() != statusCouponActived) {
+            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                    messageSource.getMessage("messages.coupon_actived_before", null, LocaleContextHolder.getLocale())));
+        }
+
         Notebook notebook = iNotebookService.getByInternalReference(coupon.getIdNotebook()).get();
         Status status = iStatusRepo.findByName(EStatus.USED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.USED +  "  not found"));
         coupon.setStatus(status);

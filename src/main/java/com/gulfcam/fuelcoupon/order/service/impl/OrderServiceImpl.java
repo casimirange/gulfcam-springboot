@@ -5,6 +5,7 @@ import com.gulfcam.fuelcoupon.client.service.IClientService;
 import com.gulfcam.fuelcoupon.order.dto.ResponseOrderDTO;
 import com.gulfcam.fuelcoupon.order.entity.Order;
 import com.gulfcam.fuelcoupon.order.entity.PaymentMethod;
+import com.gulfcam.fuelcoupon.order.helper.ExcelOrderHelper;
 import com.gulfcam.fuelcoupon.order.repository.IOrderRepo;
 import com.gulfcam.fuelcoupon.order.service.IOrderService;
 import com.gulfcam.fuelcoupon.order.service.IPaymentMethodService;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -119,6 +121,68 @@ public class OrderServiceImpl implements IOrderService {
     @Override
     public Page<Order> getOrdersByIdClient(Long idClient, int page, int size, String sort, String order) {
         return iOrderRepo.getOrdersByIdClient(idClient,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
+    }
+
+    @Override
+    public ByteArrayInputStream exportOrdersByIdClient(Long idClient) {
+        List<Order> orders = iOrderRepo.getOrdersByIdClient(idClient);
+        ResponseOrderDTO responseOrderDTO;
+        List<ResponseOrderDTO> responseOrderDTOList = new ArrayList<>();
+        for(Order item: orders){
+            Client client = new Client();
+            Store store = new Store();
+            PaymentMethod paymentMethod = new PaymentMethod();
+            Users fund = new Users();
+            Users managerOrder = new Users();
+            Users managerCoupon = new Users();
+            Users storeKeeper = new Users();
+
+            if(item.getIdClient() != null)
+                client = iClientService.getClientByInternalReference(item.getIdClient()).get();
+            if(item.getIdStore() != null)
+                store = iStoreService.getByInternalReference(item.getIdStore()).get();
+            if(item.getIdFund() != null)
+                fund = iUserService.getByInternalReference(item.getIdFund());
+            if(item.getIdManagerOrder() != null)
+                managerOrder = iUserService.getByInternalReference(item.getIdManagerOrder());
+            if(item.getIdManagerCoupon() != null)
+                managerCoupon = iUserService.getByInternalReference(item.getIdManagerCoupon());
+            if(item.getIdStorekeeper() != null)
+                storeKeeper = iUserService.getByInternalReference(item.getIdStorekeeper());
+            if(item.getIdPaymentMethod() != null)
+                paymentMethod = iPaymentMethodService.getByInternalReference(item.getIdPaymentMethod()).get();
+
+            responseOrderDTO = new ResponseOrderDTO();
+            responseOrderDTO.setClient(client);
+            responseOrderDTO.setStore(store);
+            responseOrderDTO.setFund(fund);
+            responseOrderDTO.setPaymentMethod(paymentMethod);
+            responseOrderDTO.setManagerOrder(managerOrder);
+            responseOrderDTO.setManagerCoupon(managerCoupon);
+            responseOrderDTO.setStorekeeper(storeKeeper);
+            responseOrderDTO.setCompleteName((client != null) ? client.getCompleteName(): "");
+            responseOrderDTO.setLocalisation((store != null) ? store.getLocalization(): "");
+            responseOrderDTO.setId(item.getId());
+            responseOrderDTO.setInternalReference(item.getInternalReference());
+            responseOrderDTO.setClientReference(item.getClientReference());
+            responseOrderDTO.setPaymentReference(item.getPaymentReference());
+            responseOrderDTO.setNetAggregateAmount(item.getNetAggregateAmount());
+            responseOrderDTO.setTax(item.getTax());
+            responseOrderDTO.setChannel(item.getChannel());
+            responseOrderDTO.setDescription(item.getDescription());
+            responseOrderDTO.setTTCAggregateAmount(item.getTTCAggregateAmount());
+            responseOrderDTO.setDeliveryTime(item.getDeliveryTime());
+            responseOrderDTO.setLinkInvoice(item.getLinkInvoice());
+            responseOrderDTO.setLinkDelivery(item.getLinkDelivery());
+            responseOrderDTO.setReasonForCancellation(item.getReasonForCancellation());
+            responseOrderDTO.setCreatedAt(item.getCreatedAt());
+            responseOrderDTO.setUpdateAt(item.getUpdateAt());
+            responseOrderDTO.setStatus(item.getStatus());
+            responseOrderDTO.setReasonForCancellation(item.getReasonForCancellation());
+            responseOrderDTOList.add(responseOrderDTO);
+        }
+
+        return ExcelOrderHelper.ordersToExcel(responseOrderDTOList);
     }
 
     @Override

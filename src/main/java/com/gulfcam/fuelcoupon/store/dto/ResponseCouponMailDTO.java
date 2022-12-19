@@ -10,6 +10,7 @@ import lombok.Setter;
 import javax.persistence.Column;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -20,10 +21,14 @@ public class ResponseCouponMailDTO {
 
     private String serialNumber;
 
+    private int modulo;
+
     private TypeVoucher idTypeVoucher;
 
+    private LocalDate productionDate;
 
     private Status status;
 
+    private LocalDateTime createdAt;
 
 }

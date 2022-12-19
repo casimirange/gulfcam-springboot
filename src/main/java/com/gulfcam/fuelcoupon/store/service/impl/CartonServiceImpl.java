@@ -174,8 +174,7 @@ public class CartonServiceImpl implements ICartonService {
         int numberCouponP = Integer.parseInt(numberCoupon);
         int numberCouponByCarton = (carton.getFrom()-carton.getTo()+1)/numberCouponP;
         int x = carton.getTo();
-        for(int i=carton.getTo(); i< carton.getTo()+numberCouponByCarton; i++){
-            System.out.println(" i "+ i);
+        for(int i=carton.getTo(); i<carton.getTo()+numberCouponByCarton; i++){
             Notebook notebook = new Notebook();
             notebook.setInternalReference(jwtUtils.generateInternalReference());
             notebook.setCreatedAt(LocalDateTime.now());
@@ -188,12 +187,9 @@ public class CartonServiceImpl implements ICartonService {
             notebook.setStatus(status);
             if (typeVoucher != null)
                 notebook.setIdTypeVoucher(typeVoucher.getInternalReference());
-//            Map<String, Object> notebookEncoded = new HashMap<>();
-//            notebookEncoded = iNotebookService.createNotebook(notebook);
-//            notebook = (Notebook) notebookEncoded.get("notebook");
+
             notebookList.add(notebook);
             for(int y=0; y<numberCouponP; y++){
-                x++;
                 Coupon coupon = new Coupon();
                 Long ref = jwtUtils.generateInternalReference();
                 while (iCouponService.existsCouponByInternalReference(ref)){
@@ -207,8 +203,8 @@ public class CartonServiceImpl implements ICartonService {
                     coupon.setIdTypeVoucher(typeVoucher.getInternalReference());
                 Status statusCoupon = iStatusRepo.findByName(EStatus.AVAILABLE).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.AVAILABLE +  "  not found"));
                 coupon.setStatus(statusCoupon);
+                x++;
                 couponList.add(coupon);
-//                iCouponService.createCoupon(coupon);
             }
         }
         iNotebookService.createAllNotebook(notebookList);

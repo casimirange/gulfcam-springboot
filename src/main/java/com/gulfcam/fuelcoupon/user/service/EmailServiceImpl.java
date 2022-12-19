@@ -42,7 +42,9 @@ public class EmailServiceImpl implements IEmailService {
 			mimeMessageHelper.setReplyTo(emailDto.getReplyTo(),emailDto.getReplyToName());
 			mimeMessageHelper.setText(html, true);
 
-			if(emailDto.getAttachement() != null){
+			if(emailDto.getAttachement() != null && emailDto.getNamefile() != null && emailDto.getContentType() != null){
+				mimeMessageHelper.addAttachment(emailDto.getNamefile(), new ByteArrayDataSource(emailDto.getAttachement(), emailDto.getContentType()));
+			}else if(emailDto.getAttachement() != null){
 				mimeMessageHelper.addAttachment("invoice.pdf", new ByteArrayDataSource(emailDto.getAttachement(), "application/pdf"));
 			}
 			emailSender.send(mimeMessage);
