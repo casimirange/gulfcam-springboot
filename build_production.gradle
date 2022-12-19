@@ -39,6 +39,7 @@ dependencies {
 	implementation 'net.sf.jasperreports:jasperreports:6.20.0'
 	implementation 'org.json:json:20220924'
 	implementation 'org.apache.poi:poi:5.2.3'
+	implementation 'org.apache.poi:poi-ooxml:5.2.2'
 	implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 	implementation 'org.hibernate:hibernate-entitymanager'
 	implementation 'org.hibernate:hibernate-envers'
