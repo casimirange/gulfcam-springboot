@@ -968,7 +968,7 @@ public class OrderRest {
         parameters.put("the_date", new Date());
         parameters.put("logo", appContext.getResource("classpath:/templates/logo.jpeg").getFile().getAbsolutePath());
         /* read jrxl fille and creat jasperdesign object*/
-        InputStream input = new FileInputStream(appContext.getResource("classpath:/templates/invoice.jrxml").getFile());
+        InputStream input = new FileInputStream(appContext.getResource("classpath:/templates/Invoice.jrxml").getFile());
 
         JasperDesign jasperDesign = JRXmlLoader.load(input);
 
