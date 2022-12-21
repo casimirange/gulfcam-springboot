@@ -464,7 +464,7 @@ public class CouponRest {
         Unit unit = new Unit();
         Notebook notebook = iNotebookService.getByInternalReference(coupon.getIdNotebook()).get();
         Storehouse storehouse = iStorehouseService.getByInternalReference(notebook.getIdStoreHouse()).get();
-        TypeVoucher typeVoucher = iTypeVoucherService.getTypeVoucherByAmountEquals(coupon.getIdTypeVoucher()).get();
+        TypeVoucher typeVoucher = iTypeVoucherService.getByInternalReference(coupon.getIdTypeVoucher()).get();
 
         item.setQuantityCarton(0);
         item.setIdTypeVoucher(typeVoucher.getInternalReference());
