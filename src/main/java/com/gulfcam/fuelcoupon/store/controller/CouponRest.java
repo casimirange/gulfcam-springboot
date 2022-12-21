@@ -8,6 +8,7 @@ import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
 import com.gulfcam.fuelcoupon.order.entity.*;
 import com.gulfcam.fuelcoupon.order.service.IItemService;
 import com.gulfcam.fuelcoupon.order.service.ITypeVoucherService;
+import com.gulfcam.fuelcoupon.order.service.IUnitService;
 import com.gulfcam.fuelcoupon.store.dto.AcceptCouponDTO;
 import com.gulfcam.fuelcoupon.store.dto.CreateCouponDTO;
 import com.gulfcam.fuelcoupon.store.entity.*;
@@ -74,10 +75,16 @@ public class CouponRest {
     IItemService iItemService;
 
     @Autowired
+    IUnitService iUnitService;
+
+    @Autowired
     IClientService iClientService;
 
     @Autowired
     INotebookService iNotebookService;
+
+    @Autowired
+    IStorehouseService iStorehouseService;
 
     @Autowired
     IStationService iStationService;
@@ -450,9 +457,35 @@ public class CouponRest {
             item.setStatus(status);
             item.setIdClient(idClient);
             item.setUpdateAt(LocalDateTime.now());
-            item.setIdClient(idClient);
             iCouponService.createCoupon(item);
         }
+
+        Item item = new Item();
+        Unit unit = new Unit();
+        Notebook notebook = iNotebookService.getByInternalReference(coupon.getIdNotebook()).get();
+        Storehouse storehouse = iStorehouseService.getByInternalReference(notebook.getIdStoreHouse()).get();
+        TypeVoucher typeVoucher = iTypeVoucherService.getTypeVoucherByAmountEquals(coupon.getIdTypeVoucher()).get();
+
+        item.setQuantityCarton(0);
+        item.setIdTypeVoucher(typeVoucher.getInternalReference());
+        item.setQuantityNotebook(-1);
+        item.setIdStoreHouse(notebook.getIdStoreHouse());
+        item.setInternalReference(jwtUtils.generateInternalReference());
+        Status statusItem = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
+        item.setStatus(statusItem);
+        item.setCreatedAt(LocalDateTime.now());
+
+        iItemService.createItem(item);
+
+        unit.setIdTypeVoucher(typeVoucher.getInternalReference());
+        unit.setQuantityNotebook(-1);
+        unit.setIdStore(storehouse.getIdStore());
+        unit.setInternalReference(jwtUtils.generateInternalReference());
+        Status statusUnit = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
+        unit.setStatus(statusUnit);
+        unit.setCreatedAt(LocalDateTime.now());
+
+        iUnitService.createUnit(unit);
 
         return ResponseEntity.ok(couponList);
     }
