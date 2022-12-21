@@ -14,11 +14,7 @@ import java.util.Optional;
 
 public interface IStorehouseRepo extends JpaRepository<Storehouse, Long> {
 
-    @Query("SELECT i.idTypeVoucher as typeVoucher,SUM(i.quantityCarton) as quantityCarton, SUM(i.quantityNotebook) as quantityNoteBook, tv.amount as amount\n" +
-            "FROM Item i \n" +
-            "JOIN TypeVoucher tv on i.idTypeVoucher = tv.internalReference  \n" +
-            "WHERE i.idStoreHouse = :reference \n" +
-            "GROUP BY i.idTypeVoucher")
+    @Query(nativeQuery = true)
     List<ResponseStoreHouseGroupDTO> groupeNoteBookByInternalReference(@Param("reference") Long internalReference);
 
     Page<Storehouse> getStorehousesByIdStore(Long idStore, Pageable pageable);

@@ -1,4 +1,5 @@
 package com.gulfcam.fuelcoupon.store.entity;
+import com.gulfcam.fuelcoupon.store.dto.ResponseStoreHouseGroupDTO;
 import com.gulfcam.fuelcoupon.utilities.entity.Status;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -9,6 +10,15 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
+@NamedNativeQuery(name = "Storehouse.groupeNoteBookByInternalReference",
+        query = "SELECT i.id_type_voucher as typeVoucher,SUM(i.quantity_carton) as quantityCarton, SUM(i.quantity_notebook) as quantityNoteBook, tv.amount as amount FROM item i JOIN type_voucher tv on i.id_type_voucher = tv.internal_reference WHERE i.id_store_house = :reference GROUP BY i.id_type_voucher",
+        resultSetMapping = "Mapping.ResponseStoreHouseGroupDTO")
+@SqlResultSetMapping(name = "Mapping.ResponseStoreHouseGroupDTO",
+        classes = @ConstructorResult(targetClass = ResponseStoreHouseGroupDTO.class,
+                columns = {@ColumnResult(name = "typeVoucher", type=Long.class),
+                        @ColumnResult(name = "amount", type=Float.class),
+                        @ColumnResult(name = "quantityNoteBook", type=Integer.class),
+                        @ColumnResult(name = "quantityCarton", type=Integer.class)}))
 @Entity
 @Getter
 @Setter

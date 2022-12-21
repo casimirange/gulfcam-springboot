@@ -11,11 +11,7 @@ import java.util.Optional;
 
 public interface IStoreRepo extends JpaRepository<Store, Long> {
 
-    @Query("SELECT u.idTypeVoucher as typeVoucher, t.amount as amount, SUM(u.quantityNotebook) as quantityNoteBook \n" +
-            "FROM Unit u \n" +
-            "JOIN TypeVoucher t on u.idTypeVoucher = t.internalReference  \n" +
-            "WHERE u.idStore = :reference \n" +
-            "GROUP BY u.idTypeVoucher")
+    @Query(nativeQuery = true)
     List<ResponseStoreGroupDTO> groupNoteBootByInternalReference(@Param("reference") Long internalReference);
 
     List<Store> getStoresByLocalizationLike(String localization);
