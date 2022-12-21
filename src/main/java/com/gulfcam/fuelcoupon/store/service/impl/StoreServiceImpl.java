@@ -31,7 +31,7 @@ public class StoreServiceImpl implements IStoreService {
     }
 
     @Override
-    public ResponseStoreGroupDTO groupNoteBootByInternalReference(Long internelReference) {
+    public List<ResponseStoreGroupDTO> groupNoteBootByInternalReference(Long internelReference) {
         return iStoreRepo.groupNoteBootByInternalReference(internelReference);
     }
 

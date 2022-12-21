@@ -9,6 +9,7 @@ import java.util.Optional;
 public interface INotebookRepo extends JpaRepository<Notebook, Long> {
 
     Page<Notebook> getNotebooksByIdStoreKeeper(Long idStoreKeeper, Pageable pageable);
+    Page<Notebook> getNotebooksByIdStoreHouse(Long idStoreHouse, Pageable pageable);
     Page<Notebook> getNotebooksByIdCarton(Long idCarton, Pageable pageable);
     Optional<Notebook> getNotebookBySerialNumber(String serialNumber);
     Optional<Notebook> getNotebookByInternalReference(Long internalReference);

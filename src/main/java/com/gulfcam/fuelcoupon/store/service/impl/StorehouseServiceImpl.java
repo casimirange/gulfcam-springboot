@@ -78,7 +78,7 @@ public class StorehouseServiceImpl implements IStorehouseService {
     }
 
     @Override
-    public ResponseStoreHouseGroupDTO groupeNoteBookByInternalReference(Long internelReference) {
+    public List<ResponseStoreHouseGroupDTO> groupeNoteBookByInternalReference(Long internelReference) {
         return iStorehouseRepo.groupeNoteBookByInternalReference(internelReference);
     }
 

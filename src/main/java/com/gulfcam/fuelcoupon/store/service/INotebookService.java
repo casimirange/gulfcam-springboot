@@ -11,6 +11,7 @@ public interface INotebookService {
 
     Page<Notebook> getAllNotebooks(int page, int size, String sort, String order);
     Page<Notebook> getNotebooksByIdStoreKeeper(Long idStoreKeeper, int page, int size, String sort, String order);
+    Page<Notebook> getNotebooksByIdStoreHouse(Long idStoreHouse, int page, int size, String sort, String order);
     Page<Notebook> getNotebooksByIdCarton(Long idCarton, int page, int size, String sort, String order);
     Optional<Notebook> getNotebookBySerialNumber(String serialNumber);
     Optional<Notebook> getNotebookById(Long id);

@@ -37,8 +37,13 @@ public class NotebookServiceImpl implements INotebookService {
     }
 
     @Override
-    public Page<Notebook> getNotebooksByIdStoreKeeper(Long idStoreHouse, int page, int size, String sort, String order) {
-        return iNotebookRepo.getNotebooksByIdStoreKeeper(idStoreHouse,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
+    public Page<Notebook> getNotebooksByIdStoreKeeper(Long idStorKeeper, int page, int size, String sort, String order) {
+        return iNotebookRepo.getNotebooksByIdStoreKeeper(idStorKeeper,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
+    }
+
+    @Override
+    public Page<Notebook> getNotebooksByIdStoreHouse(Long idStoreHouse, int page, int size, String sort, String order) {
+        return iNotebookRepo.getNotebooksByIdStoreHouse(idStoreHouse,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
     }
 
     @Override

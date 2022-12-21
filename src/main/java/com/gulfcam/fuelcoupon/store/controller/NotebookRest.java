@@ -208,7 +208,7 @@ public class NotebookRest {
         return ResponseEntity.ok(notebooks);
     }
 
-    @Operation(summary = "Recupérer la liste des Carnets par Entrepôt", tags = "Carnet", responses = {
+    @Operation(summary = "Recupérer la liste des Carnets par Magasinier", tags = "Carnet", responses = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Notebook.class)))),
             @ApiResponse(responseCode = "404", description = "Carnet not found", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
@@ -216,12 +216,30 @@ public class NotebookRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @GetMapping("/storekeeper/{idStoreKeeper:[0-9]+}")
     public ResponseEntity<Page<Notebook>> getNotebooksByIdStoreKeeper(@PathVariable Long idStoreKeeper,
-                                                              @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
-                                                              @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
-                                                              @RequestParam(required = false, defaultValue = "idStoreKeeper") String sort,
-                                                              @RequestParam(required = false, defaultValue = "desc") String order) {
+                                                                      @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
+                                                                      @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
+                                                                      @RequestParam(required = false, defaultValue = "idStoreKeeper") String sort,
+                                                                      @RequestParam(required = false, defaultValue = "desc") String order) {
 
         Page<Notebook> notebooks = iNotebookService.getNotebooksByIdStoreKeeper(idStoreKeeper,
+                Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
+        return ResponseEntity.ok(notebooks);
+    }
+
+    @Operation(summary = "Recupérer la liste des Carnets par Entrepôt", tags = "Carnet", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Notebook.class)))),
+            @ApiResponse(responseCode = "404", description = "Carnet not found", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+    @GetMapping("/storehouse/{idStoreHouse:[0-9]+}")
+    public ResponseEntity<Page<Notebook>> getNotebooksByIdStoreHouse(@PathVariable Long idStoreHouse,
+                                                                      @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
+                                                                      @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
+                                                                      @RequestParam(required = false, defaultValue = "idStoreKeeper") String sort,
+                                                                      @RequestParam(required = false, defaultValue = "desc") String order) {
+
+        Page<Notebook> notebooks = iNotebookService.getNotebooksByIdStoreKeeper(idStoreHouse,
                 Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(notebooks);
     }

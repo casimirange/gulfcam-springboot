@@ -16,7 +16,7 @@ public interface IStoreRepo extends JpaRepository<Store, Long> {
             "JOIN TypeVoucher t on u.idTypeVoucher = t.internalReference  \n" +
             "WHERE u.idStore = :reference \n" +
             "GROUP BY u.idTypeVoucher")
-    ResponseStoreGroupDTO groupNoteBootByInternalReference(@Param("reference") Long internalReference);
+    List<ResponseStoreGroupDTO> groupNoteBootByInternalReference(@Param("reference") Long internalReference);
 
     List<Store> getStoresByLocalizationLike(String localization);
     Optional<Store> getStoreByInternalReference(Long internalReference);
