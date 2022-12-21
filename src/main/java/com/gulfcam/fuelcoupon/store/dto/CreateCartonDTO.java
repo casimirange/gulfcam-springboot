@@ -28,10 +28,6 @@ public class CreateCartonDTO {
     @NotNull(message = "{storehouse.required}")
     private Long idStoreHouseStockage;
 
-    @Schema(description = "reference interne de l'entrepôt de vente")
-    @NotNull(message = "{storehouse.required}")
-    private Long idStoreHouseSell;
-
     @Schema(description = "Numéro de carton: Exmple 101 ou 130 ")
     @NotNull(message = "{serialNumber.required}")
     private int number;

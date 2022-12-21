@@ -154,11 +154,77 @@ public class CartonServiceImpl implements ICartonService {
     }
 
     @Override
-    public Map<String, Object> createCarton(Carton carton, Long idStoreHouseSell, int diffCarton) {
-        boolean saveCarton = (carton.getId() == null)? true: false;
+    public Map<String, Object> createCarton(Carton carton, int diffCarton) {
+
         iCartonRepo.save(carton);
-        if(saveCarton)
-            generateCoupon(carton, idStoreHouseSell, diffCarton);
+
+        if(diffCarton != 0){
+            Storehouse storehouse = iStorehouseService.getByInternalReference(carton.getIdStoreHouse()).get();
+            TypeVoucher typeVoucher = iTypeVoucherService.getTypeVoucherByAmountEquals(carton.getTypeVoucher()).get();
+            Store store = iStoreService.getByInternalReference(storehouse.getIdStore()).get();
+            Item item = new Item();
+            item.setQuantityCarton(diffCarton);
+            item.setIdTypeVoucher(typeVoucher.getInternalReference());
+            item.setQuantityNotebook(0);
+            item.setIdStoreHouse(carton.getIdStoreHouse());
+            item.setInternalReference(jwtUtils.generateInternalReference());
+            Status statusItem = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
+            item.setStatus(statusItem);
+            item.setCreatedAt(LocalDateTime.now());
+
+            iItemService.createItem(item);
+
+            StockMovement stockMovement = new StockMovement();
+            stockMovement.setType(typeStockage);
+            stockMovement.setIdStoreHouse2(storehouse.getInternalReference());
+            stockMovement.setIdStoreHouse1(storehouse.getInternalReference());
+            stockMovement.setIdStore2(storehouse.getIdStore());
+            stockMovement.setIdStore1(storehouse.getIdStore());
+            stockMovement.setInternalReference(jwtUtils.generateInternalReference());
+            stockMovement.setCreatedAt(LocalDateTime.now());
+            iStockMovementService.createStockMovement(stockMovement);
+
+            Map<String, Object> emailProps = new HashMap<>();
+            emailProps.put("carton", carton.getInternalReference()+"DE "+carton.getTypeVoucher()+"-"+carton.getSerialTo()+"  "+"A "+carton.getTypeVoucher()+"-"+carton.getSerialFrom()+" ");
+            emailProps.put("quantityCarton", diffCarton);
+            emailProps.put("typevoucher", typeVoucher.getAmount());
+            emailProps.put("quantityNotebook", 0);
+            emailProps.put("quantityCoupon", 0);
+            emailProps.put("storehouse", storehouse.getInternalReference()+" - "+storehouse.getType()+" - "+storehouse.getName());
+            emailProps.put("store", store.getInternalReference()+" - "+store.getLocalization());
+            if(carton.getIdStoreKeeper() != null){
+                Users storeKeeper = iUserService.getByInternalReference(carton.getIdStoreKeeper());
+                emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, storeKeeper.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_ORDER_STOCKAGE, ApplicationConstant.TEMPLATE_EMAIL_ORDER_STOCKAGE));
+            }
+        }
+
+
+        Map<String, Object> cartonEncoded = new HashMap<>();
+        cartonEncoded.put("carton", carton);
+        return cartonEncoded;
+    }
+
+
+    @Override
+    public Map<String, Object> supplyStoreHouse(Carton carton, Storehouse storehouse) {
+
+        iCartonRepo.save(carton);
+
+        TypeVoucher typeVoucher = iTypeVoucherService.getTypeVoucherByAmountEquals(carton.getTypeVoucher()).get();
+
+        Item item = new Item();
+        item.setQuantityCarton(-1);
+        item.setIdTypeVoucher(typeVoucher.getInternalReference());
+        item.setQuantityNotebook(0);
+        item.setIdStoreHouse(carton.getIdStoreHouse());
+        item.setInternalReference(jwtUtils.generateInternalReference());
+        Status statusItem = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
+        item.setStatus(statusItem);
+        item.setCreatedAt(LocalDateTime.now());
+        iItemService.createItem(item);
+
+
+        generateCoupon(carton, storehouse.getInternalReference());
         Map<String, Object> cartonEncoded = new HashMap<>();
         cartonEncoded.put("carton", carton);
         return cartonEncoded;
@@ -166,7 +232,7 @@ public class CartonServiceImpl implements ICartonService {
 
     @Async
     @Transactional
-    void generateCoupon(Carton carton, Long idStoreHouseSell, int diffCarton){
+    void generateCoupon(Carton carton, Long idStoreHouseSell){
 
         TypeVoucher typeVoucher = iTypeVoucherService.getTypeVoucherByAmountEquals(carton.getTypeVoucher()).get();
         List<Notebook> notebookList = new ArrayList<>();
@@ -215,7 +281,7 @@ public class CartonServiceImpl implements ICartonService {
         StockMovement stockMovement = new StockMovement();
         Storehouse storehouse = iStorehouseService.getByInternalReference(carton.getIdStoreHouse()).get();
 
-        item.setQuantityCarton(diffCarton);
+        item.setQuantityCarton(0);
         item.setIdTypeVoucher(typeVoucher.getInternalReference());
         item.setQuantityNotebook(notebookList.size());
         item.setIdStoreHouse(idStoreHouseSell);
@@ -236,7 +302,7 @@ public class CartonServiceImpl implements ICartonService {
 
         iUnitService.createUnit(unit);
 
-        stockMovement.setType((diffCarton > 0)? typeStockage: typeAppro);
+        stockMovement.setType(typeAppro);
         stockMovement.setIdStoreHouse2(idStoreHouseSell);
         stockMovement.setIdStoreHouse1(storehouse.getInternalReference());
         stockMovement.setIdStore2(storehouse.getIdStore());
@@ -249,7 +315,7 @@ public class CartonServiceImpl implements ICartonService {
 
         Map<String, Object> emailProps = new HashMap<>();
         emailProps.put("carton", carton.getInternalReference()+"DE "+carton.getTypeVoucher()+"-"+carton.getSerialTo()+"  "+"A "+carton.getTypeVoucher()+"-"+carton.getSerialFrom()+" ");
-        emailProps.put("quantityCarton", diffCarton);
+        emailProps.put("quantityCarton", 0);
         emailProps.put("typevoucher", typeVoucher.getAmount());
         emailProps.put("quantityNotebook", notebookList.size());
         emailProps.put("quantityCoupon", couponList.size());
@@ -258,10 +324,7 @@ public class CartonServiceImpl implements ICartonService {
 
         if(carton.getIdStoreKeeper() != null){
             Users storeKeeper = iUserService.getByInternalReference(carton.getIdStoreKeeper());
-            if(diffCarton > 0)
-                emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, storeKeeper.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_ORDER_STOCKAGE, ApplicationConstant.TEMPLATE_EMAIL_ORDER_STOCKAGE));
-            else
-                emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, storeKeeper.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_ORDER_SUPPLY, ApplicationConstant.TEMPLATE_EMAIL_ORDER_SUPPLY));
+            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, storeKeeper.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_ORDER_SUPPLY, ApplicationConstant.TEMPLATE_EMAIL_ORDER_SUPPLY));
         }
 
     }

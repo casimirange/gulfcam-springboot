@@ -118,15 +118,6 @@ public class CartonRest {
                         messageSource.getMessage("messages.typeVoucher_exists", null, LocaleContextHolder.getLocale())));
 
         }
-
-        if (createCartonDTO.getIdStoreHouseSell()  != null) {
-            if(!iStorehouseService.getByInternalReference(createCartonDTO.getIdStoreHouseSell()).isPresent())
-                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
-                        messageSource.getMessage("messages.storehouse_exists", null, LocaleContextHolder.getLocale())));
-            storehouse = iStorehouseService.getByInternalReference(createCartonDTO.getIdStoreHouseSell()).get();
-
-        }
-
         if (createCartonDTO.getIdStoreHouseStockage()  != null) {
             if(!iStorehouseService.getByInternalReference(createCartonDTO.getIdStoreHouseStockage()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
@@ -159,9 +150,7 @@ public class CartonRest {
 
 
         Map<String, Object> CartonEncoded = new HashMap<>();
-        CartonEncoded = iCartonService.createCarton(carton, createCartonDTO.getIdStoreHouseSell(), +1);
-        carton = (Carton) CartonEncoded.get("carton");
-//        generateCoupon(carton);
+        CartonEncoded = iCartonService.createCarton(carton, +1);
         return ResponseEntity.ok(carton);
     }
 
@@ -173,59 +162,33 @@ public class CartonRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
     @PostMapping("/supply")
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> orderSupply(@Valid @RequestBody CreateCartonDTO createCartonDTO) {
+    public ResponseEntity<?> orderSupply(@RequestParam("idCarton") Long idCarton, @RequestParam("idStoreHouseSell") Long idStoreHouseSell) {
 
         Users storeKeeper = new Users();
         Storehouse storehouse = new Storehouse();
 
-        if (createCartonDTO.getTypeVoucher() != 0) {
-            if(!iTypeVoucherService.getTypeVoucherByAmountEquals(createCartonDTO.getTypeVoucher()).isPresent())
-                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
-                        messageSource.getMessage("messages.typeVoucher_exists", null, LocaleContextHolder.getLocale())));
 
-        }
-
-        if (createCartonDTO.getIdStoreHouseSell()  != null) {
-            if(!iStorehouseService.getByInternalReference(createCartonDTO.getIdStoreHouseSell()).isPresent())
+        if (idStoreHouseSell != null) {
+            if(!iStorehouseService.getByInternalReference(idStoreHouseSell).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.storehouse_exists", null, LocaleContextHolder.getLocale())));
-            storehouse = iStorehouseService.getByInternalReference(createCartonDTO.getIdStoreHouseSell()).get();
+            storehouse = iStorehouseService.getByInternalReference(idStoreHouseSell).get();
 
         }
 
-        if (createCartonDTO.getIdStoreHouseStockage()  != null) {
-            if(!iStorehouseService.getByInternalReference(createCartonDTO.getIdStoreHouseStockage()).isPresent())
-                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
-                        messageSource.getMessage("messages.storehouse_exists", null, LocaleContextHolder.getLocale())));
-            storehouse = iStorehouseService.getByInternalReference(createCartonDTO.getIdStoreHouseStockage()).get();
-
+        if (!iCartonService.getByInternalReference(idCarton).isPresent()) {
+            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                    messageSource.getMessage("messages.carton_exists", null, LocaleContextHolder.getLocale())));
         }
+        Carton carton = iCartonService.getByInternalReference(idCarton).get();
 
-        if (createCartonDTO.getIdStoreKeeper() != null) {
-            storeKeeper = iUserService.getByInternalReference(createCartonDTO.getIdStoreKeeper());
-            if(storeKeeper.getUserId() == null)
-                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
-                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
-        }
-
-        Carton carton = new Carton();
-        carton.setInternalReference(jwtUtils.generateInternalReference());
-        carton.setCreatedAt(LocalDateTime.now());
-        carton.setFrom(createCartonDTO.getFrom());
-        carton.setSerialFrom(createCartonDTO.getSerialFrom());
-        carton.setSerialTo(createCartonDTO.getSerialTo());
-        carton.setNumber(createCartonDTO.getNumber());
-        carton.setTo(createCartonDTO.getTo());
-        carton.setTypeVoucher(createCartonDTO.getTypeVoucher());
-        carton.setIdStoreHouse(createCartonDTO.getIdStoreHouseStockage());
-        carton.setIdStoreKeeper(createCartonDTO.getIdStoreKeeper());
+        carton.setUpdateAt(LocalDateTime.now());
 
         Status status = iStatusRepo.findByName(EStatus.AVAILABLE).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.AVAILABLE +  "  not found"));
         carton.setStatus(status);
 
-
         Map<String, Object> CartonEncoded = new HashMap<>();
-        CartonEncoded = iCartonService.createCarton(carton, createCartonDTO.getIdStoreHouseSell(), -1);
+        CartonEncoded = iCartonService.supplyStoreHouse(carton, storehouse);
         carton = (Carton) CartonEncoded.get("carton");
 //        generateCoupon(carton);
         return ResponseEntity.ok(carton);
@@ -248,14 +211,6 @@ public class CartonRest {
                     messageSource.getMessage("messages.carton_exists", null, LocaleContextHolder.getLocale())));
         }
         Carton carton = iCartonService.getByInternalReference(internalReference).get();
-
-        if (createCartonDTO.getIdStoreHouseSell()  != null) {
-            if(!iStorehouseService.getByInternalReference(createCartonDTO.getIdStoreHouseSell()).isPresent())
-                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
-                        messageSource.getMessage("messages.storehouse_exists", null, LocaleContextHolder.getLocale())));
-            storehouse = iStorehouseService.getByInternalReference(createCartonDTO.getIdStoreHouseSell()).get();
-
-        }
 
         if (createCartonDTO.getIdStoreHouseStockage()  != null) {
             if(!iStorehouseService.getByInternalReference(createCartonDTO.getIdStoreHouseStockage()).isPresent())
@@ -283,7 +238,7 @@ public class CartonRest {
         if(createCartonDTO.getIdStoreKeeper() != null)
             carton.setIdStoreKeeper(createCartonDTO.getIdStoreKeeper());
 
-        iCartonService.createCarton(carton, createCartonDTO.getIdStoreHouseStockage(), 0);
+        iCartonService.createCarton(carton, 0);
 
         return ResponseEntity.ok(carton);
     }
