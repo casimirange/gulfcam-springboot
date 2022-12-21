@@ -9,8 +9,9 @@ import java.util.Optional;
 
 
 public interface IUserService {
-	
+
 	Map<String, Object> add(Users user);
+	Map<String, Object> modify(Users user);
 
 	boolean existsByEmail(String email, Long id);
 

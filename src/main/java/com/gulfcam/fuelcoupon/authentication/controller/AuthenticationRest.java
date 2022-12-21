@@ -260,7 +260,7 @@ public class AuthenticationRest {
 
             if(!iStoreService.getByInternalReference(userAddDto.getIdStore()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
-                    messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
+                        messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
             store =  iStoreService.getByInternalReference(userAddDto.getIdStore()).get();
         }
 
@@ -276,6 +276,7 @@ public class AuthenticationRest {
         u.setTypeAccount(typeAccount);
         u.setInternalReference(jwtUtils.generateInternalReference());
         u.setPosition(userAddDto.getPosition());
+        u.setPinCode(userAddDto.getPinCode());
         u.setPassword(encoder.encode(userAddDto.getPassword()));
         u.setIdStore(userAddDto.getIdStore());
         u.setCreatedDate(LocalDateTime.now());
@@ -295,6 +296,49 @@ public class AuthenticationRest {
         emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, userAddDto.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_NEW_USER, ApplicationConstant.TEMPLATE_EMAIL_NEW_USER));
         log.info("Email  send successfull for user: " + userAddDto.getEmail());
 
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(userResDto);
+    }
+
+    @Parameters(value = {
+            @Parameter(name = "typeAccount", schema = @Schema(allowableValues = {"STORE_KEEPER", "MANAGER_COUPON", "MANAGER_STORE", "TREASURY", "CUSTOMER_SERVICE", "MANAGER_STATION", "POMPIST"}))})
+    @Operation(summary = "Modification des information/profil de l'utilisateur", tags = "authentification", responses = {
+            @ApiResponse(responseCode = "201", description = "Utilisateur modifié avec succès", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = UserResDto.class)))),
+            @ApiResponse(responseCode = "400", description = "Erreur: Ce nom d'utilisateur est déjà utilisé/Erreur: Cet email est déjà utilisé", content = @Content(mediaType = "Application/Json")),})
+    @PutMapping("/{internalReference:[0-9]+}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+    public ResponseEntity<Object> update(@Valid @RequestBody UserModifyReqDto userModifyReqDto, @PathVariable Long internalReference) {
+
+        Store store = new Store();
+        if (userModifyReqDto.getIdStore() != null) {
+
+            if(!iStoreService.getByInternalReference(userModifyReqDto.getIdStore()).isPresent())
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
+            store =  iStoreService.getByInternalReference(userModifyReqDto.getIdStore()).get();
+        }
+
+        Users u = userService.getByInternalReference(internalReference);
+        u.setFirstName(userModifyReqDto.getFirstName());
+        u.setLastName(userModifyReqDto.getLastName());
+        u.setPinCode(userModifyReqDto.getPinCode());
+        Set<RoleUser> roles = new HashSet<>();
+        RoleUser rolesUser = roleRepo.findByName(userModifyReqDto.getRoleName() != null ? ERole.valueOf(userModifyReqDto.getRoleName()) : ERole.ROLE_USER).orElseThrow(()-> new ResourceNotFoundException("Role not found"));
+        roles.add(rolesUser);
+        u.setRoles(roles);
+        TypeAccount typeAccount = typeAccountRepo.findByName(userModifyReqDto.getTypeAccount() != null ? ETypeAccount.valueOf(userModifyReqDto.getTypeAccount()) : ETypeAccount.MANAGER_STORE).orElseThrow(()-> new ResourceNotFoundException("Type de compte not found"));
+        u.setTypeAccount(typeAccount);
+        u.setPosition(userModifyReqDto.getPosition());
+        u.setIdStore(userModifyReqDto.getIdStore());
+        u.setCreatedDate(LocalDateTime.now());
+        Users user = new Users();
+        String password = null;
+        Map<String, Object> userAndPasswordNotEncoded = new HashMap<>();
+
+        userAndPasswordNotEncoded = userService.modify(u);
+        user = (Users) userAndPasswordNotEncoded.get("user");
+        UserResDto userResDto = modelMapper.map(u, UserResDto.class);
+        userResDto.setStore(store);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(userResDto);
     }

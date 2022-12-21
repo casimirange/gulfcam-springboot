@@ -79,6 +79,16 @@ public class UserServiceImpl implements IUserService {
 	}
 
 	@Override
+	@Transactional
+	public Map<String, Object> modify(Users u) {
+		userRepo.save(u);
+		Map<String, Object> userAndPasswordNotEncoded = new HashMap<>();
+		userAndPasswordNotEncoded.put("user", u);
+		userAndPasswordNotEncoded.put("password", u.getPassword());
+		return userAndPasswordNotEncoded;
+	}
+
+	@Override
 	public Users getById(Long id) {
 		Users user = userRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(
 				messageSource.getMessage("messages.user_not_found", null, LocaleContextHolder.getLocale())));
