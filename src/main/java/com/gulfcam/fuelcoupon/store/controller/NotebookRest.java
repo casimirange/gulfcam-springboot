@@ -239,7 +239,7 @@ public class NotebookRest {
                                                                       @RequestParam(required = false, defaultValue = "idStoreKeeper") String sort,
                                                                       @RequestParam(required = false, defaultValue = "desc") String order) {
 
-        Page<Notebook> notebooks = iNotebookService.getNotebooksByIdStoreKeeper(idStoreHouse,
+        Page<Notebook> notebooks = iNotebookService.getNotebooksByIdStoreHouse(idStoreHouse,
                 Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(notebooks);
     }

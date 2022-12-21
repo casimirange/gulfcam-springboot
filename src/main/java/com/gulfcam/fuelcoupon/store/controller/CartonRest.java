@@ -184,7 +184,7 @@ public class CartonRest {
 
         carton.setUpdateAt(LocalDateTime.now());
 
-        Status status = iStatusRepo.findByName(EStatus.AVAILABLE).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.AVAILABLE +  "  not found"));
+        Status status = iStatusRepo.findByName(EStatus.DISABLED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.DISABLED +  "  not found"));
         carton.setStatus(status);
 
         Map<String, Object> CartonEncoded = new HashMap<>();
