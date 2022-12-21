@@ -120,8 +120,18 @@ public class StoreRest {
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @GetMapping("/{internalReference:[0-9]+}")
-    public ResponseEntity<Store> getStoreByInternalReference(@PathVariable Long internalReference) {
+    public ResponseEntity<?> getStoreByInternalReference(@PathVariable Long internalReference) {
         return ResponseEntity.ok(iStoreService.getByInternalReference(internalReference).get());
+    }
+
+    @Operation(summary = "Grouper la somme des carnet par magasin", tags = "Magasin", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Store.class)))),
+            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+    @GetMapping("/group/{internalReference:[0-9]+}")
+    public ResponseEntity<?> groupNoteBootByInternalReference(@PathVariable Long internalReference) {
+        return ResponseEntity.ok(iStoreService.groupNoteBootByInternalReference(internalReference));
     }
 
 

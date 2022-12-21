@@ -1,4 +1,5 @@
 package com.gulfcam.fuelcoupon.store.service.impl;
+import com.gulfcam.fuelcoupon.store.dto.ResponseStoreHouseGroupDTO;
 import com.gulfcam.fuelcoupon.store.dto.ResponseStorehouseDTO;
 import com.gulfcam.fuelcoupon.store.entity.Store;
 import com.gulfcam.fuelcoupon.store.entity.Storehouse;
@@ -74,6 +75,11 @@ public class StorehouseServiceImpl implements IStorehouseService {
     @Override
     public Optional<Storehouse> getStorehouseById(Long id) {
         return iStorehouseRepo.findById(id);
+    }
+
+    @Override
+    public ResponseStoreHouseGroupDTO groupeNoteBookByInternalReference(Long internelReference) {
+        return iStorehouseRepo.groupeNoteBookByInternalReference(internelReference);
     }
 
     @Override

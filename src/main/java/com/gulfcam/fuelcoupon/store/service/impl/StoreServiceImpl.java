@@ -1,5 +1,6 @@
 package com.gulfcam.fuelcoupon.store.service.impl;
 
+import com.gulfcam.fuelcoupon.store.dto.ResponseStoreGroupDTO;
 import com.gulfcam.fuelcoupon.store.entity.Store;
 import com.gulfcam.fuelcoupon.store.repository.IStoreRepo;
 import com.gulfcam.fuelcoupon.store.service.IStoreService;
@@ -27,6 +28,11 @@ public class StoreServiceImpl implements IStoreService {
     @Override
     public Optional<Store> getByInternalReference(Long internelReference) {
         return iStoreRepo.getStoreByInternalReference(internelReference);
+    }
+
+    @Override
+    public ResponseStoreGroupDTO groupNoteBootByInternalReference(Long internelReference) {
+        return iStoreRepo.groupNoteBootByInternalReference(internelReference);
     }
 
     @Override

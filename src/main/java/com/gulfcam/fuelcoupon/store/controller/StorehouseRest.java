@@ -166,6 +166,16 @@ public class StorehouseRest {
         return ResponseEntity.ok(iStorehouseService.getByInternalReference(internalReference).get());
     }
 
+    @Operation(summary = "Grouper la somme des quantités et carnets par entrepôt", tags = "Entrepôt", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Storehouse.class)))),
+            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+    @GetMapping("/group/{internalReference:[0-9]+}")
+    public ResponseEntity<?> groupeNoteBookByInternalReference(@PathVariable Long internalReference) {
+        return ResponseEntity.ok(iStorehouseService.groupeNoteBookByInternalReference(internalReference));
+    }
+
     @Operation(summary = "Supprimer un Entrepôt", tags = "Entrepôt", responses = {
             @ApiResponse(responseCode = "200", description = "Storehouse deleted successfully", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : access denied", content = @Content(mediaType = "Application/Json")),
