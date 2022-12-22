@@ -83,7 +83,7 @@
 				<textFieldExpression><![CDATA["GULFCAM. \n Douala, CAMEROUN \n" +$P{dateCreditNote}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="180" y="30" width="280" height="20" uuid="11b4bdd4-b6e6-4d4a-b26c-cb132d158441">
+				<reportElement x="220" y="30" width="280" height="20" uuid="11b4bdd4-b6e6-4d4a-b26c-cb132d158441">
 					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
