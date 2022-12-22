@@ -19,11 +19,15 @@ public class ResponseCouponMailDTO {
 
     private Long internalReference;
 
+    private String reference;
+
     private String serialNumber;
 
     private int modulo;
 
     private TypeVoucher idTypeVoucher;
+
+    private String amount;
 
     private LocalDate productionDate;
 

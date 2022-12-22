@@ -892,10 +892,10 @@ public class OrderRest {
 
         if(type.equalsIgnoreCase("DELIVERY")){
             data = generateDelivery(order, client);
-            headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=delivery-" + order.getClientReference() + ".pdf");
+            headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=delivery-" + order.getInternalReference() + ".pdf");
         }else{
             data = generateReceived(order, client);
-            headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=receive-" + order.getClientReference() + ".pdf");
+            headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=receive-" + order.getInternalReference() + ".pdf");
         }
 
         return ResponseEntity.ok().headers(headers).contentType(MediaType.APPLICATION_PDF).body(data);

@@ -146,6 +146,7 @@ public class RequestOppositionRest {
         requestOpposition.setIdServiceClient(createRequestOppositionDTO.getIdServiceClient());
         requestOpposition.setIdClient(createRequestOppositionDTO.getIdClient());
         Status status = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
+        Status statusCouponActived = iStatusRepo.findByName(EStatus.ACTIVATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.ACTIVATED +  "  not found"));
         requestOpposition.setStatus(status);
 
         iRequestOppositionService.createRequestOpposition(requestOpposition);
@@ -153,7 +154,7 @@ public class RequestOppositionRest {
         for (int i = 0; i< createRequestOppositionDTO.getSerialCoupons().size(); i++){
             coupon = iCouponService.getCouponBySerialNumber(createRequestOppositionDTO.getSerialCoupons().get(i)).get();
             ticket = new Ticket();
-            if(createRequestOppositionDTO.getIdClient().equals(coupon.getIdClient())){
+            if(createRequestOppositionDTO.getIdClient().equals(coupon.getIdClient()) && coupon.getStatus().equals(statusCouponActived)){
                 responseCouponMailDTO= new ResponseCouponMailDTO();
                 responseCouponMailDTO.setIdTypeVoucher(iTypeVoucherService.getByInternalReference(coupon.getIdTypeVoucher()).get());
                 responseCouponMailDTO.setInternalReference(coupon.getInternalReference());

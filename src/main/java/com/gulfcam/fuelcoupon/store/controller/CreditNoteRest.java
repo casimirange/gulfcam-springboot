@@ -5,7 +5,8 @@ import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.client.entity.Client;
 import com.gulfcam.fuelcoupon.client.service.IClientService;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
-import com.gulfcam.fuelcoupon.order.entity.TypeVoucher;
+import com.gulfcam.fuelcoupon.order.dto.ProductDTO;
+import com.gulfcam.fuelcoupon.order.entity.*;
 import com.gulfcam.fuelcoupon.order.service.ITypeVoucherService;
 import com.gulfcam.fuelcoupon.store.dto.CreateCreditNoteDTO;
 import com.gulfcam.fuelcoupon.store.dto.CreateRequestOppositionDTO;
@@ -37,6 +38,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -44,17 +48,21 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.ZoneId;
+import java.util.*;
 
 @RestController
 @Tag(name = "Note de crédit")
@@ -103,6 +111,7 @@ public class CreditNoteRest {
     String mailFrom;
     @Value("${mail.replyTo[0]}")
     String mailReplyTo;
+    SimpleDateFormat dateFor = new SimpleDateFormat("dd/MM/yyyy");
 
     @Operation(summary = "Valider les coupons utilisés", tags = "Note de crédit", responses = {
             @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = RequestOpposition.class)))),
@@ -119,6 +128,7 @@ public class CreditNoteRest {
         creditNote.setInternalReference(jwtUtils.generateInternalReference());
         creditNote.setIdStation(createCreditNoteDTO.getIdStation());
         creditNote.setCreatedAt(LocalDateTime.now());
+        Status statusCouponUsed = iStatusRepo.findByName(EStatus.USED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.USED +  "  not found"));
         Status status = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
         creditNote.setStatus(status);
 
@@ -127,16 +137,18 @@ public class CreditNoteRest {
         for (int i = 0; i< createCreditNoteDTO.getSerialCoupons().size(); i++){
             coupon = iCouponService.getCouponBySerialNumber(createCreditNoteDTO.getSerialCoupons().get(i)).get();
 
-            responseCouponMailDTO= new ResponseCouponMailDTO();
-            responseCouponMailDTO.setIdTypeVoucher(iTypeVoucherService.getByInternalReference(coupon.getIdTypeVoucher()).get());
-            responseCouponMailDTO.setInternalReference(coupon.getInternalReference());
-            responseCouponMailDTO.setStatus(coupon.getStatus());
-            responseCouponMailDTO.setSerialNumber(coupon.getSerialNumber());
-            coupon.setIdCreditNote(creditNote.getInternalReference());
-            coupon.setUpdateAt(LocalDateTime.now());
-            coupon.setIdStation(createCreditNoteDTO.getIdStation());
-            iCouponService.createCoupon(coupon);
-            couponList.add(responseCouponMailDTO);
+            if(coupon.getStatus().equals(statusCouponUsed)){
+                responseCouponMailDTO= new ResponseCouponMailDTO();
+                responseCouponMailDTO.setIdTypeVoucher(iTypeVoucherService.getByInternalReference(coupon.getIdTypeVoucher()).get());
+                responseCouponMailDTO.setInternalReference(coupon.getInternalReference());
+                responseCouponMailDTO.setStatus(coupon.getStatus());
+                responseCouponMailDTO.setSerialNumber(coupon.getSerialNumber());
+                coupon.setIdCreditNote(creditNote.getInternalReference());
+                coupon.setUpdateAt(LocalDateTime.now());
+                coupon.setIdStation(createCreditNoteDTO.getIdStation());
+                iCouponService.createCoupon(coupon);
+                couponList.add(responseCouponMailDTO);
+            }
 
         }
 
@@ -188,15 +200,59 @@ public class CreditNoteRest {
         return ResponseEntity.ok(responseCreditNoteDTO);
     }
 
+    @Operation(summary = "Générer Une Note de crédit par sa reference interne", tags = "Note de crédit", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = CreditNote.class)))),
+            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+    @GetMapping("/export/{internalReference:[0-9]+}")
+    public ResponseEntity<?> exportByInternalReference(@PathVariable Long internalReference) throws JRException, IOException {
+
+        CreditNote creditNote = iCreditNoteService.getByInternalReference(internalReference).get();
+        List<Coupon> couponList = iCouponService.getCouponsByIdCreditNote(internalReference);
+        Station station = iStationService.getByInternalReference(creditNote.getIdStation()).get();
+        ResponseCouponMailDTO responseCouponMailDTO;
+        List<ResponseCouponMailDTO> responseCouponMailDTOList = new ArrayList<>();
+        float amoutToDebit = 0;
+        for(int i=0; i<couponList.size(); i++){
+            responseCouponMailDTO= new ResponseCouponMailDTO();
+            TypeVoucher typeVoucher = iTypeVoucherService.getByInternalReference(couponList.get(i).getIdTypeVoucher()).get();
+            Coupon coupon = iCouponService.getByInternalReference(couponList.get(i).getInternalReference()).get();
+            amoutToDebit += typeVoucher.getAmount();
+
+            responseCouponMailDTO.setModulo(coupon.getModulo());
+            responseCouponMailDTO.setProductionDate(coupon.getProductionDate());
+            responseCouponMailDTO.setStatus(coupon.getStatus());
+            responseCouponMailDTO.setCreatedAt(coupon.getCreatedAt());
+            responseCouponMailDTO.setInternalReference(coupon.getInternalReference());
+            responseCouponMailDTO.setReference(coupon.getInternalReference()+"");
+            responseCouponMailDTO.setSerialNumber(coupon.getSerialNumber());
+            responseCouponMailDTO.setIdTypeVoucher(typeVoucher);
+            responseCouponMailDTO.setAmount(typeVoucher.getAmount()+"");
+            responseCouponMailDTOList.add(responseCouponMailDTO);
+        }
+        byte[] data = generateCreditNote(amoutToDebit, creditNote, station, responseCouponMailDTOList);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=creditnote-" + creditNote.getInternalReference() + ".pdf");
+        return ResponseEntity.ok().headers(headers).contentType(MediaType.APPLICATION_PDF).body(data);
+    }
+
     @Operation(summary = "Valider Une Note de crédit par sa reference interne", tags = "Note de crédit", responses = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = CreditNote.class)))),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @GetMapping("/valid/{internalReference:[0-9]+}")
-    public ResponseEntity<ResponseCreditNoteDTO> validCreditNote(@PathVariable Long internalReference) {
+    public ResponseEntity<?> validCreditNote(@PathVariable Long internalReference) {
 
         CreditNote creditNote = iCreditNoteService.getByInternalReference(internalReference).get();
+
+        Status statusCreditNote = iStatusRepo.findByName(EStatus.ACTIVATED).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatus.ACTIVATED +  "  not found"));
+        if (creditNote.getStatus() == statusCreditNote) {
+            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                    messageSource.getMessage("messages.credit_note_actived", null, LocaleContextHolder.getLocale())));
+        }
+
         ResponseCreditNoteDTO responseCreditNoteDTO = new ResponseCreditNoteDTO();
         float amoutToDebit = 0;
         creditNote.setUpdateAt(LocalDateTime.now());
@@ -206,12 +262,12 @@ public class CreditNoteRest {
 
         List<Coupon> coupons = iCouponService.getCouponsByIdCreditNote(internalReference);
 
-        for(int i=0; i<=coupons.size(); i++){
+        for(int i=0; i<coupons.size(); i++){
             TypeVoucher typeVoucher = iTypeVoucherService.getByInternalReference(coupons.get(i).getIdTypeVoucher()).get();
             amoutToDebit += typeVoucher.getAmount();
         }
         Station station = iStationService.getByInternalReference(creditNote.getIdStation()).get();
-        station.setBalance(station.getBalance()-amoutToDebit);
+        station.setBalance(station.getBalance()+amoutToDebit);
         station.setUpdateAt(LocalDateTime.now());
         iStationService.createStation(station);
 
@@ -275,4 +331,33 @@ public class CreditNoteRest {
         Page<ResponseCreditNoteDTO> list = iCreditNoteService.getAllCreditNotes(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(list);
     }
+
+
+    private byte[] generateCreditNote(float amountToDebit, CreditNote creditNote, Station station, List<ResponseCouponMailDTO> couponList) throws JRException, IOException {
+
+        /* Map to hold Jasper report Parameters*/
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("coupons", couponList);
+        parameters.put("amountToDebit", amountToDebit+"");
+        parameters.put("dateCreditNote", dateFor.format(Date.from((creditNote.getCreatedAt() == null) ? creditNote.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant():  creditNote.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant())).toString());
+        parameters.put("localization", station.getLocalization());
+        parameters.put("designation", station.getDesignation());
+        parameters.put("balance", station.getBalance()+"");
+        parameters.put("pinCode", station.getPinCode()+"");
+        parameters.put("reference", creditNote.getInternalReference()+"");
+        parameters.put("logo", appContext.getResource("classpath:/templates/logo.jpeg").getFile().getAbsolutePath());
+        /* read jrxl fille and creat jasperdesign object*/
+        InputStream input = new FileInputStream(appContext.getResource("classpath:/templates/creditnote.jrxml").getFile());
+
+        JasperDesign jasperDesign = JRXmlLoader.load(input);
+
+        /* compiling jrxml with help of JasperReport class*/
+        JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+
+        /* Using jasperReport objet to generate PDF*/
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
+
+        /*convert PDF to byte type*/
+        return JasperExportManager.exportReportToPdf(jasperPrint);
     }
+}
