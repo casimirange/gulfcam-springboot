@@ -41,6 +41,29 @@ public class CreditNoteServiceImpl implements ICreditNoteService {
     }
 
     @Override
+    public Page<ResponseCreditNoteDTO> getCreditNotesByIdStation(Long idStation, int page, int size, String sort, String order) {
+        List<CreditNote> creditNotes = iCreditNoteRepo.getCreditNotesByIdStation(idStation,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
+
+        ResponseCreditNoteDTO responseCreditNoteDTO;
+        List<ResponseCreditNoteDTO> responseCreditNoteDTOList = new ArrayList<>();
+
+        for (CreditNote creditNote: creditNotes){
+            responseCreditNoteDTO = new ResponseCreditNoteDTO();
+            responseCreditNoteDTO.setStatus(creditNote.getStatus());
+            responseCreditNoteDTO.setId(creditNote.getId());
+            responseCreditNoteDTO.setUpdateAt(creditNote.getUpdateAt());
+            responseCreditNoteDTO.setStation(iStationService.getByInternalReference(creditNote.getIdStation()).get());
+            responseCreditNoteDTO.setInternalReference(creditNote.getInternalReference());
+            responseCreditNoteDTO.setCreatedAt(creditNote.getCreatedAt());
+            responseCreditNoteDTO.setCoupon(iCouponService.getCouponsByIdCreditNote(creditNote.getInternalReference()));
+            responseCreditNoteDTOList.add(responseCreditNoteDTO);
+
+        }
+        Page<ResponseCreditNoteDTO> responseCreditNotePage = new PageImpl<>(responseCreditNoteDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseCreditNoteDTOList.size());
+        return responseCreditNotePage;
+    }
+
+    @Override
     public Page<ResponseCreditNoteDTO> getAllCreditNotes(int page, int size, String sort, String order) {
         List<CreditNote> creditNotes = iCreditNoteRepo.findAll();
 

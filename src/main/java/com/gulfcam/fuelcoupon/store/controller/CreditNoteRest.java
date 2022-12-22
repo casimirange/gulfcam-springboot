@@ -307,7 +307,7 @@ public class CreditNoteRest {
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @DeleteMapping("/{internalReference:[0-9]+}")
-    public ResponseEntity<Object> deleteRequestOpposition(@PathVariable Long internalReference) {
+    public ResponseEntity<Object> deleteCreditNote(@PathVariable Long internalReference) {
         CreditNote creditNote = iCreditNoteService.getByInternalReference(internalReference).get();
         iCreditNoteService.deleteCreditNote(creditNote);
         return ResponseEntity.ok(new MessageResponseDto(
@@ -324,11 +324,29 @@ public class CreditNoteRest {
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @GetMapping("")
-    public ResponseEntity<?> getAllRequestOppositions(@RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
-                                             @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
-                                             @RequestParam(required = false, defaultValue = "id") String sort,
-                                             @RequestParam(required = false, defaultValue = "desc") String order) {
+    public ResponseEntity<?> getAllCreditNotes(@RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
+                                                      @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
+                                                      @RequestParam(required = false, defaultValue = "id") String sort,
+                                                      @RequestParam(required = false, defaultValue = "desc") String order) {
         Page<ResponseCreditNoteDTO> list = iCreditNoteService.getAllCreditNotes(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
+        return ResponseEntity.ok(list);
+    }
+
+    @Parameters(value = {
+            @Parameter(name = "sort", schema = @Schema(allowableValues = {"id", "createdAt"})),
+            @Parameter(name = "order", schema = @Schema(allowableValues = {"asc", "desc"}))})
+    @Operation(summary = "Liste des Note de crédit par station", tags = "Note de crédit", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "404", description = "Credit note not found", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+    @GetMapping("/station/{idStation:[0-9]+}")
+    public ResponseEntity<?> getCreditNotesByIdStation(@PathVariable Long idStation,@RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
+                                                      @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
+                                                      @RequestParam(required = false, defaultValue = "id") String sort,
+                                                      @RequestParam(required = false, defaultValue = "desc") String order) {
+        Page<ResponseCreditNoteDTO> list = iCreditNoteService.getCreditNotesByIdStation(idStation, Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(list);
     }
 
