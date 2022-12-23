@@ -363,9 +363,9 @@ public class CreditNoteRest {
         parameters.put("balance", station.getBalance()+"");
         parameters.put("pinCode", station.getPinCode()+"");
         parameters.put("reference", creditNote.getInternalReference()+"");
-        parameters.put("logo", appContext.getResource("classpath:/templates/logo.jpeg").getFile().getAbsolutePath());
+        parameters.put("logo", appContext.getResource("classpath:/templates/logo.jpeg").getInputStream());
         /* read jrxl fille and creat jasperdesign object*/
-        InputStream input = new FileInputStream(appContext.getResource("classpath:/templates/creditnote.jrxml").getFile());
+        InputStream input = new FileInputStream(appContext.getResource("classpath:/templates/creditnote.jrxml").getInputStream().toString());
 
         JasperDesign jasperDesign = JRXmlLoader.load(input);
 

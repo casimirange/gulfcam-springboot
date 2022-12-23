@@ -966,9 +966,9 @@ public class OrderRest {
         parameters.put("clientReference", (order.getClientReference() == null) ? client.getInternalReference(): order.getClientReference()+"");
         parameters.put("idcommand", order.getInternalReference()+"");
         parameters.put("the_date", new Date());
-        parameters.put("logo", appContext.getResource("classpath:/templates/logo.jpeg").getFile().getAbsolutePath());
+        parameters.put("logo", appContext.getResource("classpath:/templates/logo.jpeg").getInputStream());
         /* read jrxl fille and creat jasperdesign object*/
-        InputStream input = new FileInputStream(appContext.getResource("classpath:/templates/Invoice.jrxml").getFile());
+        InputStream input = new FileInputStream(appContext.getResource("classpath:/templates/Invoice.jrxml").getInputStream().toString());
 
         JasperDesign jasperDesign = JRXmlLoader.load(input);
 
@@ -1016,9 +1016,9 @@ public class OrderRest {
         parameters.put("clientReference", (order.getClientReference() == null) ? client.getInternalReference(): order.getClientReference() +"");
         parameters.put("idcommand", order.getInternalReference()+"");
         parameters.put("the_date", new Date());
-        parameters.put("logo", appContext.getResource("classpath:/templates/logo.jpeg").getFile().getAbsolutePath());
+        parameters.put("logo", appContext.getResource("classpath:/templates/logo.jpeg").getInputStream());
         /* read jrxl fille and creat jasperdesign object*/
-        InputStream input = new FileInputStream(appContext.getResource("classpath:/templates/received.jrxml").getFile());
+        InputStream input = new FileInputStream(appContext.getResource("classpath:/templates/received.jrxml").getInputStream().toString());
 
         JasperDesign jasperDesign = JRXmlLoader.load(input);
 
@@ -1060,9 +1060,9 @@ public class OrderRest {
         parameters.put("clientReference", (order.getClientReference() == null) ? client.getInternalReference(): order.getClientReference()+"");
         parameters.put("idcommand", order.getInternalReference()+"");
         parameters.put("the_date", new Date());
-        parameters.put("logo", appContext.getResource("classpath:/templates/logo.jpeg").getFile().getAbsolutePath());
+        parameters.put("logo", appContext.getResource("classpath:/templates/logo.jpeg").getInputStream());
         /* read jrxl fille and creat jasperdesign object*/
-        InputStream input = new FileInputStream(appContext.getResource("classpath:/templates/delivery.jrxml").getFile());
+        InputStream input = new FileInputStream(appContext.getResource("classpath:/templates/delivery.jrxml").getInputStream().toString());
 
         JasperDesign jasperDesign = JRXmlLoader.load(input);
 
