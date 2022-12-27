@@ -144,6 +144,11 @@ public class CartonServiceImpl implements ICartonService {
     }
 
     @Override
+    public List<Carton> getCartonsByIdStoreHouse(Long idStoreHouse) {
+        return iCartonRepo.getCartonsByIdStoreHouse(idStoreHouse);
+    }
+
+    @Override
     public Page<Carton> getCartonsByIdStoreKeeper(Long idStoreKeeper, int page, int size, String sort, String order) {
         return iCartonRepo.getCartonsByIdStoreKeeper(idStoreKeeper,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
     }

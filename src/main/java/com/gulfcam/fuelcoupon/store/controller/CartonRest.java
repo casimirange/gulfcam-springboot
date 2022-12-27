@@ -111,7 +111,19 @@ public class CartonRest {
 
         Users storeKeeper = new Users();
         Storehouse storehouse = new Storehouse();
+        List<Carton> cartonList = iCartonService.getCartonsByIdStoreHouse(createCartonDTO.getIdStoreHouseStockage());
 
+        for (Carton item: cartonList){
+            if(item.getNumber() == createCartonDTO.getNumber()){
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.carton_to_storehouse_exists", null, LocaleContextHolder.getLocale())));
+            }
+
+            if(item.getFrom() == createCartonDTO.getFrom() || item.getTo() == createCartonDTO.getTo()){
+                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                        messageSource.getMessage("messages.plage_to_storehouse_exists", null, LocaleContextHolder.getLocale())));
+            }
+        }
         if (createCartonDTO.getTypeVoucher() != 0) {
             if(!iTypeVoucherService.getTypeVoucherByAmountEquals(createCartonDTO.getTypeVoucher()).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
@@ -181,6 +193,11 @@ public class CartonRest {
                     messageSource.getMessage("messages.carton_exists", null, LocaleContextHolder.getLocale())));
         }
         Carton carton = iCartonService.getByInternalReference(idCarton).get();
+
+        if (carton.getStatus().getName() == EStatus.DISABLED) {
+            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                    messageSource.getMessage("messages.carton_used", null, LocaleContextHolder.getLocale())));
+        }
 
         carton.setUpdateAt(LocalDateTime.now());
 
