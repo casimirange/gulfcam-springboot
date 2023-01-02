@@ -32,12 +32,14 @@ import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpHeaders;
@@ -45,15 +47,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -95,6 +97,9 @@ public class OrderRest {
 
     @Autowired
     ITypeDocumentRepo iTypeDocumentRepo;
+
+    @Autowired
+    ResourceLoader resourceLoader;
 
     @Autowired
     IOrderRepo iOrderRepo;
@@ -887,6 +892,46 @@ public class OrderRest {
         Order order = iOrderService.getByInternalReference(internalReference).get();
         Client client = iClientService.getClientByInternalReference(order.getIdClient()).get();
 
+        Resource resource1 = resourceLoader.getResource("classpath:/templates/logo.jpeg");
+
+        InputStream inputStream1 = resource1.getInputStream();
+
+        String FILEPATH = "";
+        File file = new File(FILEPATH);
+
+        byte[] dataAsBytes1 = FileCopyUtils.copyToByteArray(inputStream1);
+
+//        FileUtils.writeByteArrayToFile(file, dataAsBytes1);
+        // Try block to check for exceptions
+        try {
+
+            // Initialize a pointer in file
+            // using OutputStream
+            OutputStream os = new FileOutputStream(file);
+
+            // Starting writing the bytes in it
+            os.write(inputStream1.readAllBytes());
+
+            // Display message onconsole for successful
+            // execution
+            System.out.println("Successfully"
+                    + " byte inserted");
+
+            // Close the file connections
+            os.close();
+        }
+
+        // Catch block to handle the exceptions
+        catch (Exception e) {
+
+            // Display exception on console
+            System.out.println("Exception: " + e);
+        }
+
+        String data1 = new String(dataAsBytes1, StandardCharsets.UTF_8);
+
+        log.info("  appContext  "+ file);
+
         byte[] data;
         HttpHeaders headers = new HttpHeaders();
 
@@ -927,8 +972,9 @@ public class OrderRest {
     public ResponseEntity<?> getOrders(@RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                              @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                              @RequestParam(required = false, defaultValue = "id") String sort,
-                                             @RequestParam(required = false, defaultValue = "desc") String order) {
+                                             @RequestParam(required = false, defaultValue = "desc") String order) throws IOException {
         Page<ResponseOrderDTO> list = iOrderService.getAllOrders(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
+
         return ResponseEntity.ok(list);
     }
 
