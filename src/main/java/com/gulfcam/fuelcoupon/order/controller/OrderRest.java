@@ -892,46 +892,6 @@ public class OrderRest {
         Order order = iOrderService.getByInternalReference(internalReference).get();
         Client client = iClientService.getClientByInternalReference(order.getIdClient()).get();
 
-        Resource resource1 = resourceLoader.getResource("classpath:/templates/logo.jpeg");
-
-        InputStream inputStream1 = resource1.getInputStream();
-
-        String FILEPATH = "";
-        File file = new File(FILEPATH);
-
-        byte[] dataAsBytes1 = FileCopyUtils.copyToByteArray(inputStream1);
-
-//        FileUtils.writeByteArrayToFile(file, dataAsBytes1);
-        // Try block to check for exceptions
-        try {
-
-            // Initialize a pointer in file
-            // using OutputStream
-            OutputStream os = new FileOutputStream(file);
-
-            // Starting writing the bytes in it
-            os.write(inputStream1.readAllBytes());
-
-            // Display message onconsole for successful
-            // execution
-            System.out.println("Successfully"
-                    + " byte inserted");
-
-            // Close the file connections
-            os.close();
-        }
-
-        // Catch block to handle the exceptions
-        catch (Exception e) {
-
-            // Display exception on console
-            System.out.println("Exception: " + e);
-        }
-
-        String data1 = new String(dataAsBytes1, StandardCharsets.UTF_8);
-
-        log.info("  appContext  "+ file);
-
         byte[] data;
         HttpHeaders headers = new HttpHeaders();
 
