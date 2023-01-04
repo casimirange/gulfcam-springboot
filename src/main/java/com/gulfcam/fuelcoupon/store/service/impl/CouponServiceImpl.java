@@ -7,6 +7,7 @@ import com.gulfcam.fuelcoupon.store.dto.ResponseCouponDTO;
 import com.gulfcam.fuelcoupon.store.dto.ResponseCouponMailDTO;
 import com.gulfcam.fuelcoupon.store.entity.Coupon;
 import com.gulfcam.fuelcoupon.store.helper.ExcelCouponHelper;
+import com.gulfcam.fuelcoupon.store.repository.ICartonRepo;
 import com.gulfcam.fuelcoupon.store.repository.ICouponRepo;
 import com.gulfcam.fuelcoupon.store.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +35,6 @@ public class CouponServiceImpl implements ICouponService {
     IClientService iClientService;
     @Autowired
     ITypeVoucherService iTypeVoucherService;
-    @Autowired
-    ICartonService iCartonService;
     @Autowired
     IStationService iStationService;
     @Autowired
