@@ -3,6 +3,7 @@ package com.gulfcam.fuelcoupon.store.service.impl;
 import com.gulfcam.fuelcoupon.order.service.ITypeVoucherService;
 import com.gulfcam.fuelcoupon.store.dto.ResponseNotebookDTO;
 import com.gulfcam.fuelcoupon.store.entity.Notebook;
+import com.gulfcam.fuelcoupon.store.repository.ICartonRepo;
 import com.gulfcam.fuelcoupon.store.repository.INotebookRepo;
 import com.gulfcam.fuelcoupon.store.service.ICartonService;
 import com.gulfcam.fuelcoupon.store.service.INotebookService;
@@ -28,7 +29,7 @@ public class NotebookServiceImpl implements INotebookService {
     @Autowired
     ITypeVoucherService iTypeVoucherService;
     @Autowired
-    ICartonService iCartonService;
+    ICartonRepo iCartonRepo;
     @Autowired
     IUserService iUserService;
     @Autowired
@@ -60,8 +61,8 @@ public class NotebookServiceImpl implements INotebookService {
             responseNotebookDTO.setIdStoreKeeper(notebook.getIdStoreKeeper());
             responseNotebookDTO.setPlage_coupon(notebook.getPlage_coupon());
             responseNotebookDTO.setUpdateAt(notebook.getUpdateAt());
-            responseNotebookDTO.setCarton((notebook.getIdCarton() == null)? null: iCartonService.getByInternalReference(notebook.getIdCarton()).get());
-            responseNotebookDTO.setNumberCarton((notebook.getIdCarton() == null)? null: iCartonService.getByInternalReference(notebook.getIdCarton()).get().getNumber());
+            responseNotebookDTO.setCarton((notebook.getIdCarton() == null)? null: iCartonRepo.getCartonByInternalReference(notebook.getIdCarton()).get());
+            responseNotebookDTO.setNumberCarton((notebook.getIdCarton() == null)? null: iCartonRepo.getCartonByInternalReference(notebook.getIdCarton()).get().getNumber());
             responseNotebookDTO.setStoreKeeper((notebook.getIdStoreKeeper() == null)? null: iUserService.getByInternalReference(notebook.getIdStoreKeeper()));
             responseNotebookDTO.setNameStoreKeeper((notebook.getIdStoreKeeper() == null)? null: iUserService.getByInternalReference(notebook.getIdStoreKeeper()).getFirstName()+" "+iUserService.getByInternalReference(notebook.getIdStoreKeeper()).getLastName());
             responseNotebookDTO.setStorehouse((notebook.getIdStoreHouse() == null)? null: iStorehouseService.getByInternalReference(notebook.getIdStoreHouse()).get());
@@ -97,8 +98,8 @@ public class NotebookServiceImpl implements INotebookService {
             responseNotebookDTO.setIdStoreKeeper(notebook.getIdStoreKeeper());
             responseNotebookDTO.setPlage_coupon(notebook.getPlage_coupon());
             responseNotebookDTO.setUpdateAt(notebook.getUpdateAt());
-            responseNotebookDTO.setCarton((notebook.getIdCarton() == null)? null: iCartonService.getByInternalReference(notebook.getIdCarton()).get());
-            responseNotebookDTO.setNumberCarton((notebook.getIdCarton() == null)? null: iCartonService.getByInternalReference(notebook.getIdCarton()).get().getNumber());
+            responseNotebookDTO.setCarton((notebook.getIdCarton() == null)? null: iCartonRepo.getCartonByInternalReference(notebook.getIdCarton()).get());
+            responseNotebookDTO.setNumberCarton((notebook.getIdCarton() == null)? null: iCartonRepo.getCartonByInternalReference(notebook.getIdCarton()).get().getNumber());
             responseNotebookDTO.setStoreKeeper((notebook.getIdStoreKeeper() == null)? null: iUserService.getByInternalReference(notebook.getIdStoreKeeper()));
             responseNotebookDTO.setNameStoreKeeper((notebook.getIdStoreKeeper() == null)? null: iUserService.getByInternalReference(notebook.getIdStoreKeeper()).getFirstName()+" "+iUserService.getByInternalReference(notebook.getIdStoreKeeper()).getLastName());
             responseNotebookDTO.setStorehouse((notebook.getIdStoreHouse() == null)? null: iStorehouseService.getByInternalReference(notebook.getIdStoreHouse()).get());
@@ -134,8 +135,8 @@ public class NotebookServiceImpl implements INotebookService {
             responseNotebookDTO.setIdStoreKeeper(notebook.getIdStoreKeeper());
             responseNotebookDTO.setPlage_coupon(notebook.getPlage_coupon());
             responseNotebookDTO.setUpdateAt(notebook.getUpdateAt());
-            responseNotebookDTO.setCarton((notebook.getIdCarton() == null)? null: iCartonService.getByInternalReference(notebook.getIdCarton()).get());
-            responseNotebookDTO.setNumberCarton((notebook.getIdCarton() == null)? null: iCartonService.getByInternalReference(notebook.getIdCarton()).get().getNumber());
+            responseNotebookDTO.setCarton((notebook.getIdCarton() == null)? null: iCartonRepo.getCartonByInternalReference(notebook.getIdCarton()).get());
+            responseNotebookDTO.setNumberCarton((notebook.getIdCarton() == null)? null: iCartonRepo.getCartonByInternalReference(notebook.getIdCarton()).get().getNumber());
             responseNotebookDTO.setStoreKeeper((notebook.getIdStoreKeeper() == null)? null: iUserService.getByInternalReference(notebook.getIdStoreKeeper()));
             responseNotebookDTO.setNameStoreKeeper((notebook.getIdStoreKeeper() == null)? null: iUserService.getByInternalReference(notebook.getIdStoreKeeper()).getFirstName()+" "+iUserService.getByInternalReference(notebook.getIdStoreKeeper()).getLastName());
             responseNotebookDTO.setStorehouse((notebook.getIdStoreHouse() == null)? null: iStorehouseService.getByInternalReference(notebook.getIdStoreHouse()).get());
@@ -171,8 +172,8 @@ public class NotebookServiceImpl implements INotebookService {
             responseNotebookDTO.setIdStoreKeeper(notebook.getIdStoreKeeper());
             responseNotebookDTO.setPlage_coupon(notebook.getPlage_coupon());
             responseNotebookDTO.setUpdateAt(notebook.getUpdateAt());
-            responseNotebookDTO.setCarton((notebook.getIdCarton() == null)? null: iCartonService.getByInternalReference(notebook.getIdCarton()).get());
-            responseNotebookDTO.setNumberCarton((notebook.getIdCarton() == null)? null: iCartonService.getByInternalReference(notebook.getIdCarton()).get().getNumber());
+            responseNotebookDTO.setCarton((notebook.getIdCarton() == null)? null: iCartonRepo.getCartonByInternalReference(notebook.getIdCarton()).get());
+            responseNotebookDTO.setNumberCarton((notebook.getIdCarton() == null)? null: iCartonRepo.getCartonByInternalReference(notebook.getIdCarton()).get().getNumber());
             responseNotebookDTO.setStoreKeeper((notebook.getIdStoreKeeper() == null)? null: iUserService.getByInternalReference(notebook.getIdStoreKeeper()));
             responseNotebookDTO.setNameStoreKeeper((notebook.getIdStoreKeeper() == null)? null: iUserService.getByInternalReference(notebook.getIdStoreKeeper()).getFirstName()+" "+iUserService.getByInternalReference(notebook.getIdStoreKeeper()).getLastName());
             responseNotebookDTO.setStorehouse((notebook.getIdStoreHouse() == null)? null: iStorehouseService.getByInternalReference(notebook.getIdStoreHouse()).get());
