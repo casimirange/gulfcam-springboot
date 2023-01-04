@@ -1,6 +1,7 @@
 package com.gulfcam.fuelcoupon.user.controller;
 
 import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
+import com.gulfcam.fuelcoupon.user.dto.ResponseUsersDTO;
 import com.gulfcam.fuelcoupon.user.dto.UserResDto;
 import com.gulfcam.fuelcoupon.user.entity.Users;
 import com.gulfcam.fuelcoupon.user.service.IUserService;
@@ -53,12 +54,12 @@ public class UserRest {
                   @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json")) })
           @GetMapping("")
 		  @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-          public ResponseEntity<Page<Users>> get20Users(
+          public ResponseEntity<Page<ResponseUsersDTO>> get20Users(
                   @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                   @RequestParam(required = false, value = "size", defaultValue = "20") String sizeParam,
                   @RequestParam(required = false, defaultValue = "userId") String sort,
                   @RequestParam(required = false, defaultValue = "desc") String order) {
-              Page<Users> users = userService.getUsers(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
+              Page<ResponseUsersDTO> users = userService.getUsers(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
               return ResponseEntity.ok(users);
           }
 

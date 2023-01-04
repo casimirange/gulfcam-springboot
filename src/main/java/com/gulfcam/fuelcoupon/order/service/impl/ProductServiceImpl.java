@@ -72,8 +72,35 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public Page<Product> getProductsByIdOrder(Long idOrder, int page, int size, String sort, String order) {
-        return iProductRepo.getProductsByIdOrder(idOrder,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
+    public Page<ResponseProductDTO> getProductsByIdOrder(Long idOrder, int page, int size, String sort, String order) {
+
+        List<Product> products = iProductRepo.getProductsByIdOrder(idOrder);
+        ResponseProductDTO responseProductDTO;
+        List<ResponseProductDTO> responseProductDTOList = new ArrayList<>();
+
+        for(Product item: products) {
+            Order order1 = new Order();
+            TypeVoucher typeVoucher = new TypeVoucher();
+
+            if (item.getIdOrder() != null)
+                order1 = iOrderService.getByInternalReference(item.getIdOrder()).get();
+            if (item.getIdTypeVoucher() != null)
+                typeVoucher = iTypeVoucherService.getByInternalReference(item.getIdTypeVoucher()).get();
+
+            responseProductDTO = new ResponseProductDTO();
+            responseProductDTO.setId(item.getId());
+            responseProductDTO.setOrder(order1);
+            responseProductDTO.setStatus(item.getStatus());
+            responseProductDTO.setCreatedAt(item.getCreatedAt());
+            responseProductDTO.setInternalReference(item.getInternalReference());
+            responseProductDTO.setQuantityNotebook(item.getQuantityNotebook());
+            responseProductDTO.setUpdateAt(item.getUpdateAt());
+            responseProductDTO.setAmount((typeVoucher != null)? typeVoucher.getAmount(): 0);
+            responseProductDTOList.add(responseProductDTO);
+        }
+
+        Page<ResponseProductDTO> productPage = new PageImpl<>(responseProductDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseProductDTOList.size());
+        return productPage;
     }
 
     @Override

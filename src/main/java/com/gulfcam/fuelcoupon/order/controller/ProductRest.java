@@ -191,13 +191,13 @@ public class ProductRest {
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @GetMapping("/order/{idOrder:[0-9]+}")
-    public ResponseEntity<Page<Product>> getProductsByIdOrder(@PathVariable Long idOrder,
+    public ResponseEntity<Page<ResponseProductDTO>> getProductsByIdOrder(@PathVariable Long idOrder,
                                                               @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                                               @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                                               @RequestParam(required = false, defaultValue = "idOrder") String sort,
                                                               @RequestParam(required = false, defaultValue = "desc") String order) {
 
-        Page<Product> products = iProductService.getProductsByIdOrder(idOrder,
+        Page<ResponseProductDTO> products = iProductService.getProductsByIdOrder(idOrder,
                 Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(products);
     }

@@ -1,5 +1,6 @@
 package com.gulfcam.fuelcoupon.store.service;
 
+import com.gulfcam.fuelcoupon.store.dto.ResponseCouponDTO;
 import com.gulfcam.fuelcoupon.store.entity.Coupon;
 import org.springframework.data.domain.Page;
 
@@ -9,13 +10,13 @@ import java.util.Optional;
 
 public interface ICouponService {
 
-    Page<Coupon> getAllCoupons(int page, int size, String sort, String order);
+    Page<ResponseCouponDTO> getAllCoupons(int page, int size, String sort, String order);
     List<Coupon> getCouponsByIdRequestOpposition(Long idRequestOpposition);
     List<Coupon> getCouponsByIdCreditNote(Long idCreditNote);
     ByteArrayInputStream exportCouponsByIdClient(Long idClient);
-    Page<Coupon> getCouponsByIdStation(Long idStation, int page, int size, String sort, String order);
-    Page<Coupon> getCouponsByIdClient(Long idClient, int page, int size, String sort, String order);
-    Page<Coupon> getCouponsByIdNotebook(Long idNotebook, int page, int size, String sort, String order);
+    Page<ResponseCouponDTO> getCouponsByIdStation(Long idStation, int page, int size, String sort, String order);
+    Page<ResponseCouponDTO> getCouponsByIdClient(Long idClient, int page, int size, String sort, String order);
+    Page<ResponseCouponDTO> getCouponsByIdNotebook(Long idNotebook, int page, int size, String sort, String order);
     List<Coupon> getCouponsByIdNotebook(Long idNotebook);
     Page<Coupon> getCouponsByIdTicket(Long idTicket, int page, int size, String sort, String order);
     Optional<Coupon> getCouponBySerialNumber(String serialNumber);

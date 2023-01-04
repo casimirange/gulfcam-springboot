@@ -10,6 +10,7 @@ import com.gulfcam.fuelcoupon.order.service.IItemService;
 import com.gulfcam.fuelcoupon.order.service.ITypeVoucherService;
 import com.gulfcam.fuelcoupon.order.service.IUnitService;
 import com.gulfcam.fuelcoupon.store.dto.CreateStockMovementDTO;
+import com.gulfcam.fuelcoupon.store.dto.ResponseStockMovementDTO;
 import com.gulfcam.fuelcoupon.store.entity.Carton;
 import com.gulfcam.fuelcoupon.store.entity.StockMovement;
 import com.gulfcam.fuelcoupon.store.entity.Store;
@@ -135,6 +136,7 @@ public class StockMovementRest {
             stockMovement.setIdStore2(iStoreService.getByInternalReference(storehouse.getIdStore()).get().getInternalReference());
             stockMovement.setIdStoreHouse1(carton.getIdStoreHouse());
             stockMovement.setIdStoreHouse2(storehouse.getInternalReference());
+            stockMovement.setCreatedAt(LocalDateTime.now());
 
             iStockMovementService.createStockMovement(stockMovement);
 
@@ -279,7 +281,7 @@ public class StockMovementRest {
                                              @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                              @RequestParam(required = false, defaultValue = "id") String sort,
                                              @RequestParam(required = false, defaultValue = "desc") String order) {
-        Page<StockMovement> list = iStockMovementService.getAllStockMovements(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
+        Page<ResponseStockMovementDTO> list = iStockMovementService.getAllStockMovements(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(list);
     }
     }

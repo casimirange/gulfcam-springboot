@@ -1,23 +1,23 @@
 package com.gulfcam.fuelcoupon.user.service;
 
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
+import com.gulfcam.fuelcoupon.store.service.IStoreService;
+import com.gulfcam.fuelcoupon.user.dto.ResponseUsersDTO;
 import com.gulfcam.fuelcoupon.user.dto.UserEditPasswordDto;
 import com.gulfcam.fuelcoupon.user.entity.*;
 import com.gulfcam.fuelcoupon.user.repository.*;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.security.SecureRandom;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.*;
@@ -35,6 +35,9 @@ public class UserServiceImpl implements IUserService {
 
 	@Autowired
 	private IRoleUserRepo roleRepo;
+
+	@Autowired
+	private IStoreService iStoreService;
 
 	@Autowired
 	private IOldPasswordRepo oldPasswordRepo;
@@ -346,8 +349,37 @@ public class UserServiceImpl implements IUserService {
 	}
 
 	@Override
-	public Page<Users> getUsers(int page, int size, String sort, String order) {
-		return userRepo.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
+	public Page<ResponseUsersDTO> getUsers(int page, int size, String sort, String order) {
+		List<Users> usersList = userRepo.findAll();
+
+		ResponseUsersDTO responseUsersDTO;
+		List<ResponseUsersDTO> responseUsersDTOList = new ArrayList<>();
+
+		for (Users user: usersList){
+			responseUsersDTO = new ResponseUsersDTO();
+			responseUsersDTO.setStatus(user.getStatus());
+			responseUsersDTO.setUserId(user.getUserId());
+			responseUsersDTO.setEmail(user.getEmail());
+			responseUsersDTO.setRoleNames(user.getRoleNames());
+			responseUsersDTO.setFirstName(user.getFirstName());
+			responseUsersDTO.setLastName(user.getLastName());
+			responseUsersDTO.setIdStore(user.getIdStore());
+			responseUsersDTO.setPosition(user.getPosition());
+			responseUsersDTO.setPinCode(user.getPinCode());
+			responseUsersDTO.setRoles(user.getRoles());
+			responseUsersDTO.setTelephone(user.getTelephone());
+			responseUsersDTO.setTypeAccount(user.getTypeAccount());
+			responseUsersDTO.setOtpCode(user.getOtpCode());
+			responseUsersDTO.setStore((user.getIdStore() == null)? null: iStoreService.getByInternalReference(user.getIdStore()).get());
+			responseUsersDTO.setNameStore((user.getIdStore() == null)? null: iStoreService.getByInternalReference(user.getIdStore()).get().getLocalization());
+			responseUsersDTO.setInternalReference(user.getInternalReference());
+			responseUsersDTO.setCreatedDate(user.getCreatedDate());
+			responseUsersDTO.setDateLastLogin(user.getDateLastLogin());
+			responseUsersDTOList.add(responseUsersDTO);
+
+		}
+		Page<ResponseUsersDTO> responseUsersDTOPage = new PageImpl<>(responseUsersDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseUsersDTOList.size());
+		return responseUsersDTOPage;
 	}
 
 	@Override

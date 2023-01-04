@@ -6,6 +6,7 @@ import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
 import com.gulfcam.fuelcoupon.order.entity.TypeVoucher;
 import com.gulfcam.fuelcoupon.order.service.ITypeVoucherService;
 import com.gulfcam.fuelcoupon.store.dto.CreateNotebookDTO;
+import com.gulfcam.fuelcoupon.store.dto.ResponseNotebookDTO;
 import com.gulfcam.fuelcoupon.store.entity.Carton;
 import com.gulfcam.fuelcoupon.store.entity.Notebook;
 import com.gulfcam.fuelcoupon.store.repository.INotebookRepo;
@@ -197,13 +198,13 @@ public class NotebookRest {
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @GetMapping("/carton/{idCarton:[0-9]+}")
-    public ResponseEntity<Page<Notebook>> getNotebooksByIdCarton(@PathVariable Long idCarton,
+    public ResponseEntity<Page<ResponseNotebookDTO>> getNotebooksByIdCarton(@PathVariable Long idCarton,
                                                               @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                                               @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                                               @RequestParam(required = false, defaultValue = "idCarton") String sort,
                                                               @RequestParam(required = false, defaultValue = "desc") String order) {
 
-        Page<Notebook> notebooks = iNotebookService.getNotebooksByIdCarton(idCarton,
+        Page<ResponseNotebookDTO> notebooks = iNotebookService.getNotebooksByIdCarton(idCarton,
                 Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(notebooks);
     }
@@ -215,13 +216,13 @@ public class NotebookRest {
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @GetMapping("/storekeeper/{idStoreKeeper:[0-9]+}")
-    public ResponseEntity<Page<Notebook>> getNotebooksByIdStoreKeeper(@PathVariable Long idStoreKeeper,
+    public ResponseEntity<Page<ResponseNotebookDTO>> getNotebooksByIdStoreKeeper(@PathVariable Long idStoreKeeper,
                                                                       @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                                                       @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                                                       @RequestParam(required = false, defaultValue = "idStoreKeeper") String sort,
                                                                       @RequestParam(required = false, defaultValue = "desc") String order) {
 
-        Page<Notebook> notebooks = iNotebookService.getNotebooksByIdStoreKeeper(idStoreKeeper,
+        Page<ResponseNotebookDTO> notebooks = iNotebookService.getNotebooksByIdStoreKeeper(idStoreKeeper,
                 Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(notebooks);
     }
@@ -233,13 +234,13 @@ public class NotebookRest {
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @GetMapping("/storehouse/{idStoreHouse:[0-9]+}")
-    public ResponseEntity<Page<Notebook>> getNotebooksByIdStoreHouse(@PathVariable Long idStoreHouse,
+    public ResponseEntity<Page<ResponseNotebookDTO>> getNotebooksByIdStoreHouse(@PathVariable Long idStoreHouse,
                                                                       @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                                                       @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                                                       @RequestParam(required = false, defaultValue = "idStoreKeeper") String sort,
                                                                       @RequestParam(required = false, defaultValue = "desc") String order) {
 
-        Page<Notebook> notebooks = iNotebookService.getNotebooksByIdStoreHouse(idStoreHouse,
+        Page<ResponseNotebookDTO> notebooks = iNotebookService.getNotebooksByIdStoreHouse(idStoreHouse,
                 Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(notebooks);
     }
@@ -291,7 +292,7 @@ public class NotebookRest {
                                              @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                              @RequestParam(required = false, defaultValue = "id") String sort,
                                              @RequestParam(required = false, defaultValue = "desc") String order) {
-        Page<Notebook> list = iNotebookService.getAllNotebooks(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
+        Page<ResponseNotebookDTO> list = iNotebookService.getAllNotebooks(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(list);
     }
     }

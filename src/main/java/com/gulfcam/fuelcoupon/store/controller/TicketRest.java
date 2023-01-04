@@ -107,6 +107,10 @@ public class TicketRest {
         ticket.setIdCoupon(createTicketDTO.getIdCoupon());
         ticket.setIdRequestOpposition(createTicketDTO.getIdRequestOpposition());
 
+        coupon.setIdTicket(ticket.getInternalReference());
+        coupon.setCreatedAt(LocalDateTime.now());
+        iCouponService.createCoupon(coupon);
+
         Status status = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
         ticket.setStatus(status);
 

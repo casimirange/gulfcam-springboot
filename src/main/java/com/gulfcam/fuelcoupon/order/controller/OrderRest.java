@@ -734,13 +734,13 @@ public class OrderRest {
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @GetMapping("/client/{idClient:[0-9]+}")
-    public ResponseEntity<Page<Order>> getOrdersByIdClient(@PathVariable Long idClient,
+    public ResponseEntity<Page<ResponseOrderDTO>> getOrdersByIdClient(@PathVariable Long idClient,
                                                            @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                                            @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                                            @RequestParam(required = false, defaultValue = "idClient") String sort,
                                                            @RequestParam(required = false, defaultValue = "desc") String order) {
 
-        Page<Order> orders = iOrderService.getOrdersByIdClient(idClient,
+        Page<ResponseOrderDTO> orders = iOrderService.getOrdersByIdClient(idClient,
                 Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(orders);
     }

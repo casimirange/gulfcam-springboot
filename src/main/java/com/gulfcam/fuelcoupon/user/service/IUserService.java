@@ -1,5 +1,6 @@
 package com.gulfcam.fuelcoupon.user.service;
 
+import com.gulfcam.fuelcoupon.user.dto.ResponseUsersDTO;
 import com.gulfcam.fuelcoupon.user.dto.UserEditPasswordDto;
 import com.gulfcam.fuelcoupon.user.entity.Users;
 import org.springframework.data.domain.Page;
@@ -62,7 +63,7 @@ public interface IUserService {
 
 	Optional<Users> getUserByUniqueConstraints(Users u);
 
-	Page<Users> getUsers(int page, int size, String sort, String order);
+	Page<ResponseUsersDTO> getUsers(int page, int size, String sort, String order);
 
 	Page<Users> get20Users(int parseInt, int parseInt2, String sort, String order);
 

@@ -11,7 +11,7 @@ public interface IOrderService {
 
     Page<ResponseOrderDTO> getAllOrders(int page, int size, String sort, String order);
     Page<Order> getOrdersByClientReference(String clientReference, int page, int size, String sort, String order);
-    Page<Order> getOrdersByIdClient(Long idClient, int page, int size, String sort, String order);
+    Page<ResponseOrderDTO> getOrdersByIdClient(Long idClient, int page, int size, String sort, String order);
     ByteArrayInputStream exportOrdersByIdClient(Long idClient);
     Page<Order> getOrdersByIdFund(Long idFund, int page, int size, String sort, String order);
     Page<Order> getOrdersByIdManagerCoupon(Long idManagerCoupon, int page, int size, String sort, String order);

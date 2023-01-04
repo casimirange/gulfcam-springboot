@@ -1,19 +1,18 @@
 package com.gulfcam.fuelcoupon.store.service.impl;
 
-import com.gulfcam.fuelcoupon.client.entity.Client;
 import com.gulfcam.fuelcoupon.client.service.IClientService;
-import com.gulfcam.fuelcoupon.order.dto.ResponseOrderDTO;
-import com.gulfcam.fuelcoupon.order.entity.Order;
 import com.gulfcam.fuelcoupon.order.entity.TypeVoucher;
 import com.gulfcam.fuelcoupon.order.service.ITypeVoucherService;
+import com.gulfcam.fuelcoupon.store.dto.ResponseCouponDTO;
 import com.gulfcam.fuelcoupon.store.dto.ResponseCouponMailDTO;
 import com.gulfcam.fuelcoupon.store.entity.Coupon;
 import com.gulfcam.fuelcoupon.store.helper.ExcelCouponHelper;
 import com.gulfcam.fuelcoupon.store.repository.ICouponRepo;
-import com.gulfcam.fuelcoupon.store.service.ICouponService;
+import com.gulfcam.fuelcoupon.store.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -33,9 +32,21 @@ public class CouponServiceImpl implements ICouponService {
 
     @Autowired
     IClientService iClientService;
-
     @Autowired
     ITypeVoucherService iTypeVoucherService;
+    @Autowired
+    ICartonService iCartonService;
+    @Autowired
+    IStationService iStationService;
+    @Autowired
+    INotebookService iNotebookService;
+    @Autowired
+    IRequestOppositionService iRequestOppositionService;
+
+    @Autowired
+    ICreditNoteService iCreditNoteService;
+    @Autowired
+    ITicketService iTicketService;
 
     @Autowired
     ResourceBundleMessageSource messageSource;
@@ -46,8 +57,46 @@ public class CouponServiceImpl implements ICouponService {
     }
 
     @Override
-    public Page<Coupon> getAllCoupons(int page, int size, String sort, String order) {
-        return iCouponRepo.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
+    public Page<ResponseCouponDTO> getAllCoupons(int page, int size, String sort, String order) {
+        List<Coupon> couponList = iCouponRepo.findAll();
+
+        ResponseCouponDTO responseCouponDTO;
+        List<ResponseCouponDTO> responseCouponDTOList = new ArrayList<>();
+
+        for (Coupon coupon: couponList){
+            responseCouponDTO = new ResponseCouponDTO();
+            responseCouponDTO.setStatus(coupon.getStatus());
+            responseCouponDTO.setId(coupon.getId());
+            responseCouponDTO.setSerialNumber(coupon.getSerialNumber());
+            responseCouponDTO.setSerialNumber(coupon.getSerialNumber());
+            responseCouponDTO.setIdClient(coupon.getIdClient());
+            responseCouponDTO.setIdTypeVoucher(coupon.getIdTypeVoucher());
+            responseCouponDTO.setIdRequestOpposition(coupon.getIdRequestOpposition());
+            responseCouponDTO.setIdCreditNote(coupon.getIdCreditNote());
+            responseCouponDTO.setIdTicket(coupon.getIdTicket());
+            responseCouponDTO.setIdNotebook(coupon.getIdNotebook());
+            responseCouponDTO.setIdStation(coupon.getIdStation());
+            responseCouponDTO.setProductionDate(coupon.getProductionDate());
+            responseCouponDTO.setModulo(coupon.getModulo());
+            responseCouponDTO.setUpdateAt(coupon.getUpdateAt());
+            responseCouponDTO.setClient((coupon.getIdClient() == null)? null: iClientService.getClientByInternalReference(coupon.getIdClient()).get());
+            responseCouponDTO.setNameClient((coupon.getIdClient() == null)? null: iClientService.getClientByInternalReference(coupon.getIdClient()).get().getCompleteName());
+            responseCouponDTO.setRequestOpposition((coupon.getIdRequestOpposition() == null)? null: iRequestOppositionService.getByInternalReference(coupon.getIdRequestOpposition()).get());
+            responseCouponDTO.setStation((coupon.getIdStation() == null)? null: iStationService.getByInternalReference(coupon.getIdStation()).get());
+            responseCouponDTO.setNameStation((coupon.getIdStation() == null)? null: iStationService.getByInternalReference(coupon.getIdStation()).get().getDesignation());
+            responseCouponDTO.setTicket((coupon.getIdTicket() == null)? null: iTicketService.getByInternalReference(coupon.getIdTicket()).get());
+            responseCouponDTO.setNotebook((coupon.getIdNotebook() == null)? null: iNotebookService.getByInternalReference(coupon.getIdNotebook()).get());
+            responseCouponDTO.setCreditNote((coupon.getIdCreditNote() == null)? null: iCreditNoteService.getByInternalReference(coupon.getIdCreditNote()).get());
+            responseCouponDTO.setTypeVoucher((coupon.getIdTypeVoucher() == null)? null: iTypeVoucherService.getByInternalReference(coupon.getIdTypeVoucher()).get());
+            responseCouponDTO.setAmount((coupon.getIdTypeVoucher() == null)? null: iTypeVoucherService.getByInternalReference(coupon.getIdTypeVoucher()).get().getAmount());
+            responseCouponDTO.setInternalReference(coupon.getInternalReference());
+            responseCouponDTO.setCreatedAt(coupon.getCreatedAt());
+            responseCouponDTO.setUpdateAt(coupon.getUpdateAt());
+            responseCouponDTOList.add(responseCouponDTO);
+
+        }
+        Page<ResponseCouponDTO> responseNotebookDTOPage = new PageImpl<>(responseCouponDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseCouponDTOList.size());
+        return responseNotebookDTOPage;
     }
 
     @Override
@@ -88,18 +137,132 @@ public class CouponServiceImpl implements ICouponService {
     }
 
     @Override
-    public Page<Coupon> getCouponsByIdStation(Long idStation, int page, int size, String sort, String order) {
-        return iCouponRepo.getCouponsByIdStation(idStation,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
+    public Page<ResponseCouponDTO> getCouponsByIdStation(Long idStation, int page, int size, String sort, String order) {
+        List<Coupon> couponList = iCouponRepo.getCouponsByIdStation(idStation);
+
+        ResponseCouponDTO responseCouponDTO;
+        List<ResponseCouponDTO> responseCouponDTOList = new ArrayList<>();
+
+        for (Coupon coupon: couponList){
+            responseCouponDTO = new ResponseCouponDTO();
+            responseCouponDTO.setStatus(coupon.getStatus());
+            responseCouponDTO.setId(coupon.getId());
+            responseCouponDTO.setSerialNumber(coupon.getSerialNumber());
+            responseCouponDTO.setSerialNumber(coupon.getSerialNumber());
+            responseCouponDTO.setIdClient(coupon.getIdClient());
+            responseCouponDTO.setIdTypeVoucher(coupon.getIdTypeVoucher());
+            responseCouponDTO.setIdRequestOpposition(coupon.getIdRequestOpposition());
+            responseCouponDTO.setIdCreditNote(coupon.getIdCreditNote());
+            responseCouponDTO.setIdTicket(coupon.getIdTicket());
+            responseCouponDTO.setIdNotebook(coupon.getIdNotebook());
+            responseCouponDTO.setIdStation(coupon.getIdStation());
+            responseCouponDTO.setProductionDate(coupon.getProductionDate());
+            responseCouponDTO.setModulo(coupon.getModulo());
+            responseCouponDTO.setUpdateAt(coupon.getUpdateAt());
+            responseCouponDTO.setClient((coupon.getIdClient() == null)? null: iClientService.getClientByInternalReference(coupon.getIdClient()).get());
+            responseCouponDTO.setNameClient((coupon.getIdClient() == null)? null: iClientService.getClientByInternalReference(coupon.getIdClient()).get().getCompleteName());
+            responseCouponDTO.setRequestOpposition((coupon.getIdRequestOpposition() == null)? null: iRequestOppositionService.getByInternalReference(coupon.getIdRequestOpposition()).get());
+            responseCouponDTO.setStation((coupon.getIdStation() == null)? null: iStationService.getByInternalReference(coupon.getIdStation()).get());
+            responseCouponDTO.setNameStation((coupon.getIdStation() == null)? null: iStationService.getByInternalReference(coupon.getIdStation()).get().getDesignation());
+            responseCouponDTO.setTicket((coupon.getIdTicket() == null)? null: iTicketService.getByInternalReference(coupon.getIdTicket()).get());
+            responseCouponDTO.setNotebook((coupon.getIdNotebook() == null)? null: iNotebookService.getByInternalReference(coupon.getIdNotebook()).get());
+            responseCouponDTO.setCreditNote((coupon.getIdCreditNote() == null)? null: iCreditNoteService.getByInternalReference(coupon.getIdCreditNote()).get());
+            responseCouponDTO.setTypeVoucher((coupon.getIdTypeVoucher() == null)? null: iTypeVoucherService.getByInternalReference(coupon.getIdTypeVoucher()).get());
+            responseCouponDTO.setAmount((coupon.getIdTypeVoucher() == null)? null: iTypeVoucherService.getByInternalReference(coupon.getIdTypeVoucher()).get().getAmount());
+            responseCouponDTO.setInternalReference(coupon.getInternalReference());
+            responseCouponDTO.setCreatedAt(coupon.getCreatedAt());
+            responseCouponDTO.setUpdateAt(coupon.getUpdateAt());
+            responseCouponDTOList.add(responseCouponDTO);
+
+        }
+        Page<ResponseCouponDTO> responseNotebookDTOPage = new PageImpl<>(responseCouponDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseCouponDTOList.size());
+        return responseNotebookDTOPage;
     }
 
     @Override
-    public Page<Coupon> getCouponsByIdClient(Long idClient, int page, int size, String sort, String order) {
-        return iCouponRepo.getCouponsByIdClient(idClient,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
+    public Page<ResponseCouponDTO> getCouponsByIdClient(Long idClient, int page, int size, String sort, String order) {
+        List<Coupon> couponList = iCouponRepo.getCouponsByIdClient(idClient);
+
+        ResponseCouponDTO responseCouponDTO;
+        List<ResponseCouponDTO> responseCouponDTOList = new ArrayList<>();
+
+        for (Coupon coupon: couponList){
+            responseCouponDTO = new ResponseCouponDTO();
+            responseCouponDTO.setStatus(coupon.getStatus());
+            responseCouponDTO.setId(coupon.getId());
+            responseCouponDTO.setSerialNumber(coupon.getSerialNumber());
+            responseCouponDTO.setSerialNumber(coupon.getSerialNumber());
+            responseCouponDTO.setIdClient(coupon.getIdClient());
+            responseCouponDTO.setIdTypeVoucher(coupon.getIdTypeVoucher());
+            responseCouponDTO.setIdRequestOpposition(coupon.getIdRequestOpposition());
+            responseCouponDTO.setIdCreditNote(coupon.getIdCreditNote());
+            responseCouponDTO.setIdTicket(coupon.getIdTicket());
+            responseCouponDTO.setIdNotebook(coupon.getIdNotebook());
+            responseCouponDTO.setIdStation(coupon.getIdStation());
+            responseCouponDTO.setProductionDate(coupon.getProductionDate());
+            responseCouponDTO.setModulo(coupon.getModulo());
+            responseCouponDTO.setUpdateAt(coupon.getUpdateAt());
+            responseCouponDTO.setClient((coupon.getIdClient() == null)? null: iClientService.getClientByInternalReference(coupon.getIdClient()).get());
+            responseCouponDTO.setNameClient((coupon.getIdClient() == null)? null: iClientService.getClientByInternalReference(coupon.getIdClient()).get().getCompleteName());
+            responseCouponDTO.setRequestOpposition((coupon.getIdRequestOpposition() == null)? null: iRequestOppositionService.getByInternalReference(coupon.getIdRequestOpposition()).get());
+            responseCouponDTO.setStation((coupon.getIdStation() == null)? null: iStationService.getByInternalReference(coupon.getIdStation()).get());
+            responseCouponDTO.setNameStation((coupon.getIdStation() == null)? null: iStationService.getByInternalReference(coupon.getIdStation()).get().getDesignation());
+            responseCouponDTO.setTicket((coupon.getIdTicket() == null)? null: iTicketService.getByInternalReference(coupon.getIdTicket()).get());
+            responseCouponDTO.setNotebook((coupon.getIdNotebook() == null)? null: iNotebookService.getByInternalReference(coupon.getIdNotebook()).get());
+            responseCouponDTO.setCreditNote((coupon.getIdCreditNote() == null)? null: iCreditNoteService.getByInternalReference(coupon.getIdCreditNote()).get());
+            responseCouponDTO.setTypeVoucher((coupon.getIdTypeVoucher() == null)? null: iTypeVoucherService.getByInternalReference(coupon.getIdTypeVoucher()).get());
+            responseCouponDTO.setAmount((coupon.getIdTypeVoucher() == null)? null: iTypeVoucherService.getByInternalReference(coupon.getIdTypeVoucher()).get().getAmount());
+            responseCouponDTO.setInternalReference(coupon.getInternalReference());
+            responseCouponDTO.setCreatedAt(coupon.getCreatedAt());
+            responseCouponDTO.setUpdateAt(coupon.getUpdateAt());
+            responseCouponDTOList.add(responseCouponDTO);
+
+        }
+        Page<ResponseCouponDTO> responseNotebookDTOPage = new PageImpl<>(responseCouponDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseCouponDTOList.size());
+        return responseNotebookDTOPage;
     }
 
     @Override
-    public Page<Coupon> getCouponsByIdNotebook(Long idNotebook, int page, int size, String sort, String order) {
-        return iCouponRepo.getCouponsByIdNotebook(idNotebook,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
+    public Page<ResponseCouponDTO> getCouponsByIdNotebook(Long idNotebook, int page, int size, String sort, String order) {
+        List<Coupon> couponList = iCouponRepo.getCouponsByIdNotebook(idNotebook);
+
+        ResponseCouponDTO responseCouponDTO;
+        List<ResponseCouponDTO> responseCouponDTOList = new ArrayList<>();
+
+        for (Coupon coupon: couponList){
+            responseCouponDTO = new ResponseCouponDTO();
+            responseCouponDTO.setStatus(coupon.getStatus());
+            responseCouponDTO.setId(coupon.getId());
+            responseCouponDTO.setSerialNumber(coupon.getSerialNumber());
+            responseCouponDTO.setSerialNumber(coupon.getSerialNumber());
+            responseCouponDTO.setIdClient(coupon.getIdClient());
+            responseCouponDTO.setIdTypeVoucher(coupon.getIdTypeVoucher());
+            responseCouponDTO.setIdRequestOpposition(coupon.getIdRequestOpposition());
+            responseCouponDTO.setIdCreditNote(coupon.getIdCreditNote());
+            responseCouponDTO.setIdTicket(coupon.getIdTicket());
+            responseCouponDTO.setIdNotebook(coupon.getIdNotebook());
+            responseCouponDTO.setIdStation(coupon.getIdStation());
+            responseCouponDTO.setProductionDate(coupon.getProductionDate());
+            responseCouponDTO.setModulo(coupon.getModulo());
+            responseCouponDTO.setUpdateAt(coupon.getUpdateAt());
+            responseCouponDTO.setClient((coupon.getIdClient() == null)? null: iClientService.getClientByInternalReference(coupon.getIdClient()).get());
+            responseCouponDTO.setNameClient((coupon.getIdClient() == null)? null: iClientService.getClientByInternalReference(coupon.getIdClient()).get().getCompleteName());
+            responseCouponDTO.setRequestOpposition((coupon.getIdRequestOpposition() == null)? null: iRequestOppositionService.getByInternalReference(coupon.getIdRequestOpposition()).get());
+            responseCouponDTO.setStation((coupon.getIdStation() == null)? null: iStationService.getByInternalReference(coupon.getIdStation()).get());
+            responseCouponDTO.setNameStation((coupon.getIdStation() == null)? null: iStationService.getByInternalReference(coupon.getIdStation()).get().getDesignation());
+            responseCouponDTO.setTicket((coupon.getIdTicket() == null)? null: iTicketService.getByInternalReference(coupon.getIdTicket()).get());
+            responseCouponDTO.setNotebook((coupon.getIdNotebook() == null)? null: iNotebookService.getByInternalReference(coupon.getIdNotebook()).get());
+            responseCouponDTO.setCreditNote((coupon.getIdCreditNote() == null)? null: iCreditNoteService.getByInternalReference(coupon.getIdCreditNote()).get());
+            responseCouponDTO.setTypeVoucher((coupon.getIdTypeVoucher() == null)? null: iTypeVoucherService.getByInternalReference(coupon.getIdTypeVoucher()).get());
+            responseCouponDTO.setAmount((coupon.getIdTypeVoucher() == null)? null: iTypeVoucherService.getByInternalReference(coupon.getIdTypeVoucher()).get().getAmount());
+            responseCouponDTO.setInternalReference(coupon.getInternalReference());
+            responseCouponDTO.setCreatedAt(coupon.getCreatedAt());
+            responseCouponDTO.setUpdateAt(coupon.getUpdateAt());
+            responseCouponDTOList.add(responseCouponDTO);
+
+        }
+        Page<ResponseCouponDTO> responseNotebookDTOPage = new PageImpl<>(responseCouponDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseCouponDTOList.size());
+        return responseNotebookDTOPage;
     }
 
     @Override

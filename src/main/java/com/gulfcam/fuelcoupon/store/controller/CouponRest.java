@@ -11,6 +11,7 @@ import com.gulfcam.fuelcoupon.order.service.ITypeVoucherService;
 import com.gulfcam.fuelcoupon.order.service.IUnitService;
 import com.gulfcam.fuelcoupon.store.dto.AcceptCouponDTO;
 import com.gulfcam.fuelcoupon.store.dto.CreateCouponDTO;
+import com.gulfcam.fuelcoupon.store.dto.ResponseCouponDTO;
 import com.gulfcam.fuelcoupon.store.entity.*;
 import com.gulfcam.fuelcoupon.store.repository.ICouponRepo;
 import com.gulfcam.fuelcoupon.store.service.*;
@@ -268,13 +269,13 @@ public class CouponRest {
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @GetMapping("/client/{idClient:[0-9]+}")
-    public ResponseEntity<Page<Coupon>> getCouponsByIdClient(@PathVariable Long idClient,
+    public ResponseEntity<Page<ResponseCouponDTO>> getCouponsByIdClient(@PathVariable Long idClient,
                                                              @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                                              @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                                              @RequestParam(required = false, defaultValue = "idClient") String sort,
                                                              @RequestParam(required = false, defaultValue = "desc") String order) {
 
-        Page<Coupon> cartons = iCouponService.getCouponsByIdClient(idClient,
+        Page<ResponseCouponDTO> cartons = iCouponService.getCouponsByIdClient(idClient,
                 Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(cartons);
     }
@@ -312,13 +313,13 @@ public class CouponRest {
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @GetMapping("/station/{idStation:[0-9]+}")
-    public ResponseEntity<Page<Coupon>> getCouponsByIdStation(@PathVariable Long idStation,
+    public ResponseEntity<Page<ResponseCouponDTO>> getCouponsByIdStation(@PathVariable Long idStation,
                                                              @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                                              @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                                              @RequestParam(required = false, defaultValue = "idStation") String sort,
                                                              @RequestParam(required = false, defaultValue = "desc") String order) {
 
-        Page<Coupon> cartons = iCouponService.getCouponsByIdStation(idStation,
+        Page<ResponseCouponDTO> cartons = iCouponService.getCouponsByIdStation(idStation,
                 Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(cartons);
     }
@@ -330,13 +331,13 @@ public class CouponRest {
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @GetMapping("/notebook/{idNotebook:[0-9]+}")
-    public ResponseEntity<Page<Coupon>> getCouponsByIdNotebook(@PathVariable Long idNotebook,
+    public ResponseEntity<Page<ResponseCouponDTO>> getCouponsByIdNotebook(@PathVariable Long idNotebook,
                                                              @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                                              @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                                              @RequestParam(required = false, defaultValue = "idNotebook") String sort,
                                                              @RequestParam(required = false, defaultValue = "desc") String order) {
 
-        Page<Coupon> cartons = iCouponService.getCouponsByIdNotebook(idNotebook,
+        Page<ResponseCouponDTO> cartons = iCouponService.getCouponsByIdNotebook(idNotebook,
                 Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(cartons);
     }
@@ -407,6 +408,10 @@ public class CouponRest {
         coupon.setModulo(acceptCouponDTO.getModulo());
         iCouponService.createCoupon(coupon);
 
+        notebook.setStatus(status);
+        notebook.setUpdateAt(LocalDateTime.now());
+        iNotebookService.createNotebook(notebook);
+
         Item item = new Item();
         item.setIdTypeVoucher(notebook.getIdTypeVoucher());
         item.setQuantityNotebook(-1);
@@ -466,6 +471,10 @@ public class CouponRest {
         Storehouse storehouse = iStorehouseService.getByInternalReference(notebook.getIdStoreHouse()).get();
         TypeVoucher typeVoucher = iTypeVoucherService.getByInternalReference(coupon.getIdTypeVoucher()).get();
 
+        notebook.setStatus(status);
+        notebook.setUpdateAt(LocalDateTime.now());
+        iNotebookService.createNotebook(notebook);
+
         item.setQuantityCarton(0);
         item.setIdTypeVoucher(typeVoucher.getInternalReference());
         item.setQuantityNotebook(-1);
@@ -517,7 +526,7 @@ public class CouponRest {
                                              @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                              @RequestParam(required = false, defaultValue = "id") String sort,
                                              @RequestParam(required = false, defaultValue = "desc") String order) {
-        Page<Coupon> list = iCouponService.getAllCoupons(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
+        Page<ResponseCouponDTO> list = iCouponService.getAllCoupons(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(list);
     }
     }

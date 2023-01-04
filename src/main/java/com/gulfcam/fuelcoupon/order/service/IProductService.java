@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface IProductService {
 
     Page<ResponseProductDTO> getAllProducts(int page, int size, String sort, String order);
-    Page<Product> getProductsByIdOrder(Long idOrder, int page, int size, String sort, String order);
+    Page<ResponseProductDTO> getProductsByIdOrder(Long idOrder, int page, int size, String sort, String order);
     List<Product> getProductsByIdOrder(Long idOrder);
     Page<Product> getProductsByIdTypeVoucher(Long idClient, int page, int size, String sort, String order);
     Optional<Product> getProductById(Long id);
