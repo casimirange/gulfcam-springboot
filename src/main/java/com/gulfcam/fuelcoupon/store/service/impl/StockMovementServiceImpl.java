@@ -45,7 +45,7 @@ public class StockMovementServiceImpl implements IStockMovementService {
     @Override
     public Page<ResponseStockMovementDTO> getAllStockMovements(int page, int size, String sort, String order) {
 
-        List<StockMovement> stockMovementList = iStokMovementRepo.findAll();
+        Page<StockMovement> stockMovementList = iStokMovementRepo.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
 
         ResponseStockMovementDTO responseStockMovementDTO;
         List<ResponseStockMovementDTO> responseStockMovementDTOList = new ArrayList<>();
@@ -82,7 +82,7 @@ public class StockMovementServiceImpl implements IStockMovementService {
             responseStockMovementDTOList.add(responseStockMovementDTO);
 
         }
-        Page<ResponseStockMovementDTO> responseStockMovementDTOPage = new PageImpl<>(responseStockMovementDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseStockMovementDTOList.size());
+        Page<ResponseStockMovementDTO> responseStockMovementDTOPage = new PageImpl<>(responseStockMovementDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), iStokMovementRepo.findAll().size());
         return responseStockMovementDTOPage;
     }
 

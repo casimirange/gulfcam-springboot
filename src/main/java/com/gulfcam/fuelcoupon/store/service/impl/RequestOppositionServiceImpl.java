@@ -46,7 +46,7 @@ public class RequestOppositionServiceImpl implements IRequestOppositionService {
 
     @Override
     public Page<ResponseRequestOppositionDTO> getAllRequestOppositions(int page, int size, String sort, String order) {
-        List<RequestOpposition> requestOppositions = iRequestionOppositionRepo.findAll();
+        Page<RequestOpposition> requestOppositions = iRequestionOppositionRepo.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
         Client client;
         Users serviceClient;
         Users managerCoupon;
@@ -75,7 +75,7 @@ public class RequestOppositionServiceImpl implements IRequestOppositionService {
             responseRequestOppositionDTOList.add(responseRequestOppositionDTO);
 
         }
-        Page<ResponseRequestOppositionDTO> responseCreditNoteList = new PageImpl<>(responseRequestOppositionDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseRequestOppositionDTOList.size());
+        Page<ResponseRequestOppositionDTO> responseCreditNoteList = new PageImpl<>(responseRequestOppositionDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), iRequestionOppositionRepo.findAll().size());
         return responseCreditNoteList;
     }
 

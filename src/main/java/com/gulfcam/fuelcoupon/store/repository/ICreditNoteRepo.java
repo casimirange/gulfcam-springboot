@@ -11,6 +11,7 @@ import java.util.Optional;
 
 public interface ICreditNoteRepo extends JpaRepository<CreditNote, Long> {
 
-    List<CreditNote> getCreditNotesByIdStation(Long idStation, Pageable pageable);
+    Page<CreditNote> getCreditNotesByIdStation(Long idStation, Pageable pageable);
+    List<CreditNote> getCreditNotesByIdStation(Long idStation);
     Optional<CreditNote> getCreditNoteByInternalReference(Long internalReference);
 }

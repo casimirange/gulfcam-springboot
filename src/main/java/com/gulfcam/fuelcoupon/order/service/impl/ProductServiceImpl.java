@@ -42,7 +42,7 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public Page<ResponseProductDTO> getAllProducts(int page, int size, String sort, String order) {
-        List<Product> products = iProductRepo.findAll();
+        Page<Product> products = iProductRepo.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
         ResponseProductDTO responseProductDTO;
         List<ResponseProductDTO> responseProductDTOList = new ArrayList<>();
 
@@ -67,14 +67,14 @@ public class ProductServiceImpl implements IProductService {
             responseProductDTOList.add(responseProductDTO);
         }
 
-        Page<ResponseProductDTO> productPage = new PageImpl<>(responseProductDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseProductDTOList.size());
+        Page<ResponseProductDTO> productPage = new PageImpl<>(responseProductDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), iProductRepo.findAll().size());
         return productPage;
     }
 
     @Override
     public Page<ResponseProductDTO> getProductsByIdOrder(Long idOrder, int page, int size, String sort, String order) {
 
-        List<Product> products = iProductRepo.getProductsByIdOrder(idOrder);
+        Page<Product> products = iProductRepo.getProductsByIdOrder(idOrder, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
         ResponseProductDTO responseProductDTO;
         List<ResponseProductDTO> responseProductDTOList = new ArrayList<>();
 
@@ -99,7 +99,7 @@ public class ProductServiceImpl implements IProductService {
             responseProductDTOList.add(responseProductDTO);
         }
 
-        Page<ResponseProductDTO> productPage = new PageImpl<>(responseProductDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseProductDTOList.size());
+        Page<ResponseProductDTO> productPage = new PageImpl<>(responseProductDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), iProductRepo.getProductsByIdOrder(idOrder).size());
         return productPage;
     }
 

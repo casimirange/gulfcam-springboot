@@ -59,7 +59,8 @@ public class CouponServiceImpl implements ICouponService {
 
     @Override
     public Page<ResponseCouponDTO> getAllCoupons(int page, int size, String sort, String order) {
-        List<Coupon> couponList = iCouponRepo.findAll();
+        Page<Coupon> couponList = iCouponRepo.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
+
 
         ResponseCouponDTO responseCouponDTO;
         List<ResponseCouponDTO> responseCouponDTOList = new ArrayList<>();
@@ -96,7 +97,7 @@ public class CouponServiceImpl implements ICouponService {
             responseCouponDTOList.add(responseCouponDTO);
 
         }
-        Page<ResponseCouponDTO> responseNotebookDTOPage = new PageImpl<>(responseCouponDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseCouponDTOList.size());
+        Page<ResponseCouponDTO> responseNotebookDTOPage = new PageImpl<>(responseCouponDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)),  iCouponRepo.findAll().size());
         return responseNotebookDTOPage;
     }
 
@@ -139,7 +140,7 @@ public class CouponServiceImpl implements ICouponService {
 
     @Override
     public Page<ResponseCouponDTO> getCouponsByIdStation(Long idStation, int page, int size, String sort, String order) {
-        List<Coupon> couponList = iCouponRepo.getCouponsByIdStation(idStation);
+        Page<Coupon> couponList = iCouponRepo.getCouponsByIdStation(idStation, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
 
         ResponseCouponDTO responseCouponDTO;
         List<ResponseCouponDTO> responseCouponDTOList = new ArrayList<>();
@@ -176,13 +177,13 @@ public class CouponServiceImpl implements ICouponService {
             responseCouponDTOList.add(responseCouponDTO);
 
         }
-        Page<ResponseCouponDTO> responseNotebookDTOPage = new PageImpl<>(responseCouponDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseCouponDTOList.size());
+        Page<ResponseCouponDTO> responseNotebookDTOPage = new PageImpl<>(responseCouponDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), iCouponRepo.getCouponsByIdStation(idStation).size());
         return responseNotebookDTOPage;
     }
 
     @Override
     public Page<ResponseCouponDTO> getCouponsByIdClient(Long idClient, int page, int size, String sort, String order) {
-        List<Coupon> couponList = iCouponRepo.getCouponsByIdClient(idClient);
+        Page<Coupon> couponList = iCouponRepo.getCouponsByIdClient(idClient, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
 
         ResponseCouponDTO responseCouponDTO;
         List<ResponseCouponDTO> responseCouponDTOList = new ArrayList<>();
@@ -219,13 +220,13 @@ public class CouponServiceImpl implements ICouponService {
             responseCouponDTOList.add(responseCouponDTO);
 
         }
-        Page<ResponseCouponDTO> responseNotebookDTOPage = new PageImpl<>(responseCouponDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseCouponDTOList.size());
+        Page<ResponseCouponDTO> responseNotebookDTOPage = new PageImpl<>(responseCouponDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), iCouponRepo.getCouponsByIdClient(idClient).size());
         return responseNotebookDTOPage;
     }
 
     @Override
     public Page<ResponseCouponDTO> getCouponsByIdNotebook(Long idNotebook, int page, int size, String sort, String order) {
-        List<Coupon> couponList = iCouponRepo.getCouponsByIdNotebook(idNotebook);
+        Page<Coupon> couponList = iCouponRepo.getCouponsByIdNotebook(idNotebook, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
 
         ResponseCouponDTO responseCouponDTO;
         List<ResponseCouponDTO> responseCouponDTOList = new ArrayList<>();
@@ -262,7 +263,7 @@ public class CouponServiceImpl implements ICouponService {
             responseCouponDTOList.add(responseCouponDTO);
 
         }
-        Page<ResponseCouponDTO> responseNotebookDTOPage = new PageImpl<>(responseCouponDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseCouponDTOList.size());
+        Page<ResponseCouponDTO> responseNotebookDTOPage = new PageImpl<>(responseCouponDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), iCouponRepo.getCouponsByIdNotebook(idNotebook).size());
         return responseNotebookDTOPage;
     }
 

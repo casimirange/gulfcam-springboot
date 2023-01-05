@@ -45,7 +45,8 @@ public class NotebookServiceImpl implements INotebookService {
 
     @Override
     public Page<ResponseNotebookDTO> getAllNotebooks(int page, int size, String sort, String order) {
-        List<Notebook> notebookList = iNotebookRepo.findAll();
+        Page<Notebook> notebookList = iNotebookRepo.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
+
 
         ResponseNotebookDTO responseNotebookDTO;
         List<ResponseNotebookDTO> responseNotebookDTOList = new ArrayList<>();
@@ -75,14 +76,14 @@ public class NotebookServiceImpl implements INotebookService {
             responseNotebookDTOList.add(responseNotebookDTO);
 
         }
-        Page<ResponseNotebookDTO> responseNotebookDTOPage = new PageImpl<>(responseNotebookDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseNotebookDTOList.size());
+        Page<ResponseNotebookDTO> responseNotebookDTOPage = new PageImpl<>(responseNotebookDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)),  iNotebookRepo.findAll().size());
         return responseNotebookDTOPage;
     }
 
     @Override
     public Page<ResponseNotebookDTO> getNotebooksByIdStoreKeeper(Long idStorKeeper, int page, int size, String sort, String order) {
 
-        List<Notebook> notebookList = iNotebookRepo.getNotebooksByIdStoreKeeper(idStorKeeper);
+        Page<Notebook> notebookList = iNotebookRepo.getNotebooksByIdStoreKeeper(idStorKeeper, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
 
         ResponseNotebookDTO responseNotebookDTO;
         List<ResponseNotebookDTO> responseNotebookDTOList = new ArrayList<>();
@@ -112,14 +113,14 @@ public class NotebookServiceImpl implements INotebookService {
             responseNotebookDTOList.add(responseNotebookDTO);
 
         }
-        Page<ResponseNotebookDTO> responseNotebookDTOPage = new PageImpl<>(responseNotebookDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseNotebookDTOList.size());
+        Page<ResponseNotebookDTO> responseNotebookDTOPage = new PageImpl<>(responseNotebookDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), iNotebookRepo.getNotebooksByIdStoreKeeper(idStorKeeper).size());
         return responseNotebookDTOPage;
     }
 
     @Override
     public Page<ResponseNotebookDTO> getNotebooksByIdStoreHouse(Long idStoreHouse, int page, int size, String sort, String order) {
 
-        List<Notebook> notebookList = iNotebookRepo.getNotebooksByIdStoreHouse(idStoreHouse);
+        Page<Notebook> notebookList = iNotebookRepo.getNotebooksByIdStoreHouse(idStoreHouse, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
 
         ResponseNotebookDTO responseNotebookDTO;
         List<ResponseNotebookDTO> responseNotebookDTOList = new ArrayList<>();
@@ -149,14 +150,14 @@ public class NotebookServiceImpl implements INotebookService {
             responseNotebookDTOList.add(responseNotebookDTO);
 
         }
-        Page<ResponseNotebookDTO> responseNotebookDTOPage = new PageImpl<>(responseNotebookDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseNotebookDTOList.size());
+        Page<ResponseNotebookDTO> responseNotebookDTOPage = new PageImpl<>(responseNotebookDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), iNotebookRepo.getNotebooksByIdStoreHouse(idStoreHouse).size());
         return responseNotebookDTOPage;
     }
 
     @Override
     public Page<ResponseNotebookDTO> getNotebooksByIdCarton(Long idCarton, int page, int size, String sort, String order) {
 
-        List<Notebook> notebookList = iNotebookRepo.getNotebooksByIdCarton(idCarton);
+        Page<Notebook> notebookList = iNotebookRepo.getNotebooksByIdCarton(idCarton, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
 
         ResponseNotebookDTO responseNotebookDTO;
         List<ResponseNotebookDTO> responseNotebookDTOList = new ArrayList<>();
@@ -186,7 +187,7 @@ public class NotebookServiceImpl implements INotebookService {
             responseNotebookDTOList.add(responseNotebookDTO);
 
         }
-        Page<ResponseNotebookDTO> responseNotebookDTOPage = new PageImpl<>(responseNotebookDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseNotebookDTOList.size());
+        Page<ResponseNotebookDTO> responseNotebookDTOPage = new PageImpl<>(responseNotebookDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), iNotebookRepo.getNotebooksByIdCarton(idCarton).size());
         return responseNotebookDTOPage;
     }
 

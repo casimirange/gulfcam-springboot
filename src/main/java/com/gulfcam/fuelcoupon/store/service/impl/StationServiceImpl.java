@@ -39,7 +39,7 @@ public class StationServiceImpl implements IStationService {
 
     @Override
     public Page<ResponseStationDTO> getAllStations(int page, int size, String sort, String order) {
-        List<Station> stationList = iStationRepo.findAll();
+        Page<Station> stationList = iStationRepo.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
 
         ResponseStationDTO responseStationDTO;
         List<ResponseStationDTO> responseStationDTOList = new ArrayList<>();
@@ -62,7 +62,7 @@ public class StationServiceImpl implements IStationService {
             responseStationDTOList.add(responseStationDTO);
 
         }
-        Page<ResponseStationDTO> responseStationDTOPage = new PageImpl<>(responseStationDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseStationDTOList.size());
+        Page<ResponseStationDTO> responseStationDTOPage = new PageImpl<>(responseStationDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), iStationRepo.findAll().size());
         return responseStationDTOPage;
     }
 

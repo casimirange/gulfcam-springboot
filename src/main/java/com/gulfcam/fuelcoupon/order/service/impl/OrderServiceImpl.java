@@ -52,7 +52,7 @@ public class OrderServiceImpl implements IOrderService {
     @Override
     public Page<ResponseOrderDTO> getAllOrders(int page, int size, String sort, String order) {
 
-        List<Order> orders = iOrderRepo.findAll();
+        Page<Order> orders = iOrderRepo.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
         ResponseOrderDTO responseOrderDTO;
         List<ResponseOrderDTO> responseOrderDTOList = new ArrayList<>();
         for(Order item: orders){
@@ -109,7 +109,7 @@ public class OrderServiceImpl implements IOrderService {
             responseOrderDTOList.add(responseOrderDTO);
         }
 
-        Page<ResponseOrderDTO> orderPage = new PageImpl<>(responseOrderDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseOrderDTOList.size());
+        Page<ResponseOrderDTO> orderPage = new PageImpl<>(responseOrderDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), iOrderRepo.findAll().size());
         return orderPage;
     }
 
@@ -121,7 +121,7 @@ public class OrderServiceImpl implements IOrderService {
     @Override
     public Page<ResponseOrderDTO> getOrdersByIdClient(Long idClient, int page, int size, String sort, String order) {
 
-        List<Order> orders = iOrderRepo.getOrdersByIdClient(idClient);
+        Page<Order> orders = iOrderRepo.getOrdersByIdClient(idClient, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
         ResponseOrderDTO responseOrderDTO;
         List<ResponseOrderDTO> responseOrderDTOList = new ArrayList<>();
         for(Order item: orders){
@@ -178,7 +178,7 @@ public class OrderServiceImpl implements IOrderService {
             responseOrderDTOList.add(responseOrderDTO);
         }
 
-        Page<ResponseOrderDTO> orderPage = new PageImpl<>(responseOrderDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseOrderDTOList.size());
+        Page<ResponseOrderDTO> orderPage = new PageImpl<>(responseOrderDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), iOrderRepo.getOrdersByIdClient(idClient).size());
         return orderPage;
     }
 

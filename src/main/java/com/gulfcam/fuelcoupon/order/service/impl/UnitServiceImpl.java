@@ -42,7 +42,7 @@ public class UnitServiceImpl implements IUnitService {
     @Override
     public Page<ResponseUnitDTO> getAllUnits(int page, int size, String sort, String order) {
 
-        List<Unit> units = iUnitRepo.findAll();
+        Page<Unit> units = iUnitRepo.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
         ResponseUnitDTO responseUnitDTO;
         List<ResponseUnitDTO> responseUnitDTOList = new ArrayList<>();
 
@@ -67,7 +67,7 @@ public class UnitServiceImpl implements IUnitService {
             responseUnitDTOList.add(responseUnitDTO);
         }
 
-        Page<ResponseUnitDTO> unitPage = new PageImpl<>(responseUnitDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseUnitDTOList.size());
+        Page<ResponseUnitDTO> unitPage = new PageImpl<>(responseUnitDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), iUnitRepo.findAll().size());
         return unitPage;
     }
 

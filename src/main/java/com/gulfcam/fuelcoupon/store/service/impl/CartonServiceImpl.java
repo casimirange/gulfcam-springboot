@@ -102,7 +102,7 @@ public class CartonServiceImpl implements ICartonService {
 
     @Override
     public Page<ResponseCartonDTO> getAllCartons(int page, int size, String sort, String order) {
-        List<Carton> cartons = iCartonRepo.findAll();
+        Page<Carton> cartons = iCartonRepo.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
         ResponseCartonDTO responseCartonDTO;
         List<ResponseCartonDTO> responseUnitDTOList = new ArrayList<>();
 
@@ -134,7 +134,7 @@ public class CartonServiceImpl implements ICartonService {
             responseUnitDTOList.add(responseCartonDTO);
         }
 
-        Page<ResponseCartonDTO> cartonPage = new PageImpl<>(responseUnitDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseUnitDTOList.size());
+        Page<ResponseCartonDTO> cartonPage = new PageImpl<>(responseUnitDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), iCartonRepo.findAll().size());
         return cartonPage;
     }
 

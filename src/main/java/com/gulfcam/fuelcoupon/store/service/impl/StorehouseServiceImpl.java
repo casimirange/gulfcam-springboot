@@ -41,7 +41,7 @@ public class StorehouseServiceImpl implements IStorehouseService {
     @Override
     public Page<ResponseStorehouseDTO> getAllStorehouses(int page, int size, String sort, String order) {
 
-        List<Storehouse> storehouses = iStorehouseRepo.findAll();
+        Page<Storehouse> storehouses = iStorehouseRepo.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
         ResponseStorehouseDTO responseStorehouseDTO;
         List<ResponseStorehouseDTO> responseStorehouseDTOList = new ArrayList<>();
 
@@ -63,7 +63,7 @@ public class StorehouseServiceImpl implements IStorehouseService {
             responseStorehouseDTO.setLocalisationStore((store != null)? store.getLocalization(): "");
             responseStorehouseDTOList.add(responseStorehouseDTO);
         }
-        Page<ResponseStorehouseDTO> storehousePage = new PageImpl<>(responseStorehouseDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseStorehouseDTOList.size());
+        Page<ResponseStorehouseDTO> storehousePage = new PageImpl<>(responseStorehouseDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), iStorehouseRepo.findAll().size());
         return storehousePage;
     }
 

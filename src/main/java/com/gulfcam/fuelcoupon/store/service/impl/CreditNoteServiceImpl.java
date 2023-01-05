@@ -42,7 +42,7 @@ public class CreditNoteServiceImpl implements ICreditNoteService {
 
     @Override
     public Page<ResponseCreditNoteDTO> getCreditNotesByIdStation(Long idStation, int page, int size, String sort, String order) {
-        List<CreditNote> creditNotes = iCreditNoteRepo.getCreditNotesByIdStation(idStation,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
+        Page<CreditNote> creditNotes = iCreditNoteRepo.getCreditNotesByIdStation(idStation,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
 
         ResponseCreditNoteDTO responseCreditNoteDTO;
         List<ResponseCreditNoteDTO> responseCreditNoteDTOList = new ArrayList<>();
@@ -59,7 +59,7 @@ public class CreditNoteServiceImpl implements ICreditNoteService {
             responseCreditNoteDTOList.add(responseCreditNoteDTO);
 
         }
-        Page<ResponseCreditNoteDTO> responseCreditNotePage = new PageImpl<>(responseCreditNoteDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseCreditNoteDTOList.size());
+        Page<ResponseCreditNoteDTO> responseCreditNotePage = new PageImpl<>(responseCreditNoteDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), iCreditNoteRepo.getCreditNotesByIdStation(idStation).size());
         return responseCreditNotePage;
     }
 

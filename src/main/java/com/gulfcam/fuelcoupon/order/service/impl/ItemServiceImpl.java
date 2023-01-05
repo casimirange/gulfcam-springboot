@@ -39,7 +39,7 @@ public class ItemServiceImpl implements IItemService {
 
     @Override
     public Page<ResponseItemDTO> getAllItems(int page, int size, String sort, String order) {
-        List<Item> items = iItemRepo.findAll();
+        Page<Item> items = iItemRepo.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
         ResponseItemDTO responseItemDTO;
         List<ResponseItemDTO> responseItemDTOList = new ArrayList<>();
 
@@ -65,7 +65,7 @@ public class ItemServiceImpl implements IItemService {
             responseItemDTOList.add(responseItemDTO);
         }
 
-        Page<ResponseItemDTO> itemPage = new PageImpl<>(responseItemDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseItemDTOList.size());
+        Page<ResponseItemDTO> itemPage = new PageImpl<>(responseItemDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), iItemRepo.findAll().size());
         return itemPage;
     }
 
