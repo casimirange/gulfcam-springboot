@@ -46,6 +46,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpHeaders;
@@ -363,11 +364,15 @@ public class CreditNoteRest {
         parameters.put("balance", station.getBalance()+"");
         parameters.put("pinCode", station.getPinCode()+"");
         parameters.put("reference", creditNote.getInternalReference()+"");
-        parameters.put("logo", appContext.getResource("classpath:/templates/logo.jpeg").getFile().getAbsolutePath());
+        Resource resourceLogo = appContext.getResource("classpath:/templates/logo.jpeg");
+        InputStream inputStreamLogo = resourceLogo.getInputStream();
+        parameters.put("logo", inputStreamLogo);
         /* read jrxl fille and creat jasperdesign object*/
-        InputStream input = new FileInputStream(appContext.getResource("classpath:/templates/creditnote.jrxml").getFile());
+        Resource resource = appContext.getResource("classpath:/templates/creditnote.jrxml");
+        //Compile to jasperReport
+        InputStream inputStream = resource.getInputStream();
 
-        JasperDesign jasperDesign = JRXmlLoader.load(input);
+        JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
 
         /* compiling jrxml with help of JasperReport class*/
         JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);

@@ -75,7 +75,7 @@
 	<parameter name="idcommand" class="java.lang.String"/>
 	<parameter name="the_date" class="java.util.Date"/>
 	<parameter name="products" class="java.util.List"/>
-	<parameter name="logo" class="java.lang.String"/>
+	<parameter name="logo" class="java.io.InputStream"/>
 	<parameter name="dateOrder" class="java.lang.String"/>
 	<title>
 		<band height="150" splitType="Stretch">

@@ -972,11 +972,16 @@ public class OrderRest {
         parameters.put("clientReference", (order.getClientReference() == null) ? client.getInternalReference(): order.getClientReference()+"");
         parameters.put("idcommand", order.getInternalReference()+"");
         parameters.put("the_date", new Date());
-        parameters.put("logo", appContext.getResource("classpath:/templates/logo.jpeg").getFile().getAbsolutePath());
+        Resource resourceLogo = appContext.getResource("classpath:/templates/logo.jpeg");
+        //Compile to jasperReport
+        InputStream inputStreamLogo = resourceLogo.getInputStream();
+        parameters.put("logo", inputStreamLogo);
         /* read jrxl fille and creat jasperdesign object*/
-        InputStream input = new FileInputStream(appContext.getResource("classpath:/templates/Invoice.jrxml").getFile());
+        Resource resource = appContext.getResource("classpath:/templates/Invoice.jrxml");
+        //Compile to jasperReport
+        InputStream inputStream = resource.getInputStream();
 
-        JasperDesign jasperDesign = JRXmlLoader.load(input);
+        JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
 
         /* compiling jrxml with help of JasperReport class*/
         JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
@@ -1022,11 +1027,16 @@ public class OrderRest {
         parameters.put("clientReference", (order.getClientReference() == null) ? client.getInternalReference(): order.getClientReference() +"");
         parameters.put("idcommand", order.getInternalReference()+"");
         parameters.put("the_date", new Date());
-        parameters.put("logo", appContext.getResource("classpath:/templates/logo.jpeg").getInputStream());
+        Resource resourceLogo = appContext.getResource("classpath:/templates/logo.jpeg");
+        //Compile to jasperReport
+        InputStream inputStreamLogo = resourceLogo.getInputStream();
+        parameters.put("logo", inputStreamLogo);
         /* read jrxl fille and creat jasperdesign object*/
-        InputStream input = new FileInputStream(appContext.getResource("classpath:/templates/received.jrxml").getFile());
+        Resource resource = appContext.getResource("classpath:/templates/received.jrxml");
+        //Compile to jasperReport
+        InputStream inputStream = resource.getInputStream();
 
-        JasperDesign jasperDesign = JRXmlLoader.load(input);
+        JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
 
         /* compiling jrxml with help of JasperReport class*/
         JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
@@ -1063,14 +1073,21 @@ public class OrderRest {
         parameters.put("address", client.getAddress());
         parameters.put("phone", client.getPhone()+"");
         parameters.put("email", client.getEmail());
-        parameters.put("clientReference", (order.getClientReference() == null) ? client.getInternalReference(): order.getClientReference()+"");
+        parameters.put("clientReference", (order.getClientReference() == null) ? client.getInternalReference()+"": order.getClientReference()+"");
         parameters.put("idcommand", order.getInternalReference()+"");
         parameters.put("the_date", new Date());
-        parameters.put("logo", appContext.getResource("classpath:/templates/logo.jpeg").getFile().getAbsolutePath());
+        Resource resourceLogo = appContext.getResource("classpath:/templates/logo.jpeg");
+        //Compile to jasperReport
+        InputStream inputStreamLogo = resourceLogo.getInputStream();
+        parameters.put("logo", inputStreamLogo);
+//        parameters.put("logo", ResourceUtils.getFile("classpath:/templates/logo.jpeg").getAbsolutePath());
         /* read jrxl fille and creat jasperdesign object*/
-        InputStream input = new FileInputStream(appContext.getResource("classpath:/templates/delivery.jrxml").getFile());
 
-        JasperDesign jasperDesign = JRXmlLoader.load(input);
+        Resource resource = appContext.getResource("classpath:/templates/delivery.jrxml");
+        //Compile to jasperReport
+        InputStream inputStream = resource.getInputStream();
+
+        JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
 
         /* compiling jrxml with help of JasperReport class*/
         JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);

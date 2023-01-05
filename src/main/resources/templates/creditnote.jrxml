@@ -70,7 +70,7 @@
 	<parameter name="pinCode" class="java.lang.String"/>
 	<parameter name="reference" class="java.lang.String"/>
 	<parameter name="coupons" class="java.util.List"/>
-	<parameter name="logo" class="java.lang.String"/>
+	<parameter name="logo" class="java.io.InputStream"/>
 	<parameter name="dateCreditNote" class="java.lang.String"/>
 	<title>
 		<band height="150" splitType="Stretch">
