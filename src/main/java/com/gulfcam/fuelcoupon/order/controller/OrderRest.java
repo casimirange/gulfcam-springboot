@@ -383,12 +383,12 @@ public class OrderRest {
         iOrderService.createOrder(order);
 
         byte[] data = generateReceived(order, client);
-
-        Map<String, Object> emailProps2 = new HashMap<>();
-        emailProps2.put("Internalreference", InternalReference);
-        emailProps2.put("completename", client.getCompleteName());
-        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, ApplicationConstant.SUBJECT_EMAIL_NEW_RECEIVED+InternalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_RECEIVED, data));
-        log.info("Email send successfull for user: " + client.getEmail());
+//
+//        Map<String, Object> emailProps2 = new HashMap<>();
+//        emailProps2.put("Internalreference", InternalReference);
+//        emailProps2.put("completename", client.getCompleteName());
+//        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, ApplicationConstant.SUBJECT_EMAIL_NEW_RECEIVED+InternalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_RECEIVED, data));
+//        log.info("Email send successfull for user: " + client.getEmail());
 
         Map<String, Object> emailProps = new HashMap<>();
         emailProps.put("internalReferenceOrder", InternalReference);
@@ -693,9 +693,18 @@ public class OrderRest {
         List<Users> usersList = iUserService.getUsers();
         for (Users user : usersList) {
             if (user.getTypeAccount().getName() == ETypeAccount.MANAGER_COUPON) {
-                emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_MODIFY_ORDER+InternalReference+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_MODIFY_ORDER));
+                emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_MODIFY_ORDER+InternalReference+" - "+EStatusOrder.CLOSED, ApplicationConstant.TEMPLATE_EMAIL_MODIFY_ORDER));
                 log.info("Email  send successfull for user: " + user.getEmail());
             }
+        }
+        if(client.getEmail() != null){
+            byte[] data = generateReceived(order, client);
+
+            Map<String, Object> emailProps2 = new HashMap<>();
+            emailProps2.put("Internalreference", InternalReference);
+            emailProps2.put("completename", client.getCompleteName());
+            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, ApplicationConstant.SUBJECT_EMAIL_NEW_RECEIVED+InternalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_RECEIVED, data));
+            log.info("Email send successfull for user: " + client.getEmail());
         }
 
 
