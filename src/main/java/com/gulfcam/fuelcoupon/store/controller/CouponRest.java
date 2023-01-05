@@ -411,17 +411,17 @@ public class CouponRest {
         notebook.setStatus(status);
         notebook.setUpdateAt(LocalDateTime.now());
         iNotebookService.createNotebook(notebook);
-
-        Item item = new Item();
-        item.setIdTypeVoucher(notebook.getIdTypeVoucher());
-        item.setQuantityNotebook(-1);
-        item.setIdStoreHouse(notebook.getIdStoreHouse());
-        item.setInternalReference(jwtUtils.generateInternalReference());
-        Status statusItem = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
-        item.setStatus(statusItem);
-        item.setCreatedAt(LocalDateTime.now());
-
-        iItemService.createItem(item);
+//
+//        Item item = new Item();
+//        item.setIdTypeVoucher(notebook.getIdTypeVoucher());
+//        item.setQuantityNotebook(-1);
+//        item.setIdStoreHouse(notebook.getIdStoreHouse());
+//        item.setInternalReference(jwtUtils.generateInternalReference());
+//        Status statusItem = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
+//        item.setStatus(statusItem);
+//        item.setCreatedAt(LocalDateTime.now());
+//
+//        iItemService.createItem(item);
 
         Map<String, Object> emailProps = new HashMap<>();
         TypeVoucher typeVoucher = iTypeVoucherService.getByInternalReference(coupon.getIdTypeVoucher()).get();
