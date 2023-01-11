@@ -10,10 +10,13 @@ import javax.validation.constraints.NotNull;
 public class ProductDTO {
 
     @Schema(description = "Reference interne du type de bon")
-    private String price;
+    private String pu;
 
     @Schema(description = "quantité de carnet")
     private int quantityNotebook;
+
+    @Schema(description = "total")
+    private String valeur;
 
     @Schema(description = "carnet")
     private String product;

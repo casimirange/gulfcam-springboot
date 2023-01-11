@@ -44,6 +44,8 @@ public class ApplicationConstant {
 
     public static final String SUBJECT_EMAIL_NEW_RECEIVED = "GulfCam - Reçue de paiement : #Ref";
 
+    public static final String SUBJECT_EMAIL_NEW_FACTURE = "GulfCam - Facture : #Ref";
+
     public static final String SUBJECT_EMAIL_PAY_TEMPORAIRE = "GulfCam - Accès Temporaire";
 
     public static final String SUBJECT_EMAIL_VILID_PROFIL = "GulfCam - Validation de profil ";
@@ -83,6 +85,8 @@ public class ApplicationConstant {
     public static final String TEMPLATE_EMAIL_EXPORT_COUPON_EXCEL = "coupon-export-excel";
 
     public static final String TEMPLATE_EMAIL_NEW_RECEIVED = "new-received";
+
+    public static final String TEMPLATE_EMAIL_NEW_FACTURE = "new-facture";
     public static final String SUBJECT_PASSWORD_RESET = "GulfCam Réinitialisation du mot de passe";
 
     public static final String TEMPLATE_PASSWORD_RESET = "email-password-reset";

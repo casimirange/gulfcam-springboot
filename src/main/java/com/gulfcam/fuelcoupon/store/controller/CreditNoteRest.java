@@ -212,6 +212,8 @@ public class CreditNoteRest {
         CreditNote creditNote = iCreditNoteService.getByInternalReference(internalReference).get();
         List<Coupon> couponList = iCouponService.getCouponsByIdCreditNote(internalReference);
         Station station = iStationService.getByInternalReference(creditNote.getIdStation()).get();
+
+        Users managerStation = iUserService.getByInternalReference(station.getIdManagerStation());
         ResponseCouponMailDTO responseCouponMailDTO;
         List<ResponseCouponMailDTO> responseCouponMailDTOList = new ArrayList<>();
         float amoutToDebit = 0;
@@ -232,7 +234,7 @@ public class CreditNoteRest {
             responseCouponMailDTO.setAmount(typeVoucher.getAmount()+"");
             responseCouponMailDTOList.add(responseCouponMailDTO);
         }
-        byte[] data = generateCreditNote(amoutToDebit, creditNote, station, responseCouponMailDTOList);
+        byte[] data = generateCreditNote(amoutToDebit, managerStation, creditNote, station, responseCouponMailDTOList);
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=creditnote-" + creditNote.getInternalReference() + ".pdf");
         return ResponseEntity.ok().headers(headers).contentType(MediaType.APPLICATION_PDF).body(data);
@@ -352,7 +354,7 @@ public class CreditNoteRest {
     }
 
 
-    private byte[] generateCreditNote(float amountToDebit, CreditNote creditNote, Station station, List<ResponseCouponMailDTO> couponList) throws JRException, IOException {
+    private byte[] generateCreditNote(float amountToDebit, Users managerStation, CreditNote creditNote, Station station, List<ResponseCouponMailDTO> couponList) throws JRException, IOException {
 
         /* Map to hold Jasper report Parameters*/
         Map<String, Object> parameters = new HashMap<>();
@@ -362,13 +364,18 @@ public class CreditNoteRest {
         parameters.put("localization", station.getLocalization());
         parameters.put("designation", station.getDesignation());
         parameters.put("balance", station.getBalance()+"");
-        parameters.put("pinCode", station.getPinCode()+"");
+        parameters.put("nom", (managerStation != null) ? managerStation.getFirstName()+" " +managerStation.getLastName() : "");
+        parameters.put("phone", (managerStation != null) ? managerStation.getTelephone()+"" : "");
+        parameters.put("email", (managerStation != null) ? managerStation.getEmail()+"" : "");
+        parameters.put("referenceManagerStation", (managerStation != null) ? managerStation.getInternalReference()+"" : "");
         parameters.put("reference", creditNote.getInternalReference()+"");
+        parameters.put("the_date", dateFor.format(new Date()).toString());
+        parameters.put("dateCredit", dateFor.format(Date.from(creditNote.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant())).toString());
         Resource resourceLogo = appContext.getResource("classpath:/templates/logo.jpeg");
         InputStream inputStreamLogo = resourceLogo.getInputStream();
         parameters.put("logo", inputStreamLogo);
         /* read jrxl fille and creat jasperdesign object*/
-        Resource resource = appContext.getResource("classpath:/templates/creditnote.jrxml");
+        Resource resource = appContext.getResource("classpath:/templates/jasper/creditnote.jrxml");
         //Compile to jasperReport
         InputStream inputStream = resource.getInputStream();
 

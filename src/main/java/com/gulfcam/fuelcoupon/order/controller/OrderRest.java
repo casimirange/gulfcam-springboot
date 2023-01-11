@@ -528,7 +528,7 @@ public class OrderRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
     @PostMapping("/pay/{InternalReference:[0-9]+}")
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> payOrder(@PathVariable Long InternalReference, @RequestParam("idManagerCoupon") Long idManagerCoupon) {
+    public ResponseEntity<?> payOrder(@PathVariable Long InternalReference, @RequestParam("idManagerCoupon") Long idManagerCoupon) throws JRException, IOException {
 
         Order order = iOrderService.getByInternalReference(InternalReference).get();
         Client client = iClientService.getClientByInternalReference(order.getIdClient()).get();
@@ -565,6 +565,15 @@ public class OrderRest {
                 emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_MODIFY_ORDER+InternalReference+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_MODIFY_ORDER));
                 log.info("Email  send successfull for user: " + user.getEmail());
             }
+        }
+        if(client.getEmail() != null){
+            byte[] data = generateReceived(order, client);
+
+            Map<String, Object> emailProps2 = new HashMap<>();
+            emailProps2.put("Internalreference", InternalReference);
+            emailProps2.put("completename", client.getCompleteName());
+            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, ApplicationConstant.SUBJECT_EMAIL_NEW_RECEIVED+InternalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_RECEIVED, data));
+            log.info("Email send successfull for user: " + client.getEmail());
         }
 
         return ResponseEntity.ok(order);
@@ -698,12 +707,12 @@ public class OrderRest {
             }
         }
         if(client.getEmail() != null){
-            byte[] data = generateReceived(order, client);
+            byte[] data = generateFacture(order, client);
 
             Map<String, Object> emailProps2 = new HashMap<>();
             emailProps2.put("Internalreference", InternalReference);
             emailProps2.put("completename", client.getCompleteName());
-            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, ApplicationConstant.SUBJECT_EMAIL_NEW_RECEIVED+InternalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_RECEIVED, data));
+            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, ApplicationConstant.SUBJECT_EMAIL_NEW_FACTURE+InternalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_FACTURE, data));
             log.info("Email send successfull for user: " + client.getEmail());
         }
 
@@ -956,7 +965,8 @@ public class OrderRest {
         for(Product product : products){
             productDTO = new ProductDTO();
             productDTO.setQuantityNotebook(product.getQuantityNotebook());
-            productDTO.setPrice(iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get().getAmount()+"");
+            productDTO.setPu(iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get().getAmount()+"");
+            productDTO.setValeur(iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get().getAmount()*product.getQuantityNotebook()+"");
             productDTO.setProduct("Carnet N-"+product.getInternalReference());
             productDTOList.add(productDTO);
         }
@@ -973,20 +983,20 @@ public class OrderRest {
         parameters.put("tax", order.getTax()+"");
         parameters.put("TTCAggregateAmount", order.getTTCAggregateAmount()+"");
         parameters.put("completeName", client.getCompleteName());
-        parameters.put("companyName", client.getCompanyName());
         parameters.put("dateOrder", dateFor.format(Date.from(order.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant())).toString());
         parameters.put("address", client.getAddress());
         parameters.put("phone", client.getPhone()+"");
         parameters.put("email", client.getEmail());
-        parameters.put("clientReference", (order.getClientReference() == null) ? client.getInternalReference(): order.getClientReference()+"");
+        parameters.put("rc", client.getRCCM());
+        parameters.put("clientReference",  (order.getClientReference() == null) ? client.getInternalReference()+"": order.getClientReference()+"");
         parameters.put("idcommand", order.getInternalReference()+"");
-        parameters.put("the_date", new Date());
+        parameters.put("the_date", dateFor.format(new Date()).toString());
         Resource resourceLogo = appContext.getResource("classpath:/templates/logo.jpeg");
         //Compile to jasperReport
         InputStream inputStreamLogo = resourceLogo.getInputStream();
         parameters.put("logo", inputStreamLogo);
         /* read jrxl fille and creat jasperdesign object*/
-        Resource resource = appContext.getResource("classpath:/templates/Invoice.jrxml");
+        Resource resource = appContext.getResource("classpath:/templates/jasper/proforma.jrxml");
         //Compile to jasperReport
         InputStream inputStream = resource.getInputStream();
 
@@ -1011,7 +1021,8 @@ public class OrderRest {
         for(Product product : products){
             productDTO = new ProductDTO();
             productDTO.setQuantityNotebook(product.getQuantityNotebook());
-            productDTO.setPrice(iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get().getAmount()+"");
+            productDTO.setPu(iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get().getAmount()+"");
+            productDTO.setValeur(iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get().getAmount()*product.getQuantityNotebook()+"");
             productDTO.setProduct("Carnet N-"+product.getInternalReference());
             productDTOList.add(productDTO);
         }
@@ -1033,15 +1044,71 @@ public class OrderRest {
         parameters.put("address", client.getAddress());
         parameters.put("phone", client.getPhone()+"");
         parameters.put("email", client.getEmail());
-        parameters.put("clientReference", (order.getClientReference() == null) ? client.getInternalReference(): order.getClientReference() +"");
+        parameters.put("clientReference", (order.getClientReference() == null) ? client.getInternalReference()+"": order.getClientReference() +"");
         parameters.put("idcommand", order.getInternalReference()+"");
-        parameters.put("the_date", new Date());
+        parameters.put("the_date", dateFor.format(new Date()).toString());
         Resource resourceLogo = appContext.getResource("classpath:/templates/logo.jpeg");
         //Compile to jasperReport
         InputStream inputStreamLogo = resourceLogo.getInputStream();
         parameters.put("logo", inputStreamLogo);
         /* read jrxl fille and creat jasperdesign object*/
-        Resource resource = appContext.getResource("classpath:/templates/received.jrxml");
+        Resource resource = appContext.getResource("classpath:/templates/jasper/received.jrxml");
+        //Compile to jasperReport
+        InputStream inputStream = resource.getInputStream();
+
+        JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
+
+        /* compiling jrxml with help of JasperReport class*/
+        JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+
+        /* Using jasperReport objet to generate PDF*/
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
+
+        /*convert PDF to byte type*/
+        return JasperExportManager.exportReportToPdf(jasperPrint);
+    }
+
+    private byte[] generateFacture(Order order, Client client) throws JRException, IOException {
+        List<Product> products = iProductService.getProductsByIdOrder(order.getInternalReference());
+
+        ProductDTO productDTO = new ProductDTO();
+        List<ProductDTO> productDTOList = new ArrayList<>();
+
+        for(Product product : products){
+            productDTO = new ProductDTO();
+            productDTO.setQuantityNotebook(product.getQuantityNotebook());
+            productDTO.setPu(iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get().getAmount()+"");
+            productDTO.setValeur(iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get().getAmount()*product.getQuantityNotebook()+"");
+            productDTO.setProduct("Carnet N-"+product.getInternalReference());
+            productDTOList.add(productDTO);
+        }
+        boolean testTypeDocument = false;
+
+        if(client.getTypeClient().getName().equals(ETypeClient.INSTITUTION)){
+            testTypeDocument = true;
+        }
+        /* Map to hold Jasper report Parameters*/
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("products", productDTOList);
+        parameters.put("type", testTypeDocument? "PREFACTURE":"PROFORMA");
+        parameters.put("NetAggregateAmount", order.getNetAggregateAmount()+"");
+        parameters.put("tax", order.getTax()+"");
+        parameters.put("dateOrder", dateFor.format(Date.from((order.getUpdateAt() == null) ? order.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant():  order.getUpdateAt().atZone(ZoneId.systemDefault()).toInstant())).toString());
+        parameters.put("TTCAggregateAmount", order.getTTCAggregateAmount()+"");
+        parameters.put("completeName", client.getCompleteName());
+        parameters.put("companyName", client.getCompanyName());
+        parameters.put("address", client.getAddress());
+        parameters.put("phone", client.getPhone()+"");
+        parameters.put("email", client.getEmail());
+        parameters.put("clientReference", (order.getClientReference() == null) ? client.getInternalReference()+"": order.getClientReference() +"");
+        parameters.put("idcommand", order.getInternalReference()+"");
+        parameters.put("the_date", dateFor.format(new Date()).toString());
+        Resource resourceLogo = appContext.getResource("classpath:/templates/logo.jpeg");
+        //Compile to jasperReport
+        InputStream inputStreamLogo = resourceLogo.getInputStream();
+        parameters.put("logo", inputStreamLogo);
+        /* read jrxl fille and creat jasperdesign object*/
+        Resource resource = appContext.getResource("classpath:/templates/jasper/invoice.jrxml");
         //Compile to jasperReport
         InputStream inputStream = resource.getInputStream();
 
@@ -1066,7 +1133,8 @@ public class OrderRest {
         for(Product product : products){
             productDTO = new ProductDTO();
             productDTO.setQuantityNotebook(product.getQuantityNotebook());
-            productDTO.setPrice(iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get().getAmount()+"");
+            productDTO.setPu(iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get().getAmount()+"");
+            productDTO.setValeur(iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get().getAmount()*product.getQuantityNotebook()+"");
             productDTO.setProduct("Carnet N-"+product.getInternalReference());
             productDTOList.add(productDTO);
         }
@@ -1084,7 +1152,7 @@ public class OrderRest {
         parameters.put("email", client.getEmail());
         parameters.put("clientReference", (order.getClientReference() == null) ? client.getInternalReference()+"": order.getClientReference()+"");
         parameters.put("idcommand", order.getInternalReference()+"");
-        parameters.put("the_date", new Date());
+        parameters.put("the_date", dateFor.format(new Date()).toString());
         Resource resourceLogo = appContext.getResource("classpath:/templates/logo.jpeg");
         //Compile to jasperReport
         InputStream inputStreamLogo = resourceLogo.getInputStream();
@@ -1092,7 +1160,7 @@ public class OrderRest {
 //        parameters.put("logo", ResourceUtils.getFile("classpath:/templates/logo.jpeg").getAbsolutePath());
         /* read jrxl fille and creat jasperdesign object*/
 
-        Resource resource = appContext.getResource("classpath:/templates/delivery.jrxml");
+        Resource resource = appContext.getResource("classpath:/templates/jasper/delivery.jrxml");
         //Compile to jasperReport
         InputStream inputStream = resource.getInputStream();
 
