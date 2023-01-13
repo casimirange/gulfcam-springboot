@@ -116,6 +116,8 @@ public class OrderRest {
     @Autowired
     ApplicationContext appContext;
 
+    @Value("${app.numberCoupon}")
+    String numberCoupon;
     @Value("${mail.from[0]}")
     String mailFrom;
     @Value("${mail.replyTo[0]}")
@@ -963,11 +965,12 @@ public class OrderRest {
         List<ProductDTO> productDTOList = new ArrayList<>();
 
         for(Product product : products){
+            TypeVoucher typeVoucher = iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get();
             productDTO = new ProductDTO();
             productDTO.setQuantityNotebook(product.getQuantityNotebook());
-            productDTO.setPu(iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get().getAmount()+"");
-            productDTO.setValeur(iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get().getAmount()*product.getQuantityNotebook()+"");
-            productDTO.setProduct("Carnet N-"+product.getInternalReference());
+            productDTO.setPu(typeVoucher.getAmount()*Integer.parseInt(numberCoupon)+"");
+            productDTO.setValeur(Integer.parseInt(productDTO.getPu())*product.getQuantityNotebook()+"");
+            productDTO.setProduct("Carnet N-"+typeVoucher.getAmount());
             productDTOList.add(productDTO);
         }
         boolean testTypeDocument = false;
@@ -1019,11 +1022,12 @@ public class OrderRest {
         List<ProductDTO> productDTOList = new ArrayList<>();
 
         for(Product product : products){
+            TypeVoucher typeVoucher = iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get();
             productDTO = new ProductDTO();
             productDTO.setQuantityNotebook(product.getQuantityNotebook());
-            productDTO.setPu(iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get().getAmount()+"");
-            productDTO.setValeur(iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get().getAmount()*product.getQuantityNotebook()+"");
-            productDTO.setProduct("Carnet N-"+product.getInternalReference());
+            productDTO.setPu(typeVoucher.getAmount()*Integer.parseInt(numberCoupon)+"");
+            productDTO.setValeur(Integer.parseInt(productDTO.getPu())*product.getQuantityNotebook()+"");
+            productDTO.setProduct("Carnet N-"+typeVoucher.getAmount());
             productDTOList.add(productDTO);
         }
         boolean testTypeDocument = false;
@@ -1044,6 +1048,7 @@ public class OrderRest {
         parameters.put("address", (client.getAddress() != null) ? client.getAddress(): " - ");
         parameters.put("phone", (client.getPhone() != null)? client.getPhone()+"" : " - ");
         parameters.put("email", (client.getEmail() != null)? client.getEmail(): " - ");
+        parameters.put("rc", (client.getRCCM() != null)? client.getRCCM()+"": " - ");
         parameters.put("clientReference", (order.getClientReference() == null) ? client.getInternalReference()+"": order.getClientReference() +"");
         parameters.put("idcommand", order.getInternalReference()+"");
         parameters.put("the_date", dateFor.format(new Date()).toString());
@@ -1075,11 +1080,12 @@ public class OrderRest {
         List<ProductDTO> productDTOList = new ArrayList<>();
 
         for(Product product : products){
+            TypeVoucher typeVoucher = iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get();
             productDTO = new ProductDTO();
             productDTO.setQuantityNotebook(product.getQuantityNotebook());
-            productDTO.setPu(iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get().getAmount()+"");
-            productDTO.setValeur(iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get().getAmount()*product.getQuantityNotebook()+"");
-            productDTO.setProduct("Carnet N-"+product.getInternalReference());
+            productDTO.setPu(typeVoucher.getAmount()*Integer.parseInt(numberCoupon)+"");
+            productDTO.setValeur(Integer.parseInt(productDTO.getPu())*product.getQuantityNotebook()+"");
+            productDTO.setProduct("Carnet N-"+typeVoucher.getAmount());
             productDTOList.add(productDTO);
         }
         boolean testTypeDocument = false;
@@ -1100,6 +1106,7 @@ public class OrderRest {
         parameters.put("address", (client.getAddress() != null) ? client.getAddress(): " - ");
         parameters.put("phone", (client.getPhone() != null)? client.getPhone()+"" : " - ");
         parameters.put("email", (client.getEmail() != null)? client.getEmail(): " - ");
+        parameters.put("rc", (client.getRCCM() != null)? client.getRCCM()+"": " - ");
         parameters.put("clientReference", (order.getClientReference() == null) ? client.getInternalReference()+"": order.getClientReference() +"");
         parameters.put("idcommand", order.getInternalReference()+"");
         parameters.put("the_date", dateFor.format(new Date()).toString());
@@ -1131,11 +1138,12 @@ public class OrderRest {
         List<ProductDTO> productDTOList = new ArrayList<>();
 
         for(Product product : products){
+            TypeVoucher typeVoucher = iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get();
             productDTO = new ProductDTO();
             productDTO.setQuantityNotebook(product.getQuantityNotebook());
-            productDTO.setPu(iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get().getAmount()+"");
-            productDTO.setValeur(iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get().getAmount()*product.getQuantityNotebook()+"");
-            productDTO.setProduct("Carnet N-"+product.getInternalReference());
+            productDTO.setPu(typeVoucher.getAmount()*Integer.parseInt(numberCoupon)+"");
+            productDTO.setValeur(Integer.parseInt(productDTO.getPu())*product.getQuantityNotebook()+"");
+            productDTO.setProduct("Carnet N-"+typeVoucher.getAmount());
             productDTOList.add(productDTO);
         }
         /* Map to hold Jasper report Parameters*/
@@ -1150,6 +1158,7 @@ public class OrderRest {
         parameters.put("address", (client.getAddress() != null) ? client.getAddress(): " - ");
         parameters.put("phone", (client.getPhone() != null)? client.getPhone()+"" : " - ");
         parameters.put("email", (client.getEmail() != null)? client.getEmail(): " - ");
+        parameters.put("rc", (client.getRCCM() != null)? client.getRCCM()+"": " - ");
         parameters.put("clientReference", (order.getClientReference() == null) ? client.getInternalReference()+"": order.getClientReference()+"");
         parameters.put("idcommand", order.getInternalReference()+"");
         parameters.put("the_date", dateFor.format(new Date()).toString());

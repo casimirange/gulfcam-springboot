@@ -7,7 +7,7 @@
 	<property name="ireport.jasperserver.reportUnit" value="/public/Christoph/Invoice"/>
 	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="48"/>
-	<property name="ireport.y" value="425"/>
+	<property name="ireport.y" value="3"/>
 	<subDataset name="products" uuid="881345ab-2872-4599-a9e3-a65cdb209e37">
 		<queryString>
 			<![CDATA[]]>
@@ -109,19 +109,18 @@
 				<text><![CDATA[Contact :]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="316" y="73" width="219" height="31" forecolor="#007934" uuid="3cb71a06-c8ed-4e86-9fd2-7673c0ce514f"/>
+				<reportElement x="287" y="73" width="257" height="31" forecolor="#007934" uuid="3cb71a06-c8ed-4e86-9fd2-7673c0ce514f"/>
 				<textElement>
 					<font size="16" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{typeDocument} +"  #"+ $P{idcommand}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="316" y="126" width="83" height="20" uuid="16cc3e10-76d5-4046-b7d8-9cbdf970af50"/>
-				<textElement textAlignment="Right"/>
+				<reportElement x="289" y="126" width="83" height="20" uuid="16cc3e10-76d5-4046-b7d8-9cbdf970af50"/>
 				<text><![CDATA[Lieu de livraison : ]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="416" y="126" width="83" height="20" uuid="554a3a0b-806d-4b21-b168-a6683d7be493"/>
+				<reportElement x="372" y="126" width="83" height="20" uuid="554a3a0b-806d-4b21-b168-a6683d7be493"/>
 				<textElement>
 					<font isBold="true"/>
 				</textElement>
@@ -194,20 +193,30 @@
 				</jr:list>
 			</componentElement>
 		</band>
-		<band height="81">
+		<band height="106">
 			<line>
 				<reportElement x="33" y="12" width="512" height="1" uuid="53ff5bda-cbde-4163-88e0-4aa045d82a72"/>
 			</line>
 			<line>
-				<reportElement x="371" y="27" width="166" height="1" uuid="42d1960f-5d08-46cf-8290-f32fcd166f3e"/>
+				<reportElement x="339" y="28" width="198" height="1" uuid="42d1960f-5d08-46cf-8290-f32fcd166f3e"/>
 			</line>
 			<staticText>
-				<reportElement x="372" y="54" width="65" height="20" uuid="fbaa069e-12f3-4f15-9375-0c434d0e426f"/>
-				<textElement textAlignment="Right"/>
-				<text><![CDATA[Net à payer : ]]></text>
+				<reportElement x="339" y="74" width="96" height="20" uuid="fbaa069e-12f3-4f15-9375-0c434d0e426f"/>
+				<text><![CDATA[Montant Global TTC : ]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="437" y="54" width="100" height="20" uuid="d4d222ae-0717-43a5-86f7-0045403632b0"/>
+				<reportElement x="436" y="74" width="100" height="20" uuid="d4d222ae-0717-43a5-86f7-0045403632b0"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TTCAggregateAmount} + " FCFA"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="339" y="44" width="97" height="20" uuid="1b50bfd7-af32-49e2-805c-92a70fe30d45"/>
+				<text><![CDATA[Tax : ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="435" y="44" width="100" height="20" uuid="3740bd88-8639-4e84-9b6f-f8b02aa95042"/>
 				<textElement>
 					<font size="14" isBold="true"/>
 				</textElement>

@@ -108,6 +108,8 @@ public class CreditNoteRest {
     @Autowired
     ApplicationContext appContext;
 
+    @Value("${app.numberCoupon}")
+    String numberCoupon;
     @Value("${mail.from[0]}")
     String mailFrom;
     @Value("${mail.replyTo[0]}")
@@ -228,10 +230,10 @@ public class CreditNoteRest {
             responseCouponMailDTO.setStatus(coupon.getStatus());
             responseCouponMailDTO.setCreatedAt(coupon.getCreatedAt());
             responseCouponMailDTO.setInternalReference(coupon.getInternalReference());
-            responseCouponMailDTO.setReference(coupon.getInternalReference()+"");
+            responseCouponMailDTO.setReference(typeVoucher.getAmount()+"");
             responseCouponMailDTO.setSerialNumber(coupon.getSerialNumber());
             responseCouponMailDTO.setIdTypeVoucher(typeVoucher);
-            responseCouponMailDTO.setAmount(typeVoucher.getAmount()+"");
+            responseCouponMailDTO.setAmount(typeVoucher.getAmount()*Integer.parseInt(numberCoupon)+"");
             responseCouponMailDTOList.add(responseCouponMailDTO);
         }
         byte[] data = generateCreditNote(amoutToDebit, managerStation, creditNote, station, responseCouponMailDTOList);

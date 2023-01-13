@@ -7,7 +7,7 @@
 	<property name="ireport.jasperserver.reportUnit" value="/public/Christoph/Invoice"/>
 	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="50"/>
-	<property name="ireport.y" value="587"/>
+	<property name="ireport.y" value="0"/>
 	<subDataset name="coupons" uuid="881345ab-2872-4599-a9e3-a65cdb209e37">
 		<queryString>
 			<![CDATA[]]>
@@ -96,12 +96,12 @@
 				<text><![CDATA[Contact :]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="322" y="119" width="83" height="20" uuid="16cc3e10-76d5-4046-b7d8-9cbdf970af50"/>
+				<reportElement x="304" y="110" width="83" height="20" uuid="16cc3e10-76d5-4046-b7d8-9cbdf970af50"/>
 				<textElement textAlignment="Right"/>
-				<text><![CDATA[Bons retournés le ]]></text>
+				<text><![CDATA[Bons retournés le : ]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="405" y="119" width="83" height="20" uuid="554a3a0b-806d-4b21-b168-a6683d7be493"/>
+				<reportElement x="397" y="110" width="83" height="20" uuid="554a3a0b-806d-4b21-b168-a6683d7be493"/>
 				<textElement>
 					<font isBold="true"/>
 				</textElement>
@@ -145,9 +145,9 @@
 				<text><![CDATA[Nom du gérant :]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="322" y="57" width="219" height="31" forecolor="#007934" uuid="3cb71a06-c8ed-4e86-9fd2-7673c0ce514f"/>
+				<reportElement x="304" y="57" width="237" height="31" forecolor="#007934" uuid="3cb71a06-c8ed-4e86-9fd2-7673c0ce514f"/>
 				<textElement>
-					<font size="16" isBold="true"/>
+					<font size="14" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Note de crédit  #"+ $P{reference}]]></textFieldExpression>
 			</textField>

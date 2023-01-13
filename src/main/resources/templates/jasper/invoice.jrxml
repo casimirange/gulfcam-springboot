@@ -7,7 +7,7 @@
 	<property name="ireport.jasperserver.reportUnit" value="/public/Christoph/Invoice"/>
 	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="96"/>
-	<property name="ireport.y" value="41"/>
+	<property name="ireport.y" value="63"/>
 	<subDataset name="products" uuid="881345ab-2872-4599-a9e3-a65cdb209e37">
 		<queryString>
 			<![CDATA[]]>
@@ -109,15 +109,14 @@
 				<text><![CDATA[Contact :]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="316" y="73" width="219" height="31" forecolor="#007934" uuid="3cb71a06-c8ed-4e86-9fd2-7673c0ce514f"/>
+				<reportElement x="287" y="73" width="238" height="31" forecolor="#007934" uuid="3cb71a06-c8ed-4e86-9fd2-7673c0ce514f"/>
 				<textElement>
 					<font size="16" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Facture  #"+ $P{idcommand}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="316" y="126" width="83" height="20" uuid="16cc3e10-76d5-4046-b7d8-9cbdf970af50"/>
-				<textElement textAlignment="Right"/>
+				<reportElement x="289" y="126" width="83" height="20" uuid="16cc3e10-76d5-4046-b7d8-9cbdf970af50"/>
 				<text><![CDATA[Lieu de livraison : ]]></text>
 			</staticText>
 			<textField>
@@ -164,12 +163,10 @@
 			</textField>
 			<staticText>
 				<reportElement x="287" y="156" width="114" height="20" uuid="e94eea0d-85b3-47a8-8b14-240e8c43b3fe"/>
-				<textElement textAlignment="Right"/>
 				<text><![CDATA[Bon de Commande N° :]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="287" y="190" width="114" height="20" uuid="e2eb4f62-4e90-44a8-9dea-5696a3306834"/>
-				<textElement textAlignment="Right"/>
 				<text><![CDATA[Date de la commande :]]></text>
 			</staticText>
 			<textField>
@@ -218,20 +215,30 @@
 				</jr:list>
 			</componentElement>
 		</band>
-		<band height="81">
+		<band height="96">
 			<line>
 				<reportElement x="33" y="12" width="512" height="1" uuid="53ff5bda-cbde-4163-88e0-4aa045d82a72"/>
 			</line>
 			<line>
-				<reportElement x="371" y="27" width="166" height="1" uuid="42d1960f-5d08-46cf-8290-f32fcd166f3e"/>
+				<reportElement x="338" y="27" width="199" height="1" uuid="42d1960f-5d08-46cf-8290-f32fcd166f3e"/>
 			</line>
 			<staticText>
-				<reportElement x="372" y="54" width="65" height="20" uuid="fbaa069e-12f3-4f15-9375-0c434d0e426f"/>
-				<textElement textAlignment="Right"/>
-				<text><![CDATA[Net à payer : ]]></text>
+				<reportElement x="338" y="64" width="99" height="20" uuid="fbaa069e-12f3-4f15-9375-0c434d0e426f"/>
+				<text><![CDATA[Montant Global TTC : ]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="437" y="54" width="100" height="20" uuid="d4d222ae-0717-43a5-86f7-0045403632b0"/>
+				<reportElement x="437" y="64" width="100" height="20" uuid="d4d222ae-0717-43a5-86f7-0045403632b0"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{tax}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="338" y="34" width="99" height="20" uuid="17ca7001-912a-4052-a3b8-95ca15657de9"/>
+				<text><![CDATA[Tax : ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="437" y="34" width="100" height="20" uuid="2ee7772a-5ee0-48d5-a036-4a326873a478"/>
 				<textElement>
 					<font size="14" isBold="true"/>
 				</textElement>

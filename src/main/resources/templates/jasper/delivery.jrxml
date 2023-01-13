@@ -7,7 +7,7 @@
 	<property name="ireport.jasperserver.reportUnit" value="/public/Christoph/Invoice"/>
 	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="72"/>
-	<property name="ireport.y" value="311"/>
+	<property name="ireport.y" value="67"/>
 	<subDataset name="products" uuid="881345ab-2872-4599-a9e3-a65cdb209e37">
 		<queryString>
 			<![CDATA[]]>
@@ -104,13 +104,12 @@
 			<textField>
 				<reportElement x="287" y="73" width="259" height="31" forecolor="#007934" uuid="3cb71a06-c8ed-4e86-9fd2-7673c0ce514f"/>
 				<textElement>
-					<font size="16" isBold="true"/>
+					<font size="14" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Bon de livraison  #"+ $P{idcommand}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="316" y="126" width="83" height="20" uuid="16cc3e10-76d5-4046-b7d8-9cbdf970af50"/>
-				<textElement textAlignment="Right"/>
+				<reportElement x="287" y="126" width="112" height="20" uuid="16cc3e10-76d5-4046-b7d8-9cbdf970af50"/>
 				<text><![CDATA[Lieu de livraison : ]]></text>
 			</staticText>
 			<textField>
@@ -157,12 +156,10 @@
 			</textField>
 			<staticText>
 				<reportElement x="287" y="156" width="112" height="20" uuid="cb4e990f-5c81-4e28-bd53-296e49a90ad2"/>
-				<textElement textAlignment="Right"/>
 				<text><![CDATA[Bon de Commande N° :]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="287" y="190" width="114" height="20" uuid="6196d7ab-0c33-4535-90df-12f0eadc898b"/>
-				<textElement textAlignment="Right"/>
 				<text><![CDATA[Date de la commande :]]></text>
 			</staticText>
 			<textField>
@@ -170,7 +167,7 @@
 				<textElement>
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[" #"+ $P{idcommand}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{idcommand}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="401" y="190" width="83" height="20" uuid="3cf596d8-7366-4117-8aaa-a6fc6d424d78"/>
