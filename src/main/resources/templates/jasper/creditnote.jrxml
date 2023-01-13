@@ -97,7 +97,6 @@
 			</staticText>
 			<staticText>
 				<reportElement x="304" y="110" width="83" height="20" uuid="16cc3e10-76d5-4046-b7d8-9cbdf970af50"/>
-				<textElement textAlignment="Right"/>
 				<text><![CDATA[Bons retournés le : ]]></text>
 			</staticText>
 			<textField>

@@ -231,7 +231,7 @@
 				<textElement>
 					<font size="14" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{tax}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{TTCAggregateAmount} + " FCFA"]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="338" y="34" width="99" height="20" uuid="17ca7001-912a-4052-a3b8-95ca15657de9"/>
@@ -242,7 +242,7 @@
 				<textElement>
 					<font size="14" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{TTCAggregateAmount} + " FCFA"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{tax}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

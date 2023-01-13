@@ -968,9 +968,9 @@ public class OrderRest {
             TypeVoucher typeVoucher = iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get();
             productDTO = new ProductDTO();
             productDTO.setQuantityNotebook(product.getQuantityNotebook());
-            productDTO.setPu(typeVoucher.getAmount()*Integer.parseInt(numberCoupon)+"");
+            productDTO.setPu(Math.round(typeVoucher.getAmount())*Integer.parseInt(numberCoupon)+"");
             productDTO.setValeur(Integer.parseInt(productDTO.getPu())*product.getQuantityNotebook()+"");
-            productDTO.setProduct("Carnet N-"+typeVoucher.getAmount());
+            productDTO.setProduct("Carnet N-"+Math.round(typeVoucher.getAmount()));
             productDTOList.add(productDTO);
         }
         boolean testTypeDocument = false;
@@ -1025,9 +1025,9 @@ public class OrderRest {
             TypeVoucher typeVoucher = iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get();
             productDTO = new ProductDTO();
             productDTO.setQuantityNotebook(product.getQuantityNotebook());
-            productDTO.setPu(typeVoucher.getAmount()*Integer.parseInt(numberCoupon)+"");
+            productDTO.setPu(Math.round(typeVoucher.getAmount())*Integer.parseInt(numberCoupon)+"");
             productDTO.setValeur(Integer.parseInt(productDTO.getPu())*product.getQuantityNotebook()+"");
-            productDTO.setProduct("Carnet N-"+typeVoucher.getAmount());
+            productDTO.setProduct("Carnet N-"+Math.round(typeVoucher.getAmount()));
             productDTOList.add(productDTO);
         }
         boolean testTypeDocument = false;
@@ -1083,9 +1083,9 @@ public class OrderRest {
             TypeVoucher typeVoucher = iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get();
             productDTO = new ProductDTO();
             productDTO.setQuantityNotebook(product.getQuantityNotebook());
-            productDTO.setPu(typeVoucher.getAmount()*Integer.parseInt(numberCoupon)+"");
+            productDTO.setPu(Math.round(typeVoucher.getAmount())*Integer.parseInt(numberCoupon)+"");
             productDTO.setValeur(Integer.parseInt(productDTO.getPu())*product.getQuantityNotebook()+"");
-            productDTO.setProduct("Carnet N-"+typeVoucher.getAmount());
+            productDTO.setProduct("Carnet N-"+Math.round(typeVoucher.getAmount()));
             productDTOList.add(productDTO);
         }
         boolean testTypeDocument = false;
@@ -1141,9 +1141,9 @@ public class OrderRest {
             TypeVoucher typeVoucher = iTypeVoucherService.getByInternalReference(product.getIdTypeVoucher()).get();
             productDTO = new ProductDTO();
             productDTO.setQuantityNotebook(product.getQuantityNotebook());
-            productDTO.setPu(typeVoucher.getAmount()*Integer.parseInt(numberCoupon)+"");
+            productDTO.setPu(Math.round(typeVoucher.getAmount())*Integer.parseInt(numberCoupon)+"");
             productDTO.setValeur(Integer.parseInt(productDTO.getPu())*product.getQuantityNotebook()+"");
-            productDTO.setProduct("Carnet N-"+typeVoucher.getAmount());
+            productDTO.setProduct("Carnet N-"+Math.round(typeVoucher.getAmount()));
             productDTOList.add(productDTO);
         }
         /* Map to hold Jasper report Parameters*/

@@ -230,10 +230,10 @@ public class CreditNoteRest {
             responseCouponMailDTO.setStatus(coupon.getStatus());
             responseCouponMailDTO.setCreatedAt(coupon.getCreatedAt());
             responseCouponMailDTO.setInternalReference(coupon.getInternalReference());
-            responseCouponMailDTO.setReference(typeVoucher.getAmount()+"");
+            responseCouponMailDTO.setReference(Math.round(typeVoucher.getAmount())+"");
             responseCouponMailDTO.setSerialNumber(coupon.getSerialNumber());
             responseCouponMailDTO.setIdTypeVoucher(typeVoucher);
-            responseCouponMailDTO.setAmount(typeVoucher.getAmount()*Integer.parseInt(numberCoupon)+"");
+            responseCouponMailDTO.setAmount(Math.round(typeVoucher.getAmount())*Integer.parseInt(numberCoupon)+"");
             responseCouponMailDTOList.add(responseCouponMailDTO);
         }
         byte[] data = generateCreditNote(amoutToDebit, managerStation, creditNote, station, responseCouponMailDTOList);

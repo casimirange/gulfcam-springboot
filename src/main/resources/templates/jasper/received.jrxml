@@ -242,7 +242,7 @@
 				<textElement>
 					<font size="14" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{TTCAggregateAmount} + " FCFA"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{tax}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
