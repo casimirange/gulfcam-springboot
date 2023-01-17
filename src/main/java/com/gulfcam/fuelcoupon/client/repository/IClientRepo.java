@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface IClientRepo extends JpaRepository<Client, Long> {
 
-    List<Client> getClientsByCompanyNameContains(String completeName);
+    List<Client> getClientsByCompleteNameContains(String completeName);
     Optional<Client> getClientByEmail(String email);
     Optional<Client> getClientByGulfcamAccountNumber(String gulfcamaccountnumber);
     Optional<Client> getClientByInternalReference(Long internalReference);

@@ -194,12 +194,6 @@ public class CreditNoteRest {
         responseCreditNoteDTO.setUpdateAt(creditNote.getUpdateAt());
         responseCreditNoteDTO.setCreatedAt(creditNote.getCreatedAt());
 
-        creditNote.setCreatedAt(LocalDateTime.now());
-        Status status = iStatusRepo.findByName(EStatus.ACTIVATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.ACTIVATED +  "  not found"));
-        creditNote.setStatus(status);
-        iCreditNoteService.createCreditNote(creditNote);
-
-
         return ResponseEntity.ok(responseCreditNoteDTO);
     }
 

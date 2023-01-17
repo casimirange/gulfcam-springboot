@@ -174,7 +174,7 @@
 				<textElement>
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{" #"+ $P{idcommand}}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[" #"+ $P{idcommand}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="401" y="190" width="83" height="20" uuid="3cf596d8-7366-4117-8aaa-a6fc6d424d78"/>

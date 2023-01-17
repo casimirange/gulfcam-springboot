@@ -12,7 +12,7 @@ public interface IClientService {
     Optional<Client> getClientByEmail(String email);
     Optional<Client> getClientByGulfCamAccountNumber(String gulfcamaccountnumber);
     Optional<Client> getClientById(Long id);
-    List<Client> getClientsByCompanyNameLike(String completeName);
+    List<Client> getClientsByCompleteNameContains(String completeName);
     Optional<Client> getClientByInternalReference(Long internalReference);
     void createClient(Client client);
     void deleteClient(Client client);

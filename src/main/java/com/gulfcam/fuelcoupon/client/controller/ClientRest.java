@@ -177,8 +177,8 @@ public class ClientRest {
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @GetMapping("/like/{completeName}")
-    public ResponseEntity<?> getClientsByCompanyNameLike(@PathVariable String completeName) {
-        List<Client> clients = iClientService.getClientsByCompanyNameLike(completeName);
+    public ResponseEntity<?> getClientsByCompleteNameContains(@PathVariable String completeName) {
+        List<Client> clients = iClientService.getClientsByCompleteNameContains(completeName);
         return ResponseEntity.ok(clients);
     }
 

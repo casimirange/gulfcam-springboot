@@ -45,8 +45,8 @@ public class ClientServiceImpl implements IClientService {
     }
 
     @Override
-    public List<Client> getClientsByCompanyNameLike(String completeName) {
-        return iClientRepo.getClientsByCompanyNameContains(completeName);
+    public List<Client> getClientsByCompleteNameContains(String completeName) {
+        return iClientRepo.getClientsByCompleteNameContains(completeName);
     }
 
     @Override
