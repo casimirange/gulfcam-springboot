@@ -50,9 +50,10 @@ public class OrderServiceImpl implements IOrderService {
     ResourceBundleMessageSource messageSource;
 
     @Override
-    public Page<ResponseOrderDTO> getAllOrders(int page, int size, String sort, String order) {
+    public Page<ResponseOrderDTO> getAllOrders(int page, int size, String sort, String order, String createdAt, String status) {
 
         Page<Order> orders = iOrderRepo.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
+        orders.filter()
         ResponseOrderDTO responseOrderDTO;
         List<ResponseOrderDTO> responseOrderDTOList = new ArrayList<>();
         for(Order item: orders){

@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface IOrderService {
 
-    Page<ResponseOrderDTO> getAllOrders(int page, int size, String sort, String order);
+    Page<ResponseOrderDTO> getAllOrders(int page, int size, String sort, String order, String createdAt, String status);
     Page<Order> getOrdersByClientReference(String clientReference, int page, int size, String sort, String order);
     Page<ResponseOrderDTO> getOrdersByIdClient(Long idClient, int page, int size, String sort, String order);
     ByteArrayInputStream exportOrdersByIdClient(Long idClient);

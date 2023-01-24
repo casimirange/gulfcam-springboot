@@ -940,6 +940,8 @@ public class OrderRest {
     }
 
     @Parameters(value = {
+            @Parameter(name = "createdAt", description = "Filtrer la liste par date de création"),
+            @Parameter(name = "status", description = "Filtrer la liste par le status"),
             @Parameter(name = "sort", schema = @Schema(allowableValues = {"id", "createdAt"})),
             @Parameter(name = "order", schema = @Schema(allowableValues = {"asc", "desc"}))})
     @Operation(summary = "Liste des commandes", tags = "Order", responses = {
@@ -951,9 +953,11 @@ public class OrderRest {
     @GetMapping("")
     public ResponseEntity<?> getOrders(@RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                              @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
-                                             @RequestParam(required = false, defaultValue = "id") String sort,
+                                       @RequestParam(required = false, defaultValue = "id") String sort,
+                                       @RequestParam(required = false, defaultValue = "id") String createdAt,
+                                       @RequestParam(required = false, defaultValue = "id") String status,
                                              @RequestParam(required = false, defaultValue = "desc") String order) throws IOException {
-        Page<ResponseOrderDTO> list = iOrderService.getAllOrders(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
+        Page<ResponseOrderDTO> list = iOrderService.getAllOrders(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order, createdAt, status);
 
         return ResponseEntity.ok(list);
     }
