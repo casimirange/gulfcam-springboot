@@ -155,6 +155,17 @@ public class CreditNoteRest {
 
         }
 
+        float amoutToDebit = 0;
+
+        for(int i=0; i<couponList.size(); i++){
+            TypeVoucher typeVoucher = couponList.get(i).getIdTypeVoucher();
+            amoutToDebit += typeVoucher.getAmount();
+        }
+        Station station = iStationService.getByInternalReference(creditNote.getIdStation()).get();
+        station.setBalance(station.getBalance()+amoutToDebit);
+        station.setUpdateAt(LocalDateTime.now());
+        iStationService.createStation(station);
+
         Map<String, Object> emailProps = new HashMap<>();
         emailProps.put("couponList", couponList);
 
@@ -266,7 +277,7 @@ public class CreditNoteRest {
             amoutToDebit += typeVoucher.getAmount();
         }
         Station station = iStationService.getByInternalReference(creditNote.getIdStation()).get();
-        station.setBalance(station.getBalance()+amoutToDebit);
+        station.setBalance(station.getBalance()-amoutToDebit);
         station.setUpdateAt(LocalDateTime.now());
         iStationService.createStation(station);
 

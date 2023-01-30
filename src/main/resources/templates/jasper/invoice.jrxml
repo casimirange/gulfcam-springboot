@@ -89,7 +89,7 @@
 				<text><![CDATA[Code :]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="35" y="116" width="100" height="20" uuid="4d8c5ca6-8c40-43b7-89c0-fd373e6916b1"/>
+				<reportElement x="35" y="166" width="100" height="20" uuid="4d8c5ca6-8c40-43b7-89c0-fd373e6916b1"/>
 				<text><![CDATA[Adresse :]]></text>
 			</staticText>
 			<staticText>
@@ -120,7 +120,7 @@
 				<text><![CDATA[Lieu de livraison : ]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="399" y="126" width="83" height="20" uuid="554a3a0b-806d-4b21-b168-a6683d7be493"/>
+				<reportElement x="399" y="166" width="83" height="20" uuid="554a3a0b-806d-4b21-b168-a6683d7be493"/>
 				<textElement>
 					<font isBold="true"/>
 				</textElement>

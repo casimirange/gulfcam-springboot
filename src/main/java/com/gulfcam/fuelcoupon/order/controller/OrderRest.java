@@ -987,7 +987,7 @@ public class OrderRest {
         parameters.put("products", productDTOList);
         parameters.put("typeDocument", testTypeDocument? "PREFACTURE":"PROFORMA");
         parameters.put("NetAggregateAmount", order.getNetAggregateAmount()+"");
-        parameters.put("tax", order.getTax()+"");
+        parameters.put("tax", Float.valueOf(order.getTax())*10+"");
         parameters.put("TTCAggregateAmount", order.getTTCAggregateAmount()+"");
         parameters.put("completeName", client.getCompleteName());
         parameters.put("dateOrder", dateFor.format(Date.from(order.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant())).toString());
@@ -1044,7 +1044,7 @@ public class OrderRest {
         parameters.put("products", productDTOList);
         parameters.put("type", testTypeDocument? "PREFACTURE":"PROFORMA");
         parameters.put("NetAggregateAmount", order.getNetAggregateAmount()+"");
-        parameters.put("tax", order.getTax()+"");
+        parameters.put("tax", Float.valueOf(order.getTax())*10+"");
         parameters.put("dateOrder", dateFor.format(Date.from((order.getUpdateAt() == null) ? order.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant():  order.getUpdateAt().atZone(ZoneId.systemDefault()).toInstant())).toString());
         parameters.put("TTCAggregateAmount", order.getTTCAggregateAmount()+"");
         parameters.put("completeName", client.getCompleteName());
@@ -1102,7 +1102,7 @@ public class OrderRest {
         parameters.put("products", productDTOList);
         parameters.put("type", testTypeDocument? "PREFACTURE":"PROFORMA");
         parameters.put("NetAggregateAmount", order.getNetAggregateAmount()+"");
-        parameters.put("tax", order.getTax()+"");
+        parameters.put("tax", Float.valueOf(order.getTax())*10+"");
         parameters.put("dateOrder", dateFor.format(Date.from((order.getUpdateAt() == null) ? order.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant():  order.getUpdateAt().atZone(ZoneId.systemDefault()).toInstant())).toString());
         parameters.put("TTCAggregateAmount", order.getTTCAggregateAmount()+"");
         parameters.put("completeName", client.getCompleteName());
@@ -1154,7 +1154,7 @@ public class OrderRest {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("products", productDTOList);
         parameters.put("NetAggregateAmount", order.getNetAggregateAmount()+"");
-        parameters.put("tax", order.getTax()+"");
+        parameters.put("tax", Float.valueOf(order.getTax())*10+"");
         parameters.put("dateOrder", dateFor.format(Date.from((order.getUpdateAt() == null) ? order.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant():  order.getUpdateAt().atZone(ZoneId.systemDefault()).toInstant())).toString());
         parameters.put("TTCAggregateAmount", order.getTTCAggregateAmount()+"");
         parameters.put("completeName", client.getCompleteName());
