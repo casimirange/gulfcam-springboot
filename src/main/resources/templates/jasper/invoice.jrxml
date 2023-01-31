@@ -224,7 +224,7 @@
 			</line>
 			<staticText>
 				<reportElement x="338" y="64" width="99" height="20" uuid="fbaa069e-12f3-4f15-9375-0c434d0e426f"/>
-				<text><![CDATA[Montant Global TTC : ]]></text>
+				<text><![CDATA[TOTAL : ]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="437" y="64" width="100" height="20" uuid="d4d222ae-0717-43a5-86f7-0045403632b0"/>
@@ -232,17 +232,6 @@
 					<font size="14" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TTCAggregateAmount} + " FCFA"]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement x="338" y="34" width="99" height="20" uuid="17ca7001-912a-4052-a3b8-95ca15657de9"/>
-				<text><![CDATA[Tax : ]]></text>
-			</staticText>
-			<textField>
-				<reportElement x="437" y="34" width="100" height="20" uuid="2ee7772a-5ee0-48d5-a036-4a326873a478"/>
-				<textElement>
-					<font size="14" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{tax}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
