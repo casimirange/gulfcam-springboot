@@ -30,7 +30,7 @@ public class CreateClientDTO {
     @NotNull(message = "{gulfcamAccountNumber.required}")
     private String gulfcamAccountNumber;
 
-    @Schema(required = true, allowableValues = {"PARTICULAR", "ENTREPRISE", "INSTITUTION"}, description = "Type de client")
+    @Schema(required = true, allowableValues = {"PARTICULAR", "ENTREPRISE", "ADMINISTRATION"}, description = "Type de client")
     @NotNull(message = "{typeClient.required}")
     private String typeClient;
 

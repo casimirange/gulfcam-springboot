@@ -885,7 +885,7 @@ public class OrderRest {
         }
         boolean testTypeDocument = false;
 
-        if(client.getTypeClient().getName().equals(ETypeClient.INSTITUTION)){
+        if(client.getTypeClient().getName().equals(ETypeClient.ADMINISTRATION)){
             testTypeDocument = true;
         }
         Map<String, Object> emailProps2 = new HashMap<>();
@@ -979,7 +979,7 @@ public class OrderRest {
         }
         boolean testTypeDocument = false;
 
-        if(client.getTypeClient().getName().equals(ETypeClient.INSTITUTION)){
+        if(client.getTypeClient().getName().equals(ETypeClient.ADMINISTRATION)){
             testTypeDocument = true;
         }
         /* Map to hold Jasper report Parameters*/
@@ -1036,7 +1036,7 @@ public class OrderRest {
         }
         boolean testTypeDocument = false;
 
-        if(client.getTypeClient().getName().equals(ETypeClient.INSTITUTION)){
+        if(client.getTypeClient().getName().equals(ETypeClient.ADMINISTRATION)){
             testTypeDocument = true;
         }
         /* Map to hold Jasper report Parameters*/
@@ -1094,7 +1094,7 @@ public class OrderRest {
         }
         boolean testTypeDocument = false;
 
-        if(client.getTypeClient().getName().equals(ETypeClient.INSTITUTION)){
+        if(client.getTypeClient().getName().equals(ETypeClient.ADMINISTRATION)){
             testTypeDocument = true;
         }
         /* Map to hold Jasper report Parameters*/
