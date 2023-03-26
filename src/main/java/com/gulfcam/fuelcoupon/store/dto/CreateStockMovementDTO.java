@@ -17,8 +17,8 @@ public class CreateStockMovementDTO {
     @NotNull(message = "{storehouse.required}")
     private Long idStoreHouseStockage;
 
-    @Schema(description = "reference interne du magasinier")
-    private Long idStoreKeeper;
+    @Schema(description = "reference interne du gestionnaire espace 1")
+    private Long idSpaceManager1;
 
     @Schema(description = "Liste de cartons a ")
     @NotNull(message = "{carton.required}")

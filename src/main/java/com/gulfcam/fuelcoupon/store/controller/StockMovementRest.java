@@ -178,8 +178,8 @@ public class StockMovementRest {
         emailProps.put("typevoucher", typeVoucher.getAmount());
         emailProps.put("storehouseStockage", storehouse.getInternalReference()+" - "+storehouse.getType()+" - "+storehouse.getName());
 
-        if(createStockMovementDTO.getIdStoreKeeper() != null){
-            Users storeKeeper = iUserService.getByInternalReference(createStockMovementDTO.getIdStoreKeeper());
+        if(createStockMovementDTO.getIdSpaceManager1() != null){
+            Users storeKeeper = iUserService.getByInternalReference(createStockMovementDTO.getIdSpaceManager1());
             emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, storeKeeper.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_ORDER_TRANSFER, ApplicationConstant.TEMPLATE_EMAIL_ORDER_TRANSFER));
         }
 

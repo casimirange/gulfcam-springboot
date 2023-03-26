@@ -35,11 +35,20 @@ public class Order {
     @Column(nullable = true, name = "id_fund")
     private Long idFund;
 
-    @Column(nullable = true, name = "id_manager_order")
-    private Long idManagerOrder;
+    @Column(nullable = true, name = "id_commercial_attache")
+    private Long idCommercialAttache;
 
     @Column(nullable = true, name = "id_manager_coupon")
     private Long idManagerCoupon;
+
+    @Column(nullable = true, name = "id_sales_manager")
+    private Long idSalesManager;
+
+    @Column(nullable = true, name = "id_space_manager2")
+    private Long idSpaceManager2;
+
+    @Column(nullable = true, name = "id_space_manager1")
+    private Long idSpaceManager1;
 
     @Column(nullable = true, name = "net_aggregate_amount")
     private int NetAggregateAmount;
@@ -47,8 +56,8 @@ public class Order {
     @Column(nullable = true, name = "ttc_aggregateA_amount")
     private int TTCAggregateAmount;
 
-    @Column(nullable = true, name = "id_storekeeper")
-    private Long idStorekeeper;
+//    @Column(nullable = true, name = "id_storekeeper")
+//    private Long idStorekeeper;
 
     @Column(nullable = true, name = "link_invoice")
     private String linkInvoice;

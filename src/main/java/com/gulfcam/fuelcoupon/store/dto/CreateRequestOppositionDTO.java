@@ -19,12 +19,12 @@ public class CreateRequestOppositionDTO {
     @NotNull(message = "{client.required}")
     private Long idClient;
 
-    @Schema(description = "reference interne du service client / utilisateur")
+    @Schema(description = "reference interne de l'attaché commercial")
     @NotNull(message = "{serviceclient.required}")
-    private Long idServiceClient;
+    private Long idCommercialAttache;
 
-    @Schema(description = "reference interne du gestionnaire de coupons")
-    private Long idManagerCoupon;
+    @Schema(description = "reference interne du Directeur commercial")
+    private Long idSalesManager;
 
     @Schema(description = "Liste de coupons")
     private List<String> serialCoupons ;

@@ -18,7 +18,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class ExcelOrderHelper {
     public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    static String[] HEADERs = { "Reference", "Reférence du client", "Nom du client", "Localisation du magasin" , "Nom du reponsable de la commande"  , "Nom du magasigné" , "Montant Total Net" , "Montant Total TTC" , "Taxe" , "Temps de livraison" , "Méthoe epaiement" , "Reférence du paiement" , "Description" , "Date de création", "Statut" };
+    static String[] HEADERs = { "Reference", "Reférence du client", "Nom du client", "Localisation du magasin" , "Nom du reponsable de la commande"  , "Nom du Gestionnaire espace 2" , "Montant Total Net" , "Montant Total TTC" , "Taxe" , "Temps de livraison" , "Méthoe epaiement" , "Reférence du paiement" , "Description" , "Date de création", "Statut" };
     static String SHEET = "Commandes";
 
 
@@ -46,7 +46,7 @@ public class ExcelOrderHelper {
                 row.createCell(2).setCellValue(order.getClient().getCompleteName());
                 row.createCell(3).setCellValue(order.getLocalisation());
                 row.createCell(4).setCellValue((order.getManagerOrder() != null)? order.getManagerOrder().getFirstName()+" "+order.getManagerOrder().getLastName(): " ");
-                row.createCell(5).setCellValue((order.getStorekeeper() != null)? order.getStorekeeper().getFirstName()+" "+order.getStorekeeper().getLastName(): " ");
+                row.createCell(5).setCellValue((order.getSpaceManager2() != null)? order.getSpaceManager2().getFirstName()+" "+order.getSpaceManager2().getLastName(): " ");
                 row.createCell(6).setCellValue(order.getNetAggregateAmount());
                 row.createCell(7).setCellValue(order.getTTCAggregateAmount());
                 row.createCell(8).setCellValue(order.getTax());

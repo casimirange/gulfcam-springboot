@@ -61,9 +61,9 @@ public class OrderServiceImpl implements IOrderService {
             Store store = new Store();
             PaymentMethod paymentMethod = new PaymentMethod();
             Users fund = new Users();
-            Users managerOrder = new Users();
+            Users commercialAttache = new Users();
             Users managerCoupon = new Users();
-            Users storeKeeper = new Users();
+            Users spaceManager2 = new Users();
 
             if(item.getIdClient() != null)
                 client = iClientService.getClientByInternalReference(item.getIdClient()).get();
@@ -71,12 +71,12 @@ public class OrderServiceImpl implements IOrderService {
                 store = iStoreService.getByInternalReference(item.getIdStore()).get();
             if(item.getIdFund() != null)
                 fund = iUserService.getByInternalReference(item.getIdFund());
-            if(item.getIdManagerOrder() != null)
-                managerOrder = iUserService.getByInternalReference(item.getIdManagerOrder());
+            if(item.getIdCommercialAttache() != null)
+                commercialAttache = iUserService.getByInternalReference(item.getIdCommercialAttache());
             if(item.getIdManagerCoupon() != null)
                 managerCoupon = iUserService.getByInternalReference(item.getIdManagerCoupon());
-            if(item.getIdStorekeeper() != null)
-                storeKeeper = iUserService.getByInternalReference(item.getIdStorekeeper());
+            if(item.getIdSpaceManager2() != null)
+                spaceManager2 = iUserService.getByInternalReference(item.getIdSpaceManager2());
             if(item.getIdPaymentMethod() != null)
                 paymentMethod = iPaymentMethodService.getByInternalReference(item.getIdPaymentMethod()).get();
 
@@ -85,9 +85,9 @@ public class OrderServiceImpl implements IOrderService {
             responseOrderDTO.setStore(store);
             responseOrderDTO.setFund(fund);
             responseOrderDTO.setPaymentMethod(paymentMethod);
-            responseOrderDTO.setManagerOrder(managerOrder);
+            responseOrderDTO.setCommercialAttache(commercialAttache);
             responseOrderDTO.setManagerCoupon(managerCoupon);
-            responseOrderDTO.setStorekeeper(storeKeeper);
+            responseOrderDTO.setSpaceManager2(spaceManager2);
             responseOrderDTO.setCompleteName((client != null) ? client.getCompleteName(): "");
             responseOrderDTO.setLocalisation((store != null) ? store.getLocalization(): "");
             responseOrderDTO.setId(item.getId());
@@ -130,9 +130,9 @@ public class OrderServiceImpl implements IOrderService {
             Store store = new Store();
             PaymentMethod paymentMethod = new PaymentMethod();
             Users fund = new Users();
-            Users managerOrder = new Users();
+            Users commercialAttache = new Users();
             Users managerCoupon = new Users();
-            Users storeKeeper = new Users();
+            Users spaceManager2 = new Users();
 
             if(item.getIdClient() != null)
                 client = iClientService.getClientByInternalReference(item.getIdClient()).get();
@@ -140,12 +140,12 @@ public class OrderServiceImpl implements IOrderService {
                 store = iStoreService.getByInternalReference(item.getIdStore()).get();
             if(item.getIdFund() != null)
                 fund = iUserService.getByInternalReference(item.getIdFund());
-            if(item.getIdManagerOrder() != null)
-                managerOrder = iUserService.getByInternalReference(item.getIdManagerOrder());
+            if(item.getIdCommercialAttache() != null)
+                commercialAttache = iUserService.getByInternalReference(item.getIdCommercialAttache());
             if(item.getIdManagerCoupon() != null)
                 managerCoupon = iUserService.getByInternalReference(item.getIdManagerCoupon());
-            if(item.getIdStorekeeper() != null)
-                storeKeeper = iUserService.getByInternalReference(item.getIdStorekeeper());
+            if(item.getIdSpaceManager2() != null)
+                spaceManager2 = iUserService.getByInternalReference(item.getIdSpaceManager2());
             if(item.getIdPaymentMethod() != null)
                 paymentMethod = iPaymentMethodService.getByInternalReference(item.getIdPaymentMethod()).get();
 
@@ -154,9 +154,9 @@ public class OrderServiceImpl implements IOrderService {
             responseOrderDTO.setStore(store);
             responseOrderDTO.setFund(fund);
             responseOrderDTO.setPaymentMethod(paymentMethod);
-            responseOrderDTO.setManagerOrder(managerOrder);
+            responseOrderDTO.setCommercialAttache(commercialAttache);
             responseOrderDTO.setManagerCoupon(managerCoupon);
-            responseOrderDTO.setStorekeeper(storeKeeper);
+            responseOrderDTO.setSpaceManager2(spaceManager2);
             responseOrderDTO.setCompleteName((client != null) ? client.getCompleteName(): "");
             responseOrderDTO.setLocalisation((store != null) ? store.getLocalization(): "");
             responseOrderDTO.setId(item.getId());
@@ -193,9 +193,9 @@ public class OrderServiceImpl implements IOrderService {
             Store store = new Store();
             PaymentMethod paymentMethod = new PaymentMethod();
             Users fund = new Users();
-            Users managerOrder = new Users();
+            Users commercialAttache = new Users();
             Users managerCoupon = new Users();
-            Users storeKeeper = new Users();
+            Users spaceManager2 = new Users();
 
             if(item.getIdClient() != null)
                 client = iClientService.getClientByInternalReference(item.getIdClient()).get();
@@ -203,12 +203,12 @@ public class OrderServiceImpl implements IOrderService {
                 store = iStoreService.getByInternalReference(item.getIdStore()).get();
             if(item.getIdFund() != null)
                 fund = iUserService.getByInternalReference(item.getIdFund());
-            if(item.getIdManagerOrder() != null)
-                managerOrder = iUserService.getByInternalReference(item.getIdManagerOrder());
+            if(item.getIdCommercialAttache() != null)
+                commercialAttache = iUserService.getByInternalReference(item.getIdCommercialAttache());
             if(item.getIdManagerCoupon() != null)
                 managerCoupon = iUserService.getByInternalReference(item.getIdManagerCoupon());
-            if(item.getIdStorekeeper() != null)
-                storeKeeper = iUserService.getByInternalReference(item.getIdStorekeeper());
+            if(item.getIdSpaceManager2() != null)
+                spaceManager2 = iUserService.getByInternalReference(item.getIdSpaceManager2());
             if(item.getIdPaymentMethod() != null)
                 paymentMethod = iPaymentMethodService.getByInternalReference(item.getIdPaymentMethod()).get();
 
@@ -217,9 +217,9 @@ public class OrderServiceImpl implements IOrderService {
             responseOrderDTO.setStore(store);
             responseOrderDTO.setFund(fund);
             responseOrderDTO.setPaymentMethod(paymentMethod);
-            responseOrderDTO.setManagerOrder(managerOrder);
+            responseOrderDTO.setCommercialAttache(commercialAttache);
             responseOrderDTO.setManagerCoupon(managerCoupon);
-            responseOrderDTO.setStorekeeper(storeKeeper);
+            responseOrderDTO.setSpaceManager2(spaceManager2);
             responseOrderDTO.setCompleteName((client != null) ? client.getCompleteName(): "");
             responseOrderDTO.setLocalisation((store != null) ? store.getLocalization(): "");
             responseOrderDTO.setId(item.getId());
@@ -253,6 +253,26 @@ public class OrderServiceImpl implements IOrderService {
     @Override
     public Page<Order> getOrdersByIdManagerCoupon(Long idManagerCoupon, int page, int size, String sort, String order) {
         return iOrderRepo.getOrdersByIdManagerCoupon(idManagerCoupon,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
+    }
+
+    @Override
+    public Page<Order> getOrdersByIdSalesManager(Long idSalesManager, int page, int size, String sort, String order) {
+        return iOrderRepo.getOrdersByIdSalesManager(idSalesManager,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
+    }
+
+    @Override
+    public Page<Order> getOrdersByIdSpaceManager1(Long idSpaceManager1, int page, int size, String sort, String order) {
+        return iOrderRepo.getOrdersByIdSpaceManager1(idSpaceManager1,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
+    }
+
+    @Override
+    public Page<Order> getOrdersByIdSpaceManager2(Long idSpaceManager2, int page, int size, String sort, String order) {
+        return iOrderRepo.getOrdersByIdSpaceManager2(idSpaceManager2,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
+    }
+
+    @Override
+    public Page<Order> getOrdersByIdCommercialAttache(Long idCommercialAttache, int page, int size, String sort, String order) {
+        return iOrderRepo.getOrdersByIdCommercialAttache(idCommercialAttache,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
     }
 
     @Override

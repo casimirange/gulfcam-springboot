@@ -172,13 +172,13 @@ public class CreditNoteRest {
         List<Users> usersList = iUserService.getUsers();
 
         for (Users user : usersList) {
-            if (user.getTypeAccount().getName() == ETypeAccount.TREASURY) {
+            if (user.getTypeAccount().getName() == ETypeAccount.COMPTABLE) {
                 emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CREDIT_NOTE+" #"+creditNote.getInternalReference(), ApplicationConstant.TEMPLATE_EMAIL_CREDIT_NOTE));
             }
             if (user.getTypeAccount().getName() == ETypeAccount.MANAGER_STATION) {
                 emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CREDIT_NOTE+" #"+creditNote.getInternalReference(), ApplicationConstant.TEMPLATE_EMAIL_CREDIT_NOTE));
             }
-            if (user.getTypeAccount().getName() == ETypeAccount.CUSTOMER_SERVICE) {
+            if (user.getTypeAccount().getName() == ETypeAccount.DSI_AUDIT) {
                 emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CREDIT_NOTE+" #"+creditNote.getInternalReference(), ApplicationConstant.TEMPLATE_EMAIL_CREDIT_NOTE));
             }
         }
@@ -301,7 +301,7 @@ public class CreditNoteRest {
             if (user.getTypeAccount().getName() == ETypeAccount.MANAGER_STATION) {
                 emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_VALID_CREDIT_NOTE+" #"+creditNote.getInternalReference(), ApplicationConstant.TEMPLATE_EMAIL_VALID_CREDIT_NOTE));
             }
-            if (user.getTypeAccount().getName() == ETypeAccount.TREASURY) {
+            if (user.getTypeAccount().getName() == ETypeAccount.DSI_AUDIT) {
                 emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_VALID_CREDIT_NOTE+" #"+creditNote.getInternalReference(), ApplicationConstant.TEMPLATE_EMAIL_VALID_CREDIT_NOTE));
             }
         }

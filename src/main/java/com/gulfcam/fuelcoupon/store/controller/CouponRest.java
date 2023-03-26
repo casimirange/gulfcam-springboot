@@ -434,7 +434,10 @@ public class CouponRest {
             if (user.getTypeAccount().getName() == ETypeAccount.MANAGER_STATION) {
                 emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_ACCEPT_COUPON+" #"+coupon.getInternalReference(), ApplicationConstant.TEMPLATE_EMAIL_ACCEPT_COUPON));
             }
-            if (user.getTypeAccount().getName() == ETypeAccount.CUSTOMER_SERVICE) {
+            if (user.getTypeAccount().getName() == ETypeAccount.DSI_AUDIT) {
+                emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_ACCEPT_COUPON+" #"+coupon.getInternalReference(), ApplicationConstant.TEMPLATE_EMAIL_ACCEPT_COUPON));
+            }
+            if (user.getTypeAccount().getName() == ETypeAccount.COMPTABLE) {
                 emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_ACCEPT_COUPON+" #"+coupon.getInternalReference(), ApplicationConstant.TEMPLATE_EMAIL_ACCEPT_COUPON));
             }
         }

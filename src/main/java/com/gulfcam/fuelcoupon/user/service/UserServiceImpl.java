@@ -383,6 +383,11 @@ public class UserServiceImpl implements IUserService {
 	}
 
 	@Override
+	public List<Users> getUsersByIdStore(Long idStore) {
+		return userRepo.getUsersByIdStore(idStore);
+	}
+
+	@Override
 	public Page<Users> get20Users(int page, int size, String sort, String order) {
 		StatusUser status = statusRepo.findByName(EStatusUser.USER_ENABLED);
 		return userRepo.findTop20ByStatus(status , PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));

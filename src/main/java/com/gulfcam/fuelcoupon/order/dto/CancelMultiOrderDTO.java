@@ -14,8 +14,8 @@ public class CancelMultiOrderDTO {
     @Schema(description = "Liste de commandes")
     private List<Long> orders ;
 
-    @Schema(description = "Reference interne du Gestionnaire de coupons")
+    @Schema(description = "Reference interne de l'attaché commercial")
     @NotNull(message = "{idManagerCoupon.required}")
-    private Long idManagerCoupon;
+    private Long idCommercialAttache;
 
 }

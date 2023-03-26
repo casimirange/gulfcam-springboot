@@ -32,13 +32,15 @@ public class ResponseOrderDTO {
 
     private Users managerOrder;
 
+    private Users commercialAttache;
+
     private Users managerCoupon;
 
     private int NetAggregateAmount;
 
     private int TTCAggregateAmount;
 
-    private Users storekeeper;
+    private Users spaceManager2;
 
     private String linkInvoice;
 

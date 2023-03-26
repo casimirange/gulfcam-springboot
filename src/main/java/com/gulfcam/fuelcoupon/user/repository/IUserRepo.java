@@ -12,8 +12,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IUserRepo extends IUserBaseRepo<Users> {
-	
+
 	Optional<Users> findByInternalReference(Long internalReference);
+
+	List<Users> getUsersByIdStore(Long idStore);
 
 	Optional<Users> findByPinCode(int pinCode);
 

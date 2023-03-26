@@ -21,8 +21,8 @@ public class CreateCartonDTO {
     @NotNull(message = "{typeVoucher.required}")
     private int typeVoucher;
 
-    @Schema(description = "reference interne du magasinier")
-    private Long idStoreKeeper;
+    @Schema(description = "reference interne du gestionnaire espace 1")
+    private Long idSpaceManager1;
 
     @Schema(description = "reference interne de l'entrepôt de stockage")
     @NotNull(message = "{storehouse.required}")

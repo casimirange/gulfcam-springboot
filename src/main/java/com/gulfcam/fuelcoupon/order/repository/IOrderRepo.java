@@ -15,6 +15,10 @@ public interface IOrderRepo extends JpaRepository<Order, Long> {
     List<Order> getOrdersByIdClient(Long idClient);
     Page<Order> getOrdersByIdFund(Long idFund, Pageable pageable);
     Page<Order> getOrdersByIdManagerCoupon(Long idManagerCoupon, Pageable pageable);
+    Page<Order> getOrdersByIdSalesManager(Long idSalesManager, Pageable pageable);
+    Page<Order> getOrdersByIdSpaceManager1(Long idSpaceManager1, Pageable pageable);
+    Page<Order> getOrdersByIdSpaceManager2(Long idSpaceManager2, Pageable pageable);
+    Page<Order> getOrdersByIdCommercialAttache(Long idCommercialAttache, Pageable pageable);
     Page<Order> getOrdersByIdManagerOrder(Long idManagerOrder, Pageable pageable);
     Page<Order> getOrdersByIdStorekeeper(Long idStorekeeper, Pageable pageable);
     Page<Order> getOrdersByIdStore(Long idStore, Pageable pageable);

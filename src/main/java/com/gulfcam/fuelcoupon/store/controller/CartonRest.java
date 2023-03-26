@@ -138,8 +138,8 @@ public class CartonRest {
 
         }
 
-        if (createCartonDTO.getIdStoreKeeper() != null) {
-            storeKeeper = iUserService.getByInternalReference(createCartonDTO.getIdStoreKeeper());
+        if (createCartonDTO.getIdSpaceManager1() != null) {
+            storeKeeper = iUserService.getByInternalReference(createCartonDTO.getIdSpaceManager1());
             if(storeKeeper.getUserId() == null)
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
@@ -155,7 +155,7 @@ public class CartonRest {
         carton.setTo(createCartonDTO.getTo());
         carton.setTypeVoucher(createCartonDTO.getTypeVoucher());
         carton.setIdStoreHouse(createCartonDTO.getIdStoreHouseStockage());
-        carton.setIdStoreKeeper(createCartonDTO.getIdStoreKeeper());
+        carton.setIdSpaceManager1(createCartonDTO.getIdSpaceManager1());
 
         Status status = iStatusRepo.findByName(EStatus.AVAILABLE).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.AVAILABLE +  "  not found"));
         carton.setStatus(status);
@@ -237,8 +237,8 @@ public class CartonRest {
 
         }
 
-        if (createCartonDTO.getIdStoreKeeper() != null) {
-            storeKeeper = iUserService.getByInternalReference(createCartonDTO.getIdStoreKeeper());
+        if (createCartonDTO.getIdSpaceManager1() != null) {
+            storeKeeper = iUserService.getByInternalReference(createCartonDTO.getIdSpaceManager1());
             if(storeKeeper.getUserId() == null)
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
@@ -252,28 +252,28 @@ public class CartonRest {
         carton.setTypeVoucher(createCartonDTO.getTypeVoucher());
         if(createCartonDTO.getIdStoreHouseStockage() != null)
             carton.setIdStoreHouse(createCartonDTO.getIdStoreHouseStockage());
-        if(createCartonDTO.getIdStoreKeeper() != null)
-            carton.setIdStoreKeeper(createCartonDTO.getIdStoreKeeper());
+        if(createCartonDTO.getIdSpaceManager1() != null)
+            carton.setIdSpaceManager1(createCartonDTO.getIdSpaceManager1());
 
         iCartonService.createCarton(carton, 0);
 
         return ResponseEntity.ok(carton);
     }
 
-    @Operation(summary = "Recupérer la liste des Cartons par Magasinier", tags = "Carton", responses = {
+    @Operation(summary = "Recupérer la liste des Cartons par Gestionnaire espace 1", tags = "Carton", responses = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Carton.class)))),
             @ApiResponse(responseCode = "404", description = "Carton not found", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/storekeeper/{idStoreKeeper:[0-9]+}")
-    public ResponseEntity<Page<Carton>> getCartonsByIdStoreKeeper(@PathVariable Long idStoreKeeper,
+    @GetMapping("/spacemanager/{idSpaceManager1:[0-9]+}")
+    public ResponseEntity<Page<Carton>> getCartonsByIdSpaceManager1(@PathVariable Long idSpaceManager1,
                                                                   @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                                                   @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
-                                                                  @RequestParam(required = false, defaultValue = "idStoreKeeper") String sort,
+                                                                  @RequestParam(required = false, defaultValue = "idSpaceManager1") String sort,
                                                                   @RequestParam(required = false, defaultValue = "desc") String order) {
 
-        Page<Carton> cartons = iCartonService.getCartonsByIdStoreKeeper(idStoreKeeper,
+        Page<Carton> cartons = iCartonService.getCartonsByIdSpaceManager1(idSpaceManager1,
                 Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(cartons);
     }

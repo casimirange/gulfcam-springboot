@@ -52,6 +52,9 @@ public class Carton {
     @Column(nullable = true, name = "id_store_keeper")
     private Long idStoreKeeper;
 
+    @Column(nullable = true, name = "id_space_manager1")
+    private Long idSpaceManager1;
+
     @Column(nullable = true, name = "id_store_house")
     private Long idStoreHouse;
 

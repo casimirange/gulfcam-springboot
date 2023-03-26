@@ -68,6 +68,7 @@ public interface IUserService {
 	Page<Users> get20Users(int parseInt, int parseInt2, String sort, String order);
 
 	List<Users> getUsers();
+	List<Users> getUsersByIdStore(Long idStore);
 
 	void updateDateLastLoginUser(Long id_user);
 

@@ -32,11 +32,18 @@ public class RequestOpposition {
     private String reason;
 
     @NotNull
-    @Column(nullable = true, name = "id_service_client")
-    private Long idServiceClient;
+    @Column(nullable = true, name = "id_commerci_attache")
+    private Long idCommercialAttache;
+
+    @Column(nullable = true, name = "id_sales_manager")
+    private Long idSalesManager;
 
     @Column(nullable = true, name = "id_client")
     private Long idClient;
+
+    @NotNull
+    @Column(nullable = true, name = "id_service_client")
+    private Long idServiceClient;
 
     @Column(nullable = true, name = "id_manager_coupon")
     private Long idManagerCoupon;

@@ -15,6 +15,7 @@ public interface ICartonService {
     Page<Carton> getCartonsByIdStoreHouse(Long idStoreHouse, int page, int size, String sort, String order);
     List<Carton> getCartonsByIdStoreHouse(Long idStoreHouse);
     Page<Carton> getCartonsByIdStoreKeeper(Long idStoreKeeper, int page, int size, String sort, String order);
+    Page<Carton> getCartonsByIdSpaceManager1(Long idSpaceManager1, int page, int size, String sort, String order);
     Optional<Carton> getCartonById(Long id);
     Map<String, Object> createCarton(Carton carton, int diffCarton);
     Map<String, Object> supplyStoreHouse(Carton carton, Storehouse storehouse);

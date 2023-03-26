@@ -31,9 +31,9 @@ public class ResponseRequestOppositionDTO {
 
     private List<Ticket> tickets;
 
-    private Users idServiceClient;
+    private Users idCommercialAttache;
 
-    private Users idManagerCoupon;
+    private Users idSalesManager;
 
     private Client idClient;
 

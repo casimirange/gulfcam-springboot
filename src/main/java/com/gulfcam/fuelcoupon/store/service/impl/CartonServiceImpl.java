@@ -110,8 +110,8 @@ public class CartonServiceImpl implements ICartonService {
             Users storeKeeper = new Users();
             Storehouse storehouse = new Storehouse();
 
-            if (item.getIdStoreKeeper() != null)
-                storeKeeper = iUserService.getByInternalReference(item.getIdStoreKeeper());
+            if (item.getIdSpaceManager1() != null)
+                storeKeeper = iUserService.getByInternalReference(item.getIdSpaceManager1());
             if (item.getIdStoreHouse() != null)
                 storehouse = iStorehouseService.getByInternalReference(item.getIdStoreHouse()).get();
 
@@ -151,6 +151,11 @@ public class CartonServiceImpl implements ICartonService {
     @Override
     public Page<Carton> getCartonsByIdStoreKeeper(Long idStoreKeeper, int page, int size, String sort, String order) {
         return iCartonRepo.getCartonsByIdStoreKeeper(idStoreKeeper,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
+    }
+
+    @Override
+    public Page<Carton> getCartonsByIdSpaceManager1(Long idSpaceManager1, int page, int size, String sort, String order) {
+        return iCartonRepo.getCartonsByIdSpaceManager1(idSpaceManager1,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
     }
 
     @Override
@@ -197,8 +202,8 @@ public class CartonServiceImpl implements ICartonService {
             emailProps.put("quantityCoupon", 0);
             emailProps.put("storehouse", storehouse.getInternalReference()+" - "+storehouse.getType()+" - "+storehouse.getName());
             emailProps.put("store", store.getInternalReference()+" - "+store.getLocalization());
-            if(carton.getIdStoreKeeper() != null){
-                Users storeKeeper = iUserService.getByInternalReference(carton.getIdStoreKeeper());
+            if(carton.getIdSpaceManager1() != null){
+                Users storeKeeper = iUserService.getByInternalReference(carton.getIdSpaceManager1());
                 emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, storeKeeper.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_ORDER_STOCKAGE, ApplicationConstant.TEMPLATE_EMAIL_ORDER_STOCKAGE));
             }
         }
@@ -253,7 +258,7 @@ public class CartonServiceImpl implements ICartonService {
             notebook.setSerialNumber("DE "+carton.getTypeVoucher()+"-"+carton.getSerialTo()+"  "+"A "+carton.getTypeVoucher()+"-"+carton.getSerialFrom()+" ");
             notebook.setIdCarton(carton.getInternalReference());
             notebook.setIdStoreHouse(idStoreHouseSell);
-            notebook.setIdStoreKeeper(carton.getIdStoreKeeper());
+            notebook.setIdStoreKeeper(carton.getIdSpaceManager1());
             Status status = iStatusRepo.findByName(EStatus.AVAILABLE).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.AVAILABLE +  "  not found"));
             notebook.setStatus(status);
             if (typeVoucher != null)
@@ -327,8 +332,8 @@ public class CartonServiceImpl implements ICartonService {
         emailProps.put("storehouse", storehouse.getInternalReference()+" - "+storehouse.getType()+" - "+storehouse.getName());
         emailProps.put("store", store.getInternalReference()+" - "+store.getLocalization());
 
-        if(carton.getIdStoreKeeper() != null){
-            Users storeKeeper = iUserService.getByInternalReference(carton.getIdStoreKeeper());
+        if(carton.getIdSpaceManager1() != null){
+            Users storeKeeper = iUserService.getByInternalReference(carton.getIdSpaceManager1());
             emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, storeKeeper.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_ORDER_SUPPLY, ApplicationConstant.TEMPLATE_EMAIL_ORDER_SUPPLY));
         }
 

@@ -55,8 +55,8 @@ public class RequestOppositionServiceImpl implements IRequestOppositionService {
 
         for (RequestOpposition requestOpposition: requestOppositions){
             client = iClientService.getClientByInternalReference(requestOpposition.getIdClient()).get();
-            serviceClient = iUserService.getByInternalReference(requestOpposition.getIdServiceClient());
-            managerCoupon = iUserService.getByInternalReference(requestOpposition.getIdManagerCoupon());
+            serviceClient = iUserService.getByInternalReference(requestOpposition.getIdCommercialAttache());
+            managerCoupon = iUserService.getByInternalReference(requestOpposition.getIdSalesManager());
             responseRequestOppositionDTO = new ResponseRequestOppositionDTO();
             responseRequestOppositionDTO.setStatus(requestOpposition.getStatus());
             responseRequestOppositionDTO.setId(requestOpposition.getId());
@@ -66,9 +66,9 @@ public class RequestOppositionServiceImpl implements IRequestOppositionService {
             responseRequestOppositionDTO.setUpdateAt(requestOpposition.getUpdateAt());
             responseRequestOppositionDTO.setIdClient(client);
             responseRequestOppositionDTO.setNameClient(client.getCompleteName());
-            responseRequestOppositionDTO.setIdServiceClient(serviceClient);
+            responseRequestOppositionDTO.setIdCommercialAttache(serviceClient);
             responseRequestOppositionDTO.setNzmeServiceClient(serviceClient.getFirstName()+ "   " +serviceClient.getLastName());
-            responseRequestOppositionDTO.setIdManagerCoupon(managerCoupon);
+            responseRequestOppositionDTO.setIdSalesManager(managerCoupon);
             responseRequestOppositionDTO.setNameManagerCoupon(managerCoupon.getFirstName()+ "   " +managerCoupon.getLastName());
             responseRequestOppositionDTO.setInternalReference(requestOpposition.getInternalReference());
             responseRequestOppositionDTO.setCreatedAt(requestOpposition.getCreatedAt());

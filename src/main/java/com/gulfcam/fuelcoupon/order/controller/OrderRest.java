@@ -137,10 +137,10 @@ public class OrderRest {
     public ResponseEntity<?> addOrder(@Valid @RequestBody CreateOrderDTO createOrderDTO) throws JRException, IOException {
 
         Client client = new Client();
-        Users managerCoupon = new Users();
+        Users salesmanager = new Users();
         Users fund = new Users();
-        Users managerOrder = new Users();
-        Users managerStorekeeper = new Users();
+        Users commercialAttache = new Users();
+        Users managerSpaceManager2 = new Users();
         Store store = new Store();
         PaymentMethod paymentMethod = new PaymentMethod();
 
@@ -151,24 +151,24 @@ public class OrderRest {
             client = iClientService.getClientByInternalReference(createOrderDTO.getIdClient()).get();
 
         }
-        if (createOrderDTO.getIdManagerCoupon()  != null) {
-            managerCoupon = iUserService.getByInternalReference(createOrderDTO.getIdManagerCoupon());
+        if (createOrderDTO.getIdSalesManager()  != null) {
+            salesmanager = iUserService.getByInternalReference(createOrderDTO.getIdSalesManager());
 
-            if(managerCoupon.getUserId() == null)
+            if(salesmanager.getUserId() == null)
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
         }
-        if (createOrderDTO.getIdManagerOrder()  != null) {
-            managerOrder = iUserService.getByInternalReference(createOrderDTO.getIdManagerOrder());
+        if (createOrderDTO.getIdCommercialAttache()  != null) {
+            commercialAttache = iUserService.getByInternalReference(createOrderDTO.getIdCommercialAttache());
 
-            if(managerOrder.getUserId() == null)
+            if(commercialAttache.getUserId() == null)
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
         }
-        if (createOrderDTO.getIdStorekeeper()  != null) {
-            managerStorekeeper = iUserService.getByInternalReference(createOrderDTO.getIdStorekeeper());
+        if (createOrderDTO.getIdSpaceManager2()  != null) {
+            managerSpaceManager2 = iUserService.getByInternalReference(createOrderDTO.getIdSpaceManager2());
 
-            if(managerStorekeeper.getUserId() == null)
+            if(managerSpaceManager2.getUserId() == null)
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
         }
@@ -201,8 +201,8 @@ public class OrderRest {
         order.setClientReference(createOrderDTO.getClientReference());
         order.setIdClient(createOrderDTO.getIdClient());
         order.setIdFund(createOrderDTO.getIdFund());
-        order.setIdManagerCoupon(createOrderDTO.getIdManagerCoupon());
-        order.setIdManagerOrder(createOrderDTO.getIdManagerOrder());
+        order.setIdSalesManager(createOrderDTO.getIdSalesManager());
+        order.setIdCommercialAttache(createOrderDTO.getIdCommercialAttache());
         order.setChannel(createOrderDTO.getChannel());
         order.setDescription(createOrderDTO.getDescription());
         order.setDeliveryTime(createOrderDTO.getDeliveryTime());
@@ -210,7 +210,7 @@ public class OrderRest {
         order.setNetAggregateAmount(createOrderDTO.getNetAggregateAmount());
         order.setTTCAggregateAmount(createOrderDTO.getTTCAggregateAmount());
         order.setTax(createOrderDTO.getTax());
-        order.setIdStorekeeper(createOrderDTO.getIdStorekeeper());
+        order.setIdSpaceManager2(createOrderDTO.getIdSpaceManager2());
         order.setIdStore(createOrderDTO.getIdStore());
         order.setPaymentReference(createOrderDTO.getPaymentReference());
 
@@ -228,8 +228,8 @@ public class OrderRest {
             }
         }
 
-        if(createOrderDTO.getIdManagerOrder() != null){
-            emailToStore += managerOrder.getEmail();
+        if(createOrderDTO.getIdCommercialAttache() != null){
+            emailToStore += commercialAttache.getEmail();
         }
         String ClientReference = createOrderDTO.getIdClient()+" - "+client.getEmail()+" - "+client.getCompleteName()+" - "+client.getCompanyName();
         Map<String, Object> emailProps = new HashMap<>();
@@ -271,10 +271,10 @@ public class OrderRest {
         }
         Order order = iOrderService.getByInternalReference(InternalReference).get();
         Client client = new Client();
-        Users managerCoupon = new Users();
+        Users salesmanager = new Users();
         Users fund = new Users();
-        Users managerOrder = new Users();
-        Users managerStorekeeper = new Users();
+        Users commercialAttache = new Users();
+        Users managerSpaceManager2 = new Users();
         Store store = new Store();
         PaymentMethod paymentMethod = new PaymentMethod();
 
@@ -285,24 +285,24 @@ public class OrderRest {
             client = iClientService.getClientByInternalReference(createOrderDTO.getIdClient()).get();
 
         }
-        if (createOrderDTO.getIdManagerCoupon()  != null) {
-            managerCoupon = iUserService.getByInternalReference(createOrderDTO.getIdManagerCoupon());
+        if (createOrderDTO.getIdSalesManager()  != null) {
+            salesmanager = iUserService.getByInternalReference(createOrderDTO.getIdSalesManager());
 
-            if(managerCoupon.getUserId() == null)
+            if(salesmanager.getUserId() == null)
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
         }
-        if (createOrderDTO.getIdManagerOrder()  != null) {
-            managerOrder = iUserService.getByInternalReference(createOrderDTO.getIdManagerOrder());
+        if (createOrderDTO.getIdCommercialAttache()  != null) {
+            commercialAttache = iUserService.getByInternalReference(createOrderDTO.getIdCommercialAttache());
 
-            if(managerOrder.getUserId() == null)
+            if(commercialAttache.getUserId() == null)
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
         }
-        if (createOrderDTO.getIdStorekeeper()  != null) {
-            managerStorekeeper = iUserService.getByInternalReference(createOrderDTO.getIdStorekeeper());
+        if (createOrderDTO.getIdSpaceManager2()  != null) {
+            managerSpaceManager2 = iUserService.getByInternalReference(createOrderDTO.getIdSpaceManager2());
 
-            if(managerStorekeeper.getUserId() == null)
+            if(managerSpaceManager2.getUserId() == null)
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
         }
@@ -333,10 +333,10 @@ public class OrderRest {
             order.setIdClient(createOrderDTO.getIdClient());
         if (createOrderDTO.getIdFund() != null)
             order.setIdFund(createOrderDTO.getIdFund());
-        if (createOrderDTO.getIdManagerCoupon() != null)
-            order.setIdManagerCoupon(createOrderDTO.getIdManagerCoupon());
-        if (createOrderDTO.getIdManagerOrder() != null)
-            order.setIdManagerOrder(createOrderDTO.getIdManagerOrder());
+        if (createOrderDTO.getIdSalesManager() != null)
+            order.setIdSalesManager(createOrderDTO.getIdSalesManager());
+        if (createOrderDTO.getIdCommercialAttache() != null)
+            order.setIdCommercialAttache(createOrderDTO.getIdCommercialAttache());
         order.setChannel(createOrderDTO.getChannel());
         order.setDescription(createOrderDTO.getDescription());
         order.setDeliveryTime(createOrderDTO.getDeliveryTime());
@@ -345,8 +345,8 @@ public class OrderRest {
         order.setNetAggregateAmount(createOrderDTO.getNetAggregateAmount());
         order.setTTCAggregateAmount(createOrderDTO.getTTCAggregateAmount());
         order.setTax(createOrderDTO.getTax());
-        if (createOrderDTO.getIdStorekeeper() != null)
-            order.setIdStorekeeper(createOrderDTO.getIdStorekeeper());
+        if (createOrderDTO.getIdSpaceManager2() != null)
+            order.setIdSpaceManager2(createOrderDTO.getIdSpaceManager2());
         if (createOrderDTO.getIdStore() != null)
             order.setIdStore(createOrderDTO.getIdStore());
         order.setPaymentReference(createOrderDTO.getPaymentReference());
@@ -403,14 +403,14 @@ public class OrderRest {
         emailProps.put("status", EStatusOrder.ACCEPTED);
         emailProps.put("payementMethode", (order.getIdPaymentMethod() == null)? "":order.getIdPaymentMethod()+ " - "+iPaymentMethodService.getByInternalReference(order.getIdPaymentMethod()).get().getDesignation());
 
-        List<Users> usersList = iUserService.getUsers();
+        List<Users> usersList = iUserService.getUsersByIdStore(order.getIdStore());
         for (Users user : usersList) {
             if (user.getTypeAccount().getName() == ETypeAccount.TREASURY) {
                 emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_MODIFY_ORDER+InternalReference+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_MODIFY_ORDER));
                 log.info("Email  send successfull for user: " + user.getEmail());
             }
 
-            if (user.getTypeAccount().getName() == ETypeAccount.MANAGER_COUPON) {
+            if (user.getTypeAccount().getName() == ETypeAccount.SALES_MANAGER) {
                 emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_MODIFY_ORDER+InternalReference+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_MODIFY_ORDER));
                 log.info("Email  send successfull for user: " + user.getEmail());
             }
@@ -429,7 +429,7 @@ public class OrderRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
     @PostMapping("/delivery/{internalReference:[0-9]+}")
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> devliveryOrder(@PathVariable Long internalReference, @RequestParam("idManagerCoupon") Long idManagerCoupon) throws JRException, IOException {
+    public ResponseEntity<?> devliveryOrder(@PathVariable Long internalReference, @RequestParam("idSalesManager") Long idSalesManager) throws JRException, IOException {
 
         Order order = iOrderService.getByInternalReference(internalReference).get();
         Client client = iClientService.getClientByInternalReference(order.getIdClient()).get();
@@ -442,7 +442,7 @@ public class OrderRest {
         StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.IN_PROCESS_OF_DELIVERY).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.IN_PROCESS_OF_DELIVERY +  "  not found"));
         order.setStatus(statusOrder);
         order.setUpdateAt(LocalDateTime.now());
-        order.setIdManagerCoupon(idManagerCoupon);
+        order.setIdSalesManager(idSalesManager);
         iOrderService.createOrder(order);
 
         HttpHeaders headers = new HttpHeaders();
@@ -530,7 +530,7 @@ public class OrderRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
     @PostMapping("/pay/{InternalReference:[0-9]+}")
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> payOrder(@PathVariable Long InternalReference, @RequestParam("idManagerCoupon") Long idManagerCoupon) throws JRException, IOException {
+    public ResponseEntity<?> payOrder(@PathVariable Long InternalReference, @RequestParam("idSalesManager") Long idSalesManager) throws JRException, IOException {
 
         Order order = iOrderService.getByInternalReference(InternalReference).get();
         Client client = iClientService.getClientByInternalReference(order.getIdClient()).get();
@@ -542,7 +542,7 @@ public class OrderRest {
         StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.PAID).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.PAID +  "  not found"));
         order.setStatus(statusOrder);
         order.setUpdateAt(LocalDateTime.now());
-        order.setIdManagerCoupon(idManagerCoupon);
+        order.setIdSalesManager(idSalesManager);
         iOrderService.createOrder(order);
 
         Map<String, Object> emailProps = new HashMap<>();
@@ -556,14 +556,14 @@ public class OrderRest {
         emailProps.put("status", EStatusOrder.PAID);
         emailProps.put("payementMethode", (order.getIdPaymentMethod() == null)? "":order.getIdPaymentMethod()+ " - "+iPaymentMethodService.getByInternalReference(order.getIdPaymentMethod()).get().getDesignation());
 
-        List<Users> usersList = iUserService.getUsers();
+        List<Users> usersList = iUserService.getUsersByIdStore(order.getIdStore());
         for (Users user : usersList) {
-            if (user.getTypeAccount().getName() == ETypeAccount.STORE_KEEPER) {
+            if (user.getTypeAccount().getName() == ETypeAccount.MANAGER_SPACES_2) {
                 emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_MODIFY_ORDER+InternalReference+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_MODIFY_ORDER));
                 log.info("Email  send successfull for user: " + user.getEmail());
             }
 
-            if (user.getTypeAccount().getName() == ETypeAccount.MANAGER_COUPON) {
+            if (user.getTypeAccount().getName() == ETypeAccount.SALES_MANAGER) {
                 emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_MODIFY_ORDER+InternalReference+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_MODIFY_ORDER));
                 log.info("Email  send successfull for user: " + user.getEmail());
             }
@@ -588,7 +588,7 @@ public class OrderRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
     @PostMapping("/cancel/{InternalReference:[0-9]+}")
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> cancelOrder(@PathVariable Long InternalReference, @RequestParam("idManagerCoupon") Long idManagerCoupon, @RequestParam("reasonForCancellation")  @Schema(description = "Raison d’annulation") String reasonForCancellation) {
+    public ResponseEntity<?> cancelOrder(@PathVariable Long InternalReference, @RequestParam("idCommercialAttache") Long idCommercialAttache, @RequestParam("reasonForCancellation")  @Schema(description = "Raison d’annulation") String reasonForCancellation) {
 
         Order order = iOrderService.getByInternalReference(InternalReference).get();
         Client client = iClientService.getClientByInternalReference(order.getIdClient()).get();
@@ -596,7 +596,7 @@ public class OrderRest {
         StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.ORDER_CANCEL).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.ORDER_CANCEL +  "  not found"));
         order.setStatus(statusOrder);
         order.setUpdateAt(LocalDateTime.now());
-        order.setIdManagerCoupon(idManagerCoupon);
+        order.setIdCommercialAttache(idCommercialAttache);
         order.setReasonForCancellation(reasonForCancellation);
         iOrderService.createOrder(order);
 
@@ -611,9 +611,9 @@ public class OrderRest {
         emailProps.put("status", EStatusOrder.ORDER_CANCEL);
         emailProps.put("payementMethode", (order.getIdPaymentMethod() == null)? "":order.getIdPaymentMethod()+ " - "+iPaymentMethodService.getByInternalReference(order.getIdPaymentMethod()).get().getDesignation());
 
-        Users managerCoupon = iUserService.getByInternalReference(idManagerCoupon);
-        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, managerCoupon.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_ORDER+InternalReference+" - "+EStatusOrder.ORDER_CANCEL, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_ORDER));
-        log.info("Email  send successfull for user: " + managerCoupon.getEmail());
+        Users commercialAttache = iUserService.getByInternalReference(idCommercialAttache);
+        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, commercialAttache.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_ORDER+InternalReference+" - "+EStatusOrder.ORDER_CANCEL, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_ORDER));
+        log.info("Email  send successfull for user: " + commercialAttache.getEmail());
 
         emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_ORDER+InternalReference+" - "+EStatusOrder.ORDER_CANCEL, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_ORDER));
         log.info("Email  send successfull for user: " + client.getEmail());
@@ -657,9 +657,9 @@ public class OrderRest {
 
         Map<String, Object> emailProps = new HashMap<>();
         emailProps.put("order", cancelMultiOrderDTO.getOrders());
-        Users managerCoupon = iUserService.getByInternalReference(cancelMultiOrderDTO.getIdManagerCoupon());
-        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, managerCoupon.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_MULTI_ORDER+" - "+EStatusOrder.ORDER_CANCEL, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_MULTI_ORDER));
-        log.info("Email  send successfull for user: " + managerCoupon.getEmail());
+        Users commercialAttache = iUserService.getByInternalReference(cancelMultiOrderDTO.getIdCommercialAttache());
+        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, commercialAttache.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_MULTI_ORDER+" - "+EStatusOrder.ORDER_CANCEL, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_MULTI_ORDER));
+        log.info("Email  send successfull for user: " + commercialAttache.getEmail());
 
         return ResponseEntity.ok().body(new MessageResponseDto(HttpStatus.OK, " Les commandes ont été annulé avec succèss !"));
     }
@@ -671,7 +671,7 @@ public class OrderRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
     @PostMapping("/valid/delivery/{InternalReference:[0-9]+}")
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> validDeliveryOrder(@RequestBody MultipartFile file, @PathVariable Long InternalReference, @RequestParam("idManagerCoupon") Long idManagerCoupon) throws JRException, IOException {
+    public ResponseEntity<?> validDeliveryOrder(@RequestBody MultipartFile file, @PathVariable Long InternalReference, @RequestParam("idSalesManager") Long idSalesManager) throws JRException, IOException {
 
         Order order = iOrderService.getByInternalReference(InternalReference).get();
         Client client = iClientService.getClientByInternalReference(order.getIdClient()).get();
@@ -687,7 +687,7 @@ public class OrderRest {
         order.setLinkDelivery(fileDownloadUri);
         order.setStatus(statusOrder);
         order.setUpdateAt(LocalDateTime.now());
-        order.setIdManagerCoupon(idManagerCoupon);
+        order.setIdSalesManager(idSalesManager);
         iOrderService.createOrder(order);
 
         Map<String, Object> emailProps = new HashMap<>();
@@ -701,9 +701,9 @@ public class OrderRest {
         emailProps.put("status", EStatusOrder.CLOSED);
         emailProps.put("payementMethode", order.getIdPaymentMethod()+ " - "+iPaymentMethodService.getByInternalReference(order.getIdPaymentMethod()).get().getDesignation());
 
-        List<Users> usersList = iUserService.getUsers();
+        List<Users> usersList = iUserService.getUsersByIdStore(order.getIdStore());
         for (Users user : usersList) {
-            if (user.getTypeAccount().getName() == ETypeAccount.MANAGER_COUPON) {
+            if (user.getTypeAccount().getName() == ETypeAccount.SALES_MANAGER) {
                 emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_MODIFY_ORDER+InternalReference+" - "+EStatusOrder.CLOSED, ApplicationConstant.TEMPLATE_EMAIL_MODIFY_ORDER));
                 log.info("Email  send successfull for user: " + user.getEmail());
             }
@@ -784,20 +784,56 @@ public class OrderRest {
     }
 
 
-    @Operation(summary = "Recupérer la liste des commandes par gestionnaire de coupon", tags = "Order", responses = {
+    @Operation(summary = "Recupérer la liste des commandes par Directeur commercial", tags = "Order", responses = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Order.class)))),
             @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/managercoupon/{idManagerCoupon:[0-9]+}")
-    public ResponseEntity<Page<Order>> getOrdersByIdManagerCoupon(@PathVariable Long idManagerCoupon,
-                                                                  @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
-                                                                  @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
-                                                                  @RequestParam(required = false, defaultValue = "idManagerCoupon") String sort,
-                                                                  @RequestParam(required = false, defaultValue = "desc") String order) {
+    @GetMapping("/salesmanager/{idSalesManager:[0-9]+}")
+    public ResponseEntity<Page<Order>> getOrdersByIdsalesmanager(@PathVariable Long idSalesManager,
+                                                                 @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
+                                                                 @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
+                                                                 @RequestParam(required = false, defaultValue = "idsalesmanager") String sort,
+                                                                 @RequestParam(required = false, defaultValue = "desc") String order) {
 
-        Page<Order> orders = iOrderService.getOrdersByIdManagerCoupon(idManagerCoupon,
+        Page<Order> orders = iOrderService.getOrdersByIdSalesManager(idSalesManager,
+                Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
+        return ResponseEntity.ok(orders);
+    }
+
+    @Operation(summary = "Recupérer la liste des commandes par Gestionnaire espace 2", tags = "Order", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Order.class)))),
+            @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+    @GetMapping("/spacemanager2/{idSpaceManager2:[0-9]+}")
+    public ResponseEntity<Page<Order>> getOrdersByIdSpaceManager2(@PathVariable Long idSpaceManager2,
+                                                                 @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
+                                                                 @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
+                                                                 @RequestParam(required = false, defaultValue = "idsalesmanager") String sort,
+                                                                 @RequestParam(required = false, defaultValue = "desc") String order) {
+
+        Page<Order> orders = iOrderService.getOrdersByIdSpaceManager2(idSpaceManager2,
+                Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
+        return ResponseEntity.ok(orders);
+    }
+
+    @Operation(summary = "Recupérer la liste des commandes par attaché commercial", tags = "Order", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Order.class)))),
+            @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+    @GetMapping("/commercialattache/{idCommercialAttache:[0-9]+}")
+    public ResponseEntity<Page<Order>> getOrdersByIdCommercialAttache(@PathVariable Long idCommercialAttache,
+                                                                 @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
+                                                                 @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
+                                                                 @RequestParam(required = false, defaultValue = "idsalesmanager") String sort,
+                                                                 @RequestParam(required = false, defaultValue = "desc") String order) {
+
+        Page<Order> orders = iOrderService.getOrdersByIdCommercialAttache(idCommercialAttache,
                 Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(orders);
     }

@@ -17,12 +17,12 @@ public class CreateOrderDTO {
     @Schema(description = "Reference interne Caisse/Trésorerie")
     private Long idFund;
 
-    @Schema(description = "Reference interne du Gestionnaire de commandes")
+    @Schema(description = "Reference interne de l'attaché commercial")
     @NotNull(message = "{idManagerStore.required}")
-    private Long idManagerOrder;
+    private Long idCommercialAttache;
 
-    @Schema(description = "Reference interne du Gestionnaire de coupons")
-    private Long idManagerCoupon;
+    @Schema(description = "Reference interne du Directeur commercial")
+    private Long idSalesManager;
 
     @Schema(description = "Montant global NET")
     private int NetAggregateAmount;
@@ -30,8 +30,8 @@ public class CreateOrderDTO {
     @Schema(description = "Montant global TTC")
     private int TTCAggregateAmount;
 
-    @Schema(description = "Reference interne du magasinier")
-    private Long idStorekeeper;
+    @Schema(description = "Reference interne du Gestionnaire espace 2")
+    private Long idSpaceManager2;
 
     @Schema(description = "Taxe applicable")
     private String tax;
