@@ -1,7 +1,9 @@
 package com.gulfcam.fuelcoupon.user.controller;
 
 import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
+import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
 import com.gulfcam.fuelcoupon.order.entity.TypeVoucher;
+import com.gulfcam.fuelcoupon.store.dto.ResponseCouponDTO;
 import com.gulfcam.fuelcoupon.user.dto.ResponseUsersDTO;
 import com.gulfcam.fuelcoupon.user.dto.UserResDto;
 import com.gulfcam.fuelcoupon.user.entity.ETypeAccount;
@@ -10,6 +12,8 @@ import com.gulfcam.fuelcoupon.user.entity.Users;
 import com.gulfcam.fuelcoupon.user.repository.ITypeAccountRepository;
 import com.gulfcam.fuelcoupon.user.service.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -317,12 +321,30 @@ public class UserRest {
 	@PreAuthorize("hasRole('SUPERADMIN') or hasRole('ADMIN') or hasRole('DIRECTOR') or hasRole('AGENT')")
 	@GetMapping("/typeaccount/{typeAccount}")
 	public ResponseEntity<?> getUsersByTypeAccount(@PathVariable String typeAccount)  {
-		System.out.println("=========================================");
 		TypeAccount typeAccount1 = iTypeAccountRepository.findByName(ETypeAccount.valueOf(typeAccount.toUpperCase())).get();
-		System.out.println(typeAccount1.getName());
-		System.out.println("=========================================");
 		List<Users> users = userService.getUsersByTypeAccount(typeAccount1);
 		return ResponseEntity.ok(users);
+	}
+
+	@Parameters(value = {
+			@Parameter(name = "sort", schema = @Schema(allowableValues = {"id", "createdAt"})),
+			@Parameter(name = "order", schema = @Schema(allowableValues = {"asc", "desc"}))})
+	@Operation(summary = "Filtre des utilisateurs", tags = "users", responses = {
+			@ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json")),
+			@ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
+			@ApiResponse(responseCode = "404", description = "Coupon not found", content = @Content(mediaType = "Application/Json")),
+			@ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
+	@PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+	@GetMapping("/filter")
+	public ResponseEntity<?> filtrerCoupons(@RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
+											@RequestParam(required = false, value = "firstName") String name,
+											@RequestParam(required = false, value = "typeAccount") String type,
+											@RequestParam(required = false, value = "status") String status,
+											@RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
+											@RequestParam(required = false, defaultValue = "id") String sort,
+											@RequestParam(required = false, defaultValue = "desc") String order) {
+		Page<ResponseUsersDTO> list = userService.filtres(status, type, name, Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
+		return ResponseEntity.ok(list);
 	}
 
 }

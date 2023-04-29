@@ -3,7 +3,9 @@ package com.gulfcam.fuelcoupon.user.repository;
 
 import com.gulfcam.fuelcoupon.user.entity.*;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,4 +40,5 @@ public interface IUserRepo extends IUserBaseRepo<Users> {
 	List<Users> getUsersByTypeAccount(TypeAccount typeAccount);
 
 
+    Page<Users> findAll(Specification<Users> specification, Pageable pageable);
 }

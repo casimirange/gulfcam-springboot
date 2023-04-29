@@ -1,11 +1,17 @@
 package com.gulfcam.fuelcoupon.user.service;
 
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
+import com.gulfcam.fuelcoupon.client.entity.Client;
+import com.gulfcam.fuelcoupon.order.entity.TypeVoucher;
+import com.gulfcam.fuelcoupon.store.entity.Coupon;
+import com.gulfcam.fuelcoupon.store.entity.Station;
 import com.gulfcam.fuelcoupon.store.service.IStoreService;
 import com.gulfcam.fuelcoupon.user.dto.ResponseUsersDTO;
 import com.gulfcam.fuelcoupon.user.dto.UserEditPasswordDto;
 import com.gulfcam.fuelcoupon.user.entity.*;
 import com.gulfcam.fuelcoupon.user.repository.*;
+import com.gulfcam.fuelcoupon.utilities.entity.EStatus;
+import com.gulfcam.fuelcoupon.utilities.entity.Status;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -14,10 +20,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.criteria.Predicate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.*;
@@ -380,6 +389,61 @@ public class UserServiceImpl implements IUserService {
 		}
 		Page<ResponseUsersDTO> responseUsersDTOPage = new PageImpl<>(responseUsersDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseUsersDTOList.size());
 		return responseUsersDTOPage;
+	}
+
+	@Override
+	public Page<ResponseUsersDTO> filtres(String statusName, String typeAccount, String firstName, int page, int size, String sort, String order) {
+
+		Specification<Users> specification = ((root, query, criteriaBuilder) -> {
+
+			List<Predicate> predicates = new ArrayList<>();
+
+			if (firstName != null && !firstName.isEmpty()){
+				predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("firstName")), "%" + firstName + "%"));
+			}
+
+			if (typeAccount != null && !typeAccount.isEmpty()){
+				Optional<TypeAccount> typeVoucher = typeAccountRepo.findByName(ETypeAccount.valueOf(typeAccount));
+				predicates.add(criteriaBuilder.equal(criteriaBuilder.lower(root.get("typeAccount")), typeVoucher.map(TypeAccount::getId).orElse(null)));
+			}
+
+			if (statusName != null && !statusName.isEmpty()){
+				StatusUser status = statusRepo.findByName(EStatusUser.valueOf(statusName.toUpperCase()));
+				predicates.add(criteriaBuilder.equal(criteriaBuilder.lower(root.get("status")), status));
+			}
+			return criteriaBuilder.and(predicates.toArray(new javax.persistence.criteria.Predicate[0]));
+		});
+
+		Page<Users> users = userRepo.findAll(specification, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
+
+		ResponseUsersDTO responseUsersDTO;
+		List<ResponseUsersDTO> responseUsersDTOList = new ArrayList<>();
+
+		for (Users user: users){
+			responseUsersDTO = new ResponseUsersDTO();
+			responseUsersDTO.setStatus(user.getStatus());
+			responseUsersDTO.setUserId(user.getUserId());
+			responseUsersDTO.setEmail(user.getEmail());
+			responseUsersDTO.setRoleNames(user.getRoleNames());
+			responseUsersDTO.setFirstName(user.getFirstName());
+			responseUsersDTO.setLastName(user.getLastName());
+			responseUsersDTO.setIdStore(user.getIdStore());
+			responseUsersDTO.setPosition(user.getPosition());
+			responseUsersDTO.setPinCode(user.getPinCode());
+			responseUsersDTO.setRoles(user.getRoles());
+			responseUsersDTO.setTelephone(user.getTelephone());
+			responseUsersDTO.setTypeAccount(user.getTypeAccount());
+			responseUsersDTO.setOtpCode(user.getOtpCode());
+			responseUsersDTO.setStore((user.getIdStore() == null)? null: iStoreService.getByInternalReference(user.getIdStore()).get());
+			responseUsersDTO.setNameStore((user.getIdStore() == null)? null: iStoreService.getByInternalReference(user.getIdStore()).get().getLocalization());
+			responseUsersDTO.setInternalReference(user.getInternalReference());
+			responseUsersDTO.setCreatedDate(user.getCreatedDate());
+			responseUsersDTO.setDateLastLogin(user.getDateLastLogin());
+			responseUsersDTOList.add(responseUsersDTO);
+
+		}
+		return new PageImpl<>(responseUsersDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), users.getTotalElements());
+
 	}
 
 	@Override

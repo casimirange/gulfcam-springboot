@@ -124,7 +124,8 @@ public class CouponServiceImpl implements ICouponService {
     }
 
     @Override
-    public Page<ResponseCouponDTO> filtres(String serialNumber, String statusName, String clientName, String type, String stationName, int page, int size, String sort, String order){
+    public Page<ResponseCouponDTO> filtres(String serialNumber, String statusName, String clientName, String type, String stationName, int page, int size,
+                                           String sort, String order){
 
         Specification<Coupon> specification = ((root, query, criteriaBuilder) -> {
 
