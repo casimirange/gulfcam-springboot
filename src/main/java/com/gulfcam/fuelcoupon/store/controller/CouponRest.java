@@ -38,11 +38,15 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
+<<<<<<< HEAD
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.format.annotation.DateTimeFormat;
+=======
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -52,7 +56,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.ByteArrayInputStream;
+<<<<<<< HEAD
 import java.time.LocalDate;
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -319,6 +326,7 @@ public class CouponRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @GetMapping("/station/{idStation:[0-9]+}")
     public ResponseEntity<Page<ResponseCouponDTO>> getCouponsByIdStation(@PathVariable Long idStation,
+<<<<<<< HEAD
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)              @RequestParam(required = false, value = "date", defaultValue = "") LocalDate date,
                                                                 @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                                                 @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
@@ -326,6 +334,14 @@ public class CouponRest {
                                                                 @RequestParam(required = false, defaultValue = "desc") String order) {
 
         Page<ResponseCouponDTO> cartons = iCouponService.getCouponsByIdStation(idStation, date,
+=======
+                                                             @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
+                                                             @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
+                                                             @RequestParam(required = false, defaultValue = "idStation") String sort,
+                                                             @RequestParam(required = false, defaultValue = "desc") String order) {
+
+        Page<ResponseCouponDTO> cartons = iCouponService.getCouponsByIdStation(idStation,
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
                 Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(cartons);
     }
@@ -538,6 +554,7 @@ public class CouponRest {
         Page<ResponseCouponDTO> list = iCouponService.getAllCoupons(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(list);
     }
+<<<<<<< HEAD
 
     @Parameters(value = {
             @Parameter(name = "sort", schema = @Schema(allowableValues = {"id", "createdAt"})),
@@ -581,4 +598,6 @@ public class CouponRest {
         Page<ResponseCouponDTO> list = iCouponService.filtres(serialNumber, status, clientName, type, stationName, Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(list);
     }
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
     }

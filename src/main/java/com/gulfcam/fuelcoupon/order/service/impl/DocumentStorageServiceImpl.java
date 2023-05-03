@@ -5,7 +5,10 @@ import com.gulfcam.fuelcoupon.order.entity.DocumentStorageProperties;
 import com.gulfcam.fuelcoupon.order.entity.TypeDocument;
 import com.gulfcam.fuelcoupon.order.repository.IDocumentStoragePropertiesRepo;
 import com.gulfcam.fuelcoupon.order.service.IDocumentStorageService;
+<<<<<<< HEAD
 import lombok.RequiredArgsConstructor;
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -25,17 +28,26 @@ import java.nio.file.StandardCopyOption;
 
 @Service
 @Slf4j
+<<<<<<< HEAD
 @RequiredArgsConstructor
 public class DocumentStorageServiceImpl implements IDocumentStorageService {
 
     private Path fileStorageLocation;
+=======
+public class DocumentStorageServiceImpl implements IDocumentStorageService {
+
+    private final Path fileStorageLocation;
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
     @Autowired
     IDocumentStoragePropertiesRepo docStorageRepo;
     
     @Autowired
     public DocumentStorageServiceImpl(DocumentStorageProperties fileStorageProperties) {
         fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir()).toAbsolutePath().normalize();
+<<<<<<< HEAD
         log.info("path: {}"+fileStorageLocation);
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
         try {
             Files.createDirectories(fileStorageLocation);
         } catch (Exception e) {

@@ -25,7 +25,11 @@ public class TypeClient {
     private Long id;
 
     @NotNull
+<<<<<<< HEAD
     @Schema(description = "nom du type de compte", example = "PARTICULAR, ENTREPRISE, ADMINISTRATION")
+=======
+    @Schema(description = "nom du type de compte", example = "PARTICULAR, ENTREPRISE, INSTITUTION")
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
     @Enumerated(EnumType.STRING)
     private ETypeClient name;
 

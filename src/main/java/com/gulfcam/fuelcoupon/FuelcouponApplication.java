@@ -1,6 +1,9 @@
 package com.gulfcam.fuelcoupon;
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import com.gulfcam.fuelcoupon.order.entity.DocumentStorageProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

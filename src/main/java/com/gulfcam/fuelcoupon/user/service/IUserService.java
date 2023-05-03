@@ -2,8 +2,11 @@ package com.gulfcam.fuelcoupon.user.service;
 
 import com.gulfcam.fuelcoupon.user.dto.ResponseUsersDTO;
 import com.gulfcam.fuelcoupon.user.dto.UserEditPasswordDto;
+<<<<<<< HEAD
 import com.gulfcam.fuelcoupon.user.entity.ETypeAccount;
 import com.gulfcam.fuelcoupon.user.entity.TypeAccount;
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import com.gulfcam.fuelcoupon.user.entity.Users;
 import org.springframework.data.domain.Page;
 import java.util.List;
@@ -26,8 +29,11 @@ public interface IUserService {
 
 	Users getByInternalReference(Long internalReference);
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 	Optional<Users> getByTelephone(String tel);
 
 	Optional<Users> getByEmail(String email);
@@ -68,12 +74,18 @@ public interface IUserService {
 	Optional<Users> getUserByUniqueConstraints(Users u);
 
 	Page<ResponseUsersDTO> getUsers(int page, int size, String sort, String order);
+<<<<<<< HEAD
 	Page<ResponseUsersDTO> filtres(String statut, String typeAccount, String firstName, String lastName, String idStore, int page, int size, String sort, String order);
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 
 	Page<Users> get20Users(int parseInt, int parseInt2, String sort, String order);
 
 	List<Users> getUsers();
+<<<<<<< HEAD
 	List<Users> getUsersByTypeAccount(TypeAccount typeAccount);
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 	List<Users> getUsersByIdStore(Long idStore);
 
 	void updateDateLastLoginUser(Long id_user);

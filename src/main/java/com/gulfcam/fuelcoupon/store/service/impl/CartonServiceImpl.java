@@ -1,7 +1,10 @@
 package com.gulfcam.fuelcoupon.store.service.impl;
 
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
+<<<<<<< HEAD
 import com.gulfcam.fuelcoupon.client.entity.Client;
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
 import com.gulfcam.fuelcoupon.order.dto.ResponseUnitDTO;
 import com.gulfcam.fuelcoupon.order.entity.Item;
@@ -28,14 +31,20 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+<<<<<<< HEAD
 import org.springframework.data.jpa.domain.Specification;
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+<<<<<<< HEAD
 import javax.persistence.criteria.Predicate;
 import java.time.LocalDate;
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -143,6 +152,7 @@ public class CartonServiceImpl implements ICartonService {
     }
 
     @Override
+<<<<<<< HEAD
     public Page<ResponseCartonDTO> filtres(String number, String statusName, String idStoreHouse, LocalDate date, String spaceManager1, String type, int page, int size, String sort, String order) {
         Specification<Carton> specification = ((root, query, criteriaBuilder) -> {
 
@@ -217,6 +227,8 @@ public class CartonServiceImpl implements ICartonService {
     }
 
     @Override
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
     public Page<Carton> getCartonsByIdStoreHouse(Long idStoreHouse, int page, int size, String sort, String order) {
         return iCartonRepo.getCartonsByIdStoreHouse(idStoreHouse,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
     }

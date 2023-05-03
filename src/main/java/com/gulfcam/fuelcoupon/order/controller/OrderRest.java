@@ -42,7 +42,10 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+<<<<<<< HEAD
 import org.springframework.format.annotation.DateTimeFormat;
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -58,9 +61,13 @@ import javax.validation.Valid;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+<<<<<<< HEAD
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
+=======
+import java.time.LocalDateTime;
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import java.time.ZoneId;
 import java.util.*;
 
@@ -377,7 +384,11 @@ public class OrderRest {
         }
         StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.ACCEPTED).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.ACCEPTED +  "  not found"));
         TypeDocument typeDocument = iTypeDocumentRepo.findByName(ETypeDocument.INVOICE).orElseThrow(()-> new ResourceNotFoundException("Statut :  "  +  ETypeDocument.INVOICE +  "  not found"));
+<<<<<<< HEAD
 //        String fileName = iDocumentStorageService.storeFile(file, InternalReference, docType, typeDocument);
+=======
+        String fileName = iDocumentStorageService.storeFile(file, InternalReference, docType, typeDocument);
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
         String fileDownloadUri = api_base_url+"/api/v1.0/order/file/" + InternalReference + "/downloadFile?type=invoice&docType=" + docType;
         order.setLinkInvoice(fileDownloadUri);
         order.setStatus(statusOrder);
@@ -685,7 +696,11 @@ public class OrderRest {
         }
         StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.CLOSED).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.CLOSED +  "  not found"));
         TypeDocument typeDocument = iTypeDocumentRepo.findByName(ETypeDocument.DELIVERY).orElseThrow(()-> new ResourceNotFoundException("Statut :  "  +  ETypeDocument.DELIVERY +  "  not found"));
+<<<<<<< HEAD
 //        String fileName = iDocumentStorageService.storeFile(file, InternalReference, "pdf", typeDocument);
+=======
+        String fileName = iDocumentStorageService.storeFile(file, InternalReference, "pdf", typeDocument);
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
         String fileDownloadUri = api_base_url+"/api/v1.0/order/file/" + InternalReference + "/downloadFile?type=delivery&docType=pdf";
         order.setLinkDelivery(fileDownloadUri);
         order.setStatus(statusOrder);
@@ -841,6 +856,7 @@ public class OrderRest {
         return ResponseEntity.ok(orders);
     }
 
+<<<<<<< HEAD
 //    @Operation(summary = "Recupérer la liste des commandes par gestionnaire de commandes", tags = "Order", responses = {
 //            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Order.class)))),
 //            @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "Application/Json")),
@@ -879,6 +895,75 @@ public class OrderRest {
 //    }
 
     @Operation(summary = "Recupérer la liste des commandes par magasin", tags = "Order", responses = {
+=======
+    @Operation(summary = "Recupérer la liste des commandes par gestionnaire de commandes", tags = "Order", responses = {
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Order.class)))),
+            @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+<<<<<<< HEAD
+    @GetMapping("/store/{idStore:[0-9]+}")
+    public ResponseEntity<Page<Order>> getOrdersByIdStore(@PathVariable Long idStore,
+                                                                 @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
+                                                                 @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
+                                                                 @RequestParam(required = false, defaultValue = "idStore") String sort,
+                                                                 @RequestParam(required = false, defaultValue = "desc") String order) {
+
+        Page<Order> orders = iOrderService.getOrdersByIdStore(idStore,
+=======
+    @GetMapping("/managerstore/{idManagerOrder:[0-9]+}")
+    public ResponseEntity<Page<Order>> getOrdersByIdManagerStore(@PathVariable Long idManagerOrder,
+                                                                 @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
+                                                                 @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
+                                                                 @RequestParam(required = false, defaultValue = "idManagerOrder") String sort,
+                                                                 @RequestParam(required = false, defaultValue = "desc") String order) {
+
+        Page<Order> orders = iOrderService.getOrdersByIdManagerOrder(idManagerOrder,
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
+                Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
+        return ResponseEntity.ok(orders);
+    }
+
+<<<<<<< HEAD
+    @Operation(summary = "Filtrer les commandes", tags = "Order", responses = {
+=======
+
+    @Operation(summary = "Recupérer la liste des commandes par magasinier", tags = "Order", responses = {
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Order.class)))),
+            @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+<<<<<<< HEAD
+    @GetMapping("/filter")
+    public ResponseEntity<Page<ResponseOrderDTO>> filterOrders(@RequestParam(required = false, value = "store" ) String idStore,
+                                                               @RequestParam(required = false, value = "client" ) String clientName,
+     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)            @RequestParam(required = false, value = "date" ) LocalDate date,
+                                                               @RequestParam(required = false, value = "ref" ) String internalRef,
+                                                               @RequestParam(required = false, value = "status") String status,
+                                                               @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
+                                                               @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
+                                                               @RequestParam(required = false, defaultValue = "id") String sort,
+                                                               @RequestParam(required = false, defaultValue = "desc") String order) {
+
+        Page<ResponseOrderDTO> orders = iOrderService.filtrerOrders(idStore, clientName, date, internalRef, status,
+=======
+    @GetMapping("/storekeeper/{idStorekeeper:[0-9]+}")
+    public ResponseEntity<Page<Order>> getOrdersByIdStorekeeper(@PathVariable Long idStorekeeper,
+                                                                  @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
+                                                                  @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
+                                                                  @RequestParam(required = false, defaultValue = "idStorekeeper") String sort,
+                                                                  @RequestParam(required = false, defaultValue = "desc") String order) {
+
+        Page<Order> orders = iOrderService.getOrdersByIdStorekeeper(idStorekeeper,
+                Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
+        return ResponseEntity.ok(orders);
+    }
+
+    @Operation(summary = "Recupérer la liste des commandes par magasin", tags = "Order", responses = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Order.class)))),
             @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
@@ -892,28 +977,7 @@ public class OrderRest {
                                                                  @RequestParam(required = false, defaultValue = "desc") String order) {
 
         Page<Order> orders = iOrderService.getOrdersByIdStore(idStore,
-                Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
-        return ResponseEntity.ok(orders);
-    }
-
-    @Operation(summary = "Filtrer les commandes", tags = "Order", responses = {
-            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Order.class)))),
-            @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "Application/Json")),
-            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
-            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
-    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/filter")
-    public ResponseEntity<Page<ResponseOrderDTO>> filterOrders(@RequestParam(required = false, value = "store" ) String idStore,
-                                                               @RequestParam(required = false, value = "client" ) String clientName,
-     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)            @RequestParam(required = false, value = "date" ) LocalDate date,
-                                                               @RequestParam(required = false, value = "ref" ) String internalRef,
-                                                               @RequestParam(required = false, value = "status") String status,
-                                                               @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
-                                                               @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
-                                                               @RequestParam(required = false, defaultValue = "id") String sort,
-                                                               @RequestParam(required = false, defaultValue = "desc") String order) {
-
-        Page<ResponseOrderDTO> orders = iOrderService.filtrerOrders(idStore, clientName, date, internalRef, status,
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
                 Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(orders);
     }

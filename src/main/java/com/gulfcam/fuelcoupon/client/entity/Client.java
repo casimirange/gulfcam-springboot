@@ -34,6 +34,7 @@ public class Client {
 
     private String phone;
 
+<<<<<<< HEAD
     @Column(unique = false,nullable = true)
     @Email
     private String email;
@@ -41,6 +42,12 @@ public class Client {
     @Column(unique = true,nullable = true)
     private String niu;
 
+=======
+    @Column(unique = true,nullable = false)
+    @Email
+    private String email;
+
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
     private String RCCM;
 
     @Column(nullable = true, unique = true)

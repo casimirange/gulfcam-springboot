@@ -28,13 +28,19 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+<<<<<<< HEAD
 import org.springframework.format.annotation.DateTimeFormat;
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
+<<<<<<< HEAD
 import java.time.LocalDate;
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -81,6 +87,7 @@ public class ClientRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     public ResponseEntity<?> addClient(@Valid @RequestBody CreateClientDTO createClientDTO) {
 
+<<<<<<< HEAD
         if (!createClientDTO.getEmail().isEmpty() && iClientService.existsByEmail(createClientDTO.getEmail())) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.email_exists", null, LocaleContextHolder.getLocale())));
@@ -89,6 +96,12 @@ public class ClientRest {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.niu_exists", null, LocaleContextHolder.getLocale())));
         }
+=======
+        if (iClientService.existsByEmail(createClientDTO.getEmail())) {
+            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+                    messageSource.getMessage("messages.email_exists", null, LocaleContextHolder.getLocale())));
+        }
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
         if (iClientService.existsByGulfCamAccountNumber(createClientDTO.getGulfcamAccountNumber())) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.num_gulfcam_exists", null, LocaleContextHolder.getLocale())));
@@ -101,7 +114,10 @@ public class ClientRest {
         client.setCompleteName(createClientDTO.getCompleteName());
         client.setPhone(createClientDTO.getPhone());
         client.setRCCM(createClientDTO.getRCCM());
+<<<<<<< HEAD
         client.setNiu(createClientDTO.getNiu());
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
         client.setGulfcamAccountNumber(createClientDTO.getGulfcamAccountNumber());
         client.setEmail(createClientDTO.getEmail());
         TypeClient typeAccount = iTypeClientRepo.findByName(ETypeClient.valueOf(createClientDTO.getTypeClient().toUpperCase())).orElseThrow(()-> new ResourceNotFoundException("Type de Client:  "  +  createClientDTO.getTypeClient() +  "  not found"));
@@ -126,11 +142,16 @@ public class ClientRest {
     @PutMapping("/{internalReference:[0-9]+}")
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     public ResponseEntity<?> updateClient(@Valid @RequestBody CreateClientDTO createClientDTO, @PathVariable Long internalReference) {
+<<<<<<< HEAD
         Client client = iClientService.getClientByInternalReference(internalReference).get();
+=======
+
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
         if (!iClientService.getClientByInternalReference(internalReference).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.client_exists", null, LocaleContextHolder.getLocale())));
         }
+<<<<<<< HEAD
         if (!client.getNiu().equals(createClientDTO.getNiu()) && !createClientDTO.getNiu().isEmpty() && iClientService.existsByNiu(createClientDTO.getNiu())) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.niu_exists", null, LocaleContextHolder.getLocale())));
@@ -140,13 +161,19 @@ public class ClientRest {
                     messageSource.getMessage("messages.email_exists", null, LocaleContextHolder.getLocale())));
         }
 
+=======
+        Client client = iClientService.getClientByInternalReference(internalReference).get();
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
         client.setUpdateAt(LocalDateTime.now());
         client.setAddress(createClientDTO.getAddress());
         client.setCompanyName(createClientDTO.getCompanyName());
         client.setCompleteName(createClientDTO.getCompleteName());
         client.setPhone(createClientDTO.getPhone());
         client.setRCCM(createClientDTO.getRCCM());
+<<<<<<< HEAD
         client.setNiu(createClientDTO.getNiu());
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
         client.setGulfcamAccountNumber(createClientDTO.getGulfcamAccountNumber());
         client.setEmail(createClientDTO.getEmail());
         TypeClient typeAccount = iTypeClientRepo.findByName(ETypeClient.valueOf(createClientDTO.getTypeClient().toUpperCase())).orElseThrow(()-> new ResourceNotFoundException("Type de Client:  "  +  createClientDTO.getTypeClient() +  "  not found"));
@@ -228,6 +255,7 @@ public class ClientRest {
         Page<Client> list = iClientService.getAllClients(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(list);
     }
+<<<<<<< HEAD
 
     @Parameters(value = {
             @Parameter(name = "sort", schema = @Schema(allowableValues = {"id", "createdAt"})),
@@ -250,4 +278,6 @@ public class ClientRest {
         Page<Client> list = iClientService.filtres(clientName, company, type, date, Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(list);
     }
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
     }

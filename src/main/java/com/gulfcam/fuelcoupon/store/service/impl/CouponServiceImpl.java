@@ -1,32 +1,43 @@
 package com.gulfcam.fuelcoupon.store.service.impl;
 
+<<<<<<< HEAD
 import com.gulfcam.fuelcoupon.client.entity.Client;
 import com.gulfcam.fuelcoupon.client.repository.IClientRepo;
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import com.gulfcam.fuelcoupon.client.service.IClientService;
 import com.gulfcam.fuelcoupon.order.entity.TypeVoucher;
 import com.gulfcam.fuelcoupon.order.service.ITypeVoucherService;
 import com.gulfcam.fuelcoupon.store.dto.ResponseCouponDTO;
 import com.gulfcam.fuelcoupon.store.dto.ResponseCouponMailDTO;
+<<<<<<< HEAD
 import com.gulfcam.fuelcoupon.store.dto.ResponseRequestOppositionDTO;
 import com.gulfcam.fuelcoupon.store.entity.Coupon;
 import com.gulfcam.fuelcoupon.store.entity.Station;
+=======
+import com.gulfcam.fuelcoupon.store.entity.Coupon;
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import com.gulfcam.fuelcoupon.store.helper.ExcelCouponHelper;
 import com.gulfcam.fuelcoupon.store.repository.ICartonRepo;
 import com.gulfcam.fuelcoupon.store.repository.ICouponRepo;
 import com.gulfcam.fuelcoupon.store.repository.ICreditNoteRepo;
 import com.gulfcam.fuelcoupon.store.repository.INotebookRepo;
 import com.gulfcam.fuelcoupon.store.service.*;
+<<<<<<< HEAD
 import com.gulfcam.fuelcoupon.utilities.entity.EStatus;
 import com.gulfcam.fuelcoupon.utilities.entity.Status;
 import com.gulfcam.fuelcoupon.utilities.repository.IStatusRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+<<<<<<< HEAD
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,14 +59,30 @@ import java.util.stream.Collectors;
 public class CouponServiceImpl implements ICouponService {
     @Autowired
     private IClientRepo iClientRepo;
+=======
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+@Transactional
+public class CouponServiceImpl implements ICouponService {
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 
     @Autowired
     ICouponRepo iCouponRepo;
 
     @Autowired
+<<<<<<< HEAD
     IStatusRepo iStatusRepo;
 
     @Autowired
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
     IClientService iClientService;
     @Autowired
     ITypeVoucherService iTypeVoucherService;
@@ -124,6 +151,7 @@ public class CouponServiceImpl implements ICouponService {
     }
 
     @Override
+<<<<<<< HEAD
     public Page<ResponseCouponDTO> filtres(String serialNumber, String statusName, String clientName, String type, String stationName, int page, int size,
                                            String sort, String order){
 
@@ -273,6 +301,8 @@ public class CouponServiceImpl implements ICouponService {
     }
 
     @Override
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
     public List<Coupon> getCouponsByIdRequestOpposition(Long idRequestOpposition) {
         return iCouponRepo.getCouponsByIdRequestOpposition(idRequestOpposition);
     }
@@ -310,9 +340,13 @@ public class CouponServiceImpl implements ICouponService {
     }
 
     @Override
+<<<<<<< HEAD
     public Page<ResponseCouponDTO> getCouponsByIdStation(Long idStation, LocalDate period, int page, int size, String sort, String order) {
         LocalDate noDate = LocalDate.of(1900, Month.JANUARY, 1);
         Predicate<ResponseCouponDTO> byDate = date -> date.getUpdateAt().toLocalDate().isEqual(period);
+=======
+    public Page<ResponseCouponDTO> getCouponsByIdStation(Long idStation, int page, int size, String sort, String order) {
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
         Page<Coupon> couponList = iCouponRepo.getCouponsByIdStation(idStation, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
 
         ResponseCouponDTO responseCouponDTO;
@@ -350,10 +384,14 @@ public class CouponServiceImpl implements ICouponService {
             responseCouponDTOList.add(responseCouponDTO);
 
         }
+<<<<<<< HEAD
         List<ResponseCouponDTO> responseCouponDTOList2 = responseCouponDTOList.stream()
                 .filter(period != null  ? byDate : date -> !date.getCreatedAt().toLocalDate().isEqual(noDate))
                 .collect(Collectors.toList());
         Page<ResponseCouponDTO> responseNotebookDTOPage = new PageImpl<>(responseCouponDTOList2, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseCouponDTOList2.size());
+=======
+        Page<ResponseCouponDTO> responseNotebookDTOPage = new PageImpl<>(responseCouponDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), iCouponRepo.getCouponsByIdStation(idStation).size());
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
         return responseNotebookDTOPage;
     }
 

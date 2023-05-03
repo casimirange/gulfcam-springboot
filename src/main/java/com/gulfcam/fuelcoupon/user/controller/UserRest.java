@@ -1,6 +1,7 @@
 package com.gulfcam.fuelcoupon.user.controller;
 
 import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
+<<<<<<< HEAD
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
 import com.gulfcam.fuelcoupon.order.entity.TypeVoucher;
 import com.gulfcam.fuelcoupon.store.dto.ResponseCouponDTO;
@@ -14,6 +15,13 @@ import com.gulfcam.fuelcoupon.user.service.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+=======
+import com.gulfcam.fuelcoupon.user.dto.ResponseUsersDTO;
+import com.gulfcam.fuelcoupon.user.dto.UserResDto;
+import com.gulfcam.fuelcoupon.user.entity.Users;
+import com.gulfcam.fuelcoupon.user.service.IUserService;
+import io.swagger.v3.oas.annotations.Operation;
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -31,9 +39,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+<<<<<<< HEAD
 import java.util.List;
 import java.util.Optional;
 
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 
 @RestController
 @Tag(name = "users")
@@ -41,8 +52,11 @@ import java.util.Optional;
 @Slf4j
 public class UserRest {
 	@Autowired
+<<<<<<< HEAD
 	private ITypeAccountRepository iTypeAccountRepository;
 	@Autowired
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 	private IUserService userService;
 
 	@Autowired
@@ -314,6 +328,7 @@ public class UserRest {
 				.getMessage("messages.user_status_account_update", null, LocaleContextHolder.getLocale())));
 	}
 
+<<<<<<< HEAD
 
 	@Operation(summary = "Liste des utilisateurs par type de compte", tags = "users", responses = {
 			@ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json")),
@@ -349,4 +364,6 @@ public class UserRest {
 		return ResponseEntity.ok(list);
 	}
 
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 }
