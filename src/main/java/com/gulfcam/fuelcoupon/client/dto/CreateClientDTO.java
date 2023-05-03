@@ -26,8 +26,11 @@ public class CreateClientDTO {
     private String email;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     private String niu;
 
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
     private String RCCM;

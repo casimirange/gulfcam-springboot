@@ -1,12 +1,18 @@
 package com.gulfcam.fuelcoupon.store.repository;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import com.gulfcam.fuelcoupon.store.dto.ResponseCouponDTO;
 import com.gulfcam.fuelcoupon.store.entity.Coupon;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+=======
+import com.gulfcam.fuelcoupon.store.entity.Coupon;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 import com.gulfcam.fuelcoupon.store.entity.Coupon;
 import org.springframework.data.domain.Page;
@@ -35,8 +41,11 @@ public interface ICouponRepo extends JpaRepository<Coupon, Long> {
     boolean existsCouponBySerialNumber(String serialNumber);
     boolean existsCouponByInternalReference(Long internalReference);
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     Page<Coupon> findAll(Specification<Coupon> specification, Pageable pageable);
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 }

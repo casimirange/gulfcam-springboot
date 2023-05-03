@@ -2,10 +2,13 @@ package com.gulfcam.fuelcoupon.user.service;
 
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import com.gulfcam.fuelcoupon.client.entity.Client;
 import com.gulfcam.fuelcoupon.order.entity.TypeVoucher;
 import com.gulfcam.fuelcoupon.store.entity.Coupon;
 import com.gulfcam.fuelcoupon.store.entity.Station;
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import com.gulfcam.fuelcoupon.store.service.IStoreService;
@@ -14,8 +17,11 @@ import com.gulfcam.fuelcoupon.user.dto.UserEditPasswordDto;
 import com.gulfcam.fuelcoupon.user.entity.*;
 import com.gulfcam.fuelcoupon.user.repository.*;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import com.gulfcam.fuelcoupon.utilities.entity.EStatus;
 import com.gulfcam.fuelcoupon.utilities.entity.Status;
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +33,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import org.springframework.data.jpa.domain.Specification;
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -35,8 +44,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 import javax.persistence.criteria.Predicate;
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import java.time.LocalDateTime;
@@ -405,6 +417,7 @@ public class UserServiceImpl implements IUserService {
 
 	@Override
 <<<<<<< HEAD
+<<<<<<< HEAD
 	public Page<ResponseUsersDTO> filtres(String statusName, String typeAccount, String firstName, String lastName, String idStore, int page, int size, String sort, String order) {
 
 		Specification<Users> specification = ((root, query, criteriaBuilder) -> {
@@ -470,6 +483,8 @@ public class UserServiceImpl implements IUserService {
 	@Override
 =======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 	public List<Users> getUsersByIdStore(Long idStore) {
 		return userRepo.getUsersByIdStore(idStore);
 	}
@@ -487,11 +502,14 @@ public class UserServiceImpl implements IUserService {
 
 	@Override
 <<<<<<< HEAD
+<<<<<<< HEAD
 	public List<Users> getUsersByTypeAccount(TypeAccount typeAccount) {
 		return userRepo.getUsersByTypeAccount(typeAccount);
 	}
 
 	@Override
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 	public void updateDateLastLoginUser(Long id_user) {

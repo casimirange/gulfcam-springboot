@@ -40,7 +40,10 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import org.springframework.format.annotation.DateTimeFormat;
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import org.springframework.http.HttpStatus;
@@ -51,7 +54,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import java.time.LocalDate;
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import java.time.LocalDateTime;
@@ -345,6 +351,7 @@ public class CartonRest {
         return ResponseEntity.ok(list);
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     @Parameters(value = {
             @Parameter(name = "sort", schema = @Schema(allowableValues = {"id", "createdAt"})),
@@ -369,6 +376,8 @@ public class CartonRest {
         Page<ResponseCartonDTO> list = iCartonService.filtres(number, status, storeHouse, date, spacemanager1, type, Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(list);
     }
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 }

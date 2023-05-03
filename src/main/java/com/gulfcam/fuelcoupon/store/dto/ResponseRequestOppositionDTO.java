@@ -1,6 +1,11 @@
 package com.gulfcam.fuelcoupon.store.dto;
 import com.gulfcam.fuelcoupon.client.entity.Client;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+import com.gulfcam.fuelcoupon.store.entity.Coupon;
+import com.gulfcam.fuelcoupon.store.entity.Station;
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 import com.gulfcam.fuelcoupon.store.entity.Coupon;
 import com.gulfcam.fuelcoupon.store.entity.Station;
@@ -29,9 +34,15 @@ public class ResponseRequestOppositionDTO {
     private String nameClient;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     private String nameSaleManager;
 
     private String nameCommercialAttache;
+=======
+    private String nameManagerCoupon;
+
+    private String nzmeServiceClient;
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
     private String nameManagerCoupon;
 

@@ -42,6 +42,7 @@ public class RequestOpposition {
     private Long idClient;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 //    @NotNull
 //    @Column(nullable = true, name = "id_service_client")
 //    private Long idServiceClient;
@@ -49,12 +50,17 @@ public class RequestOpposition {
 //    @Column(nullable = true, name = "id_manager_coupon")
 //    private Long idManagerCoupon;
 =======
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
     @NotNull
     @Column(nullable = true, name = "id_service_client")
     private Long idServiceClient;
 
     @Column(nullable = true, name = "id_manager_coupon")
     private Long idManagerCoupon;
+<<<<<<< HEAD
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
+=======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 
     private LocalDateTime createdAt;

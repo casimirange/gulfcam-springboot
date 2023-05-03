@@ -2,6 +2,7 @@ package com.gulfcam.fuelcoupon.client.service.impl;
 
 import com.gulfcam.fuelcoupon.client.entity.Client;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import com.gulfcam.fuelcoupon.client.entity.ETypeClient;
 import com.gulfcam.fuelcoupon.client.entity.TypeClient;
 import com.gulfcam.fuelcoupon.client.repository.IClientRepo;
@@ -38,6 +39,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
+=======
+import com.gulfcam.fuelcoupon.client.repository.IClientRepo;
+import com.gulfcam.fuelcoupon.client.service.IClientService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import java.util.List;
 import java.util.Optional;
 
@@ -50,9 +63,12 @@ public class ClientServiceImpl implements IClientService {
 
     @Autowired
 <<<<<<< HEAD
+<<<<<<< HEAD
     ITypeClientRepo iTypeClientRepo;
 
     @Autowired
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
     ResourceBundleMessageSource messageSource;
@@ -63,6 +79,7 @@ public class ClientServiceImpl implements IClientService {
     }
 
     @Override
+<<<<<<< HEAD
 <<<<<<< HEAD
     public Page<Client> filtres(String name, String company, String type, LocalDate date, int page, int size, String sort, String order) {
         Specification<Client> specification = ((root, query, criteriaBuilder) -> {
@@ -92,6 +109,8 @@ public class ClientServiceImpl implements IClientService {
     }
 
     @Override
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
     public Optional<Client> getClientByEmail(String email) {
@@ -135,11 +154,14 @@ public class ClientServiceImpl implements IClientService {
 
     @Override
 <<<<<<< HEAD
+<<<<<<< HEAD
     public boolean existsByNiu(String niu) {
         return iClientRepo.existsByNiu(niu);
     }
 
     @Override
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
     public boolean existsByGulfCamAccountNumber(String gulfcamaccountnumber) {

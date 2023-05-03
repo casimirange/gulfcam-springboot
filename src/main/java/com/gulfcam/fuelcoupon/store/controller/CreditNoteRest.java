@@ -50,7 +50,10 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import org.springframework.format.annotation.DateTimeFormat;
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import org.springframework.http.HttpHeaders;
@@ -66,7 +69,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import java.time.LocalDate;
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import java.time.LocalDateTime;
@@ -354,6 +360,7 @@ public class CreditNoteRest {
             @Parameter(name = "sort", schema = @Schema(allowableValues = {"id", "createdAt"})),
             @Parameter(name = "order", schema = @Schema(allowableValues = {"asc", "desc"}))})
 <<<<<<< HEAD
+<<<<<<< HEAD
     @Operation(summary = "Filtre des Note de crédit", tags = "Note de crédit", responses = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
@@ -376,6 +383,8 @@ public class CreditNoteRest {
     @Parameters(value = {
             @Parameter(name = "sort", schema = @Schema(allowableValues = {"id", "createdAt"})),
             @Parameter(name = "order", schema = @Schema(allowableValues = {"asc", "desc"}))})
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
     @Operation(summary = "Liste des Note de crédit par station", tags = "Note de crédit", responses = {

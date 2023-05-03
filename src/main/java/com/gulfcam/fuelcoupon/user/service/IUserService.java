@@ -3,8 +3,11 @@ package com.gulfcam.fuelcoupon.user.service;
 import com.gulfcam.fuelcoupon.user.dto.ResponseUsersDTO;
 import com.gulfcam.fuelcoupon.user.dto.UserEditPasswordDto;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import com.gulfcam.fuelcoupon.user.entity.ETypeAccount;
 import com.gulfcam.fuelcoupon.user.entity.TypeAccount;
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import com.gulfcam.fuelcoupon.user.entity.Users;
@@ -30,8 +33,11 @@ public interface IUserService {
 	Users getByInternalReference(Long internalReference);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 	Optional<Users> getByTelephone(String tel);
@@ -75,7 +81,10 @@ public interface IUserService {
 
 	Page<ResponseUsersDTO> getUsers(int page, int size, String sort, String order);
 <<<<<<< HEAD
+<<<<<<< HEAD
 	Page<ResponseUsersDTO> filtres(String statut, String typeAccount, String firstName, String lastName, String idStore, int page, int size, String sort, String order);
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 
@@ -83,7 +92,10 @@ public interface IUserService {
 
 	List<Users> getUsers();
 <<<<<<< HEAD
+<<<<<<< HEAD
 	List<Users> getUsersByTypeAccount(TypeAccount typeAccount);
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 	List<Users> getUsersByIdStore(Long idStore);

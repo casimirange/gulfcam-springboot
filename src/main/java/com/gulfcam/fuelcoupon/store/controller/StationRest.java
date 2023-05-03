@@ -3,7 +3,10 @@ package com.gulfcam.fuelcoupon.store.controller;
 import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import com.gulfcam.fuelcoupon.client.entity.Client;
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
@@ -42,7 +45,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import java.util.List;
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 
@@ -212,6 +218,7 @@ public class StationRest {
         return ResponseEntity.ok(list);
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     @Operation(summary = "Recupérer la liste des station par désignation", tags = "Station", responses = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Station.class)))),
@@ -241,6 +248,8 @@ public class StationRest {
         Page<ResponseStationDTO> stationList = iStationService.filtres(designation, localization, pinCode, idManagerStation, Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         return ResponseEntity.ok(stationList);
     }
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
     }

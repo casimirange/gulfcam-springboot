@@ -6,7 +6,12 @@ import javax.persistence.*;
 
 @Entity
 <<<<<<< HEAD
+<<<<<<< HEAD
 @Data
+=======
+@Getter
+@Setter
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 @Getter
 @Setter
@@ -20,7 +25,11 @@ public class SettingProperties {
 
     @Id
 <<<<<<< HEAD
+<<<<<<< HEAD
     @GeneratedValue(strategy = GenerationType.AUTO)
+=======
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6

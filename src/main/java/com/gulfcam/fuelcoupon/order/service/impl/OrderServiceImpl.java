@@ -4,6 +4,7 @@ import com.gulfcam.fuelcoupon.client.entity.Client;
 import com.gulfcam.fuelcoupon.client.service.IClientService;
 import com.gulfcam.fuelcoupon.order.dto.ResponseOrderDTO;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import com.gulfcam.fuelcoupon.order.entity.*;
 import com.gulfcam.fuelcoupon.order.helper.ExcelOrderHelper;
 import com.gulfcam.fuelcoupon.order.repository.IOrderRepo;
@@ -13,21 +14,29 @@ import com.gulfcam.fuelcoupon.order.service.IPaymentMethodService;
 import com.gulfcam.fuelcoupon.store.entity.Coupon;
 import com.gulfcam.fuelcoupon.store.entity.Station;
 =======
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import com.gulfcam.fuelcoupon.order.entity.Order;
 import com.gulfcam.fuelcoupon.order.entity.PaymentMethod;
 import com.gulfcam.fuelcoupon.order.helper.ExcelOrderHelper;
 import com.gulfcam.fuelcoupon.order.repository.IOrderRepo;
 import com.gulfcam.fuelcoupon.order.service.IOrderService;
 import com.gulfcam.fuelcoupon.order.service.IPaymentMethodService;
+<<<<<<< HEAD
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
+=======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import com.gulfcam.fuelcoupon.store.entity.Store;
 import com.gulfcam.fuelcoupon.store.service.IStoreService;
 import com.gulfcam.fuelcoupon.user.entity.Users;
 import com.gulfcam.fuelcoupon.user.service.IUserService;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import com.gulfcam.fuelcoupon.utilities.entity.EStatus;
 import com.gulfcam.fuelcoupon.utilities.entity.Status;
 import org.aspectj.util.FileUtil;
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,13 +46,17 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import org.springframework.data.jpa.domain.Specification;
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
+<<<<<<< HEAD
 <<<<<<< HEAD
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -54,6 +67,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+=======
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 import java.util.ArrayList;
 import java.util.List;
@@ -82,8 +100,11 @@ public class OrderServiceImpl implements IOrderService {
     @Autowired
     ResourceBundleMessageSource messageSource;
 <<<<<<< HEAD
+<<<<<<< HEAD
     @Autowired
     private IStatusOrderRepo iStatusOrderRepo;
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 =======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 
@@ -314,6 +335,7 @@ public class OrderServiceImpl implements IOrderService {
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 //    @Override
 //    public Page<Order> getOrdersByIdManagerOrder(Long idManagerOrder, int page, int size, String sort, String order) {
 //        return iOrderRepo.getOrdersByIdManagerOrder(idManagerOrder,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
@@ -526,6 +548,8 @@ public class OrderServiceImpl implements IOrderService {
 
 
 =======
+=======
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
     @Override
     public Page<Order> getOrdersByIdManagerOrder(Long idManagerOrder, int page, int size, String sort, String order) {
         return iOrderRepo.getOrdersByIdManagerOrder(idManagerOrder,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
@@ -541,6 +565,9 @@ public class OrderServiceImpl implements IOrderService {
         return iOrderRepo.getOrdersByIdStore(idStore,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
     }
 
+<<<<<<< HEAD
+>>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
+=======
 >>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
     @Override
     public Optional<Order> getOrderById(Long id) {
