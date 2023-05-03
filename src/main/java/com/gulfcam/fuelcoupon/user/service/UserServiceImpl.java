@@ -392,7 +392,7 @@ public class UserServiceImpl implements IUserService {
 	}
 
 	@Override
-	public Page<ResponseUsersDTO> filtres(String statusName, String typeAccount, String firstName, int page, int size, String sort, String order) {
+	public Page<ResponseUsersDTO> filtres(String statusName, String typeAccount, String firstName, String lastName, String idStore, int page, int size, String sort, String order) {
 
 		Specification<Users> specification = ((root, query, criteriaBuilder) -> {
 
@@ -400,6 +400,14 @@ public class UserServiceImpl implements IUserService {
 
 			if (firstName != null && !firstName.isEmpty()){
 				predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("firstName")), "%" + firstName + "%"));
+			}
+
+			if (lastName != null && !lastName.isEmpty()){
+				predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("lastName")), "%" + lastName + "%"));
+			}
+
+			if (idStore != null && !idStore.isEmpty()){
+				predicates.add(criteriaBuilder.equal(criteriaBuilder.lower(root.get("idStore")), Long.parseLong(idStore) ));
 			}
 
 			if (typeAccount != null && !typeAccount.isEmpty()){

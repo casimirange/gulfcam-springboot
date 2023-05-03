@@ -336,14 +336,16 @@ public class UserRest {
 			@ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
 	@PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
 	@GetMapping("/filter")
-	public ResponseEntity<?> filtrerCoupons(@RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
-											@RequestParam(required = false, value = "firstName") String name,
+	public ResponseEntity<?> filtrerUsers(@RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
+											@RequestParam(required = false, value = "firstName") String firstName,
+											@RequestParam(required = false, value = "lastName") String lastName,
 											@RequestParam(required = false, value = "typeAccount") String type,
 											@RequestParam(required = false, value = "status") String status,
+											@RequestParam(required = false, value = "store") String idStore,
 											@RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
-											@RequestParam(required = false, defaultValue = "id") String sort,
+											@RequestParam(required = false, defaultValue = "userId") String sort,
 											@RequestParam(required = false, defaultValue = "desc") String order) {
-		Page<ResponseUsersDTO> list = userService.filtres(status, type, name, Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
+		Page<ResponseUsersDTO> list = userService.filtres(status, type, firstName, lastName, idStore, Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
 		return ResponseEntity.ok(list);
 	}
 

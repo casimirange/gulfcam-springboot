@@ -68,7 +68,7 @@ public interface IUserService {
 	Optional<Users> getUserByUniqueConstraints(Users u);
 
 	Page<ResponseUsersDTO> getUsers(int page, int size, String sort, String order);
-	Page<ResponseUsersDTO> filtres(String statut, String typeAccount, String name, int page, int size, String sort, String order);
+	Page<ResponseUsersDTO> filtres(String statut, String typeAccount, String firstName, String lastName, String idStore, int page, int size, String sort, String order);
 
 	Page<Users> get20Users(int parseInt, int parseInt2, String sort, String order);
 

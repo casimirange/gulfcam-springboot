@@ -150,7 +150,7 @@ public class CouponServiceImpl implements ICouponService {
 
             if (stationName != null && !stationName.isEmpty()){
                 List<Station> stations = iStationService.getStationsByDesignationContains(stationName);
-                var ref = 0L;
+                Long ref = 0L;
                 if (!stations.isEmpty()){
                     for (Station station : stations) {
                         ref = !station.getInternalReference().toString().isEmpty() ? station.getInternalReference() : 0;
