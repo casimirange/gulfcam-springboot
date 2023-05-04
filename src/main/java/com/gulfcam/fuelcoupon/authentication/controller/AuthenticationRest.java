@@ -63,6 +63,7 @@ import java.util.stream.Collectors;
 @Tag(name = "authentification")
 @RequestMapping("/api/v1.0/auth")
 @Slf4j
+@CrossOrigin("*")
 public class AuthenticationRest {
 
     @Autowired
@@ -272,7 +273,7 @@ public class AuthenticationRest {
         RoleUser rolesUser = roleRepo.findByName(userAddDto.getRoleName() != null ? ERole.valueOf(userAddDto.getRoleName()) : ERole.ROLE_USER).orElseThrow(()-> new ResourceNotFoundException("Role not found"));
         roles.add(rolesUser);
         u.setRoles(roles);
-        TypeAccount typeAccount = typeAccountRepo.findByName(userAddDto.getTypeAccount() != null ? ETypeAccount.valueOf(userAddDto.getTypeAccount()) : ETypeAccount.MANAGER_STORE).orElseThrow(()-> new ResourceNotFoundException("Type de compte not found"));
+        TypeAccount typeAccount = typeAccountRepo.findByName(userAddDto.getTypeAccount() != null ? ETypeAccount.valueOf(userAddDto.getTypeAccount()) : ETypeAccount.COMMERCIAL_ATTACHE).orElseThrow(()-> new ResourceNotFoundException("Type de compte not found"));
         u.setTypeAccount(typeAccount);
         u.setInternalReference(jwtUtils.generateInternalReference());
         u.setPosition(userAddDto.getPosition());
