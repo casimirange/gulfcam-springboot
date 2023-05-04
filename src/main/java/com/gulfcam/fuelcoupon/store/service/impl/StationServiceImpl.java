@@ -1,21 +1,13 @@
 package com.gulfcam.fuelcoupon.store.service.impl;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 import com.gulfcam.fuelcoupon.client.entity.Client;
 import com.gulfcam.fuelcoupon.order.entity.TypeVoucher;
-=======
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
-=======
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import com.gulfcam.fuelcoupon.store.dto.ResponseCouponDTO;
 import com.gulfcam.fuelcoupon.store.dto.ResponseStationDTO;
 import com.gulfcam.fuelcoupon.store.entity.Coupon;
 import com.gulfcam.fuelcoupon.store.entity.Station;
 import com.gulfcam.fuelcoupon.store.repository.IStationRepo;
 import com.gulfcam.fuelcoupon.store.service.IStationService;
-<<<<<<< HEAD
-<<<<<<< HEAD
 import com.gulfcam.fuelcoupon.user.entity.ETypeAccount;
 import com.gulfcam.fuelcoupon.user.entity.TypeAccount;
 import com.gulfcam.fuelcoupon.user.entity.Users;
@@ -23,25 +15,13 @@ import com.gulfcam.fuelcoupon.user.repository.ITypeAccountRepository;
 import com.gulfcam.fuelcoupon.user.service.IUserService;
 import com.gulfcam.fuelcoupon.utilities.entity.EStatus;
 import com.gulfcam.fuelcoupon.utilities.entity.Status;
-=======
-import com.gulfcam.fuelcoupon.user.service.IUserService;
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
-=======
-import com.gulfcam.fuelcoupon.user.service.IUserService;
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-<<<<<<< HEAD
-<<<<<<< HEAD
 import org.springframework.data.jpa.domain.Specification;
-=======
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
-=======
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,14 +37,8 @@ public class StationServiceImpl implements IStationService {
     IStationRepo iStationRepo;
     @Autowired
     IUserService iUserService;
-<<<<<<< HEAD
-<<<<<<< HEAD
     @Autowired
     ITypeAccountRepository iTypeAccountRepository;
-=======
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
-=======
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 
     @Autowired
     ResourceBundleMessageSource messageSource;
@@ -119,8 +93,6 @@ public class StationServiceImpl implements IStationService {
     }
 
     @Override
-<<<<<<< HEAD
-<<<<<<< HEAD
     public List<Station> getStationsByDesignationContains(String designation) {
         return iStationRepo.getStationsByDesignationContains(designation);
     }
@@ -176,10 +148,6 @@ public class StationServiceImpl implements IStationService {
     }
 
     @Override
-=======
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
-=======
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
     public void createStation(Station station) {
         iStationRepo.save(station);
     }

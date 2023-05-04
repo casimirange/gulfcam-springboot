@@ -9,23 +9,15 @@ import com.gulfcam.fuelcoupon.store.service.IRequestOppositionService;
 import com.gulfcam.fuelcoupon.store.service.ITicketService;
 import com.gulfcam.fuelcoupon.user.entity.Users;
 import com.gulfcam.fuelcoupon.user.service.IUserService;
-<<<<<<< HEAD
-<<<<<<< HEAD
 import com.gulfcam.fuelcoupon.utilities.entity.EStatus;
 import com.gulfcam.fuelcoupon.utilities.entity.Status;
 import com.gulfcam.fuelcoupon.utilities.repository.IStatusRepo;
-=======
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
-=======
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-<<<<<<< HEAD
-<<<<<<< HEAD
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,18 +27,6 @@ import java.time.Month;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-=======
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
-=======
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 
 @Service
 @Transactional
@@ -60,14 +40,8 @@ public class RequestOppositionServiceImpl implements IRequestOppositionService {
 
     @Autowired
     IUserService iUserService;
-<<<<<<< HEAD
-<<<<<<< HEAD
     @Autowired
     IStatusRepo iStatusRepo;
-=======
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
-=======
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 
     @Autowired
     IClientService iClientService;
@@ -103,21 +77,9 @@ public class RequestOppositionServiceImpl implements IRequestOppositionService {
             responseRequestOppositionDTO.setIdClient(client);
             responseRequestOppositionDTO.setNameClient(client.getCompleteName());
             responseRequestOppositionDTO.setIdCommercialAttache(serviceClient);
-<<<<<<< HEAD
-<<<<<<< HEAD
             responseRequestOppositionDTO.setNameCommercialAttache(serviceClient.getFirstName()+ "   " +serviceClient.getLastName());
             responseRequestOppositionDTO.setIdSalesManager(managerCoupon);
             responseRequestOppositionDTO.setNameSaleManager(managerCoupon.getFirstName()+ "   " +managerCoupon.getLastName());
-=======
-            responseRequestOppositionDTO.setNzmeServiceClient(serviceClient.getFirstName()+ "   " +serviceClient.getLastName());
-            responseRequestOppositionDTO.setIdSalesManager(managerCoupon);
-            responseRequestOppositionDTO.setNameManagerCoupon(managerCoupon.getFirstName()+ "   " +managerCoupon.getLastName());
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
-=======
-            responseRequestOppositionDTO.setNzmeServiceClient(serviceClient.getFirstName()+ "   " +serviceClient.getLastName());
-            responseRequestOppositionDTO.setIdSalesManager(managerCoupon);
-            responseRequestOppositionDTO.setNameManagerCoupon(managerCoupon.getFirstName()+ "   " +managerCoupon.getLastName());
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
             responseRequestOppositionDTO.setInternalReference(requestOpposition.getInternalReference());
             responseRequestOppositionDTO.setCreatedAt(requestOpposition.getCreatedAt());
             responseRequestOppositionDTOList.add(responseRequestOppositionDTO);
@@ -128,8 +90,6 @@ public class RequestOppositionServiceImpl implements IRequestOppositionService {
     }
 
     @Override
-<<<<<<< HEAD
-<<<<<<< HEAD
     public Page<ResponseRequestOppositionDTO> filterRequestOppositions(String clientName, LocalDate period, String statusName, int page, int size, String sort, String order) {
         Predicate<ResponseRequestOppositionDTO> byClient = client -> client.getNameClient().contains(clientName);
         Predicate<ResponseRequestOppositionDTO> byDate = date -> date.getCreatedAt().toLocalDate().isEqual(period);
@@ -250,28 +210,12 @@ public class RequestOppositionServiceImpl implements IRequestOppositionService {
     public Page<RequestOpposition> getRequestOppositionsByIdServiceClient(Long idServiceClient, int page, int size, String sort, String order) {
 //        return iRequestionOppositionRepo.getRequestOppositionsByIdServiceClient(idServiceClient,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
         return null;
-=======
-    public Page<RequestOpposition> getRequestOppositionsByIdServiceClient(Long idServiceClient, int page, int size, String sort, String order) {
-        return iRequestionOppositionRepo.getRequestOppositionsByIdServiceClient(idServiceClient,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
-=======
-    public Page<RequestOpposition> getRequestOppositionsByIdServiceClient(Long idServiceClient, int page, int size, String sort, String order) {
-        return iRequestionOppositionRepo.getRequestOppositionsByIdServiceClient(idServiceClient,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
     }
 
     @Override
     public Page<RequestOpposition> getRequestOppositionsByIdManagerCoupon(Long idManagerCoupon, int page, int size, String sort, String order) {
-<<<<<<< HEAD
-<<<<<<< HEAD
 //        return iRequestionOppositionRepo.getRequestOppositionsByIdManagerCoupon(idManagerCoupon,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
         return null;
-=======
-        return iRequestionOppositionRepo.getRequestOppositionsByIdManagerCoupon(idManagerCoupon,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
-=======
-        return iRequestionOppositionRepo.getRequestOppositionsByIdManagerCoupon(idManagerCoupon,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
     }
 
     @Override

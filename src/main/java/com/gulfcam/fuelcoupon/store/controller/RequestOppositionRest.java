@@ -21,14 +21,6 @@ import com.gulfcam.fuelcoupon.user.service.IUserService;
 import com.gulfcam.fuelcoupon.utilities.entity.EStatus;
 import com.gulfcam.fuelcoupon.utilities.entity.Status;
 import com.gulfcam.fuelcoupon.utilities.repository.IStatusRepo;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-import io.swagger.models.Response;
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
-=======
-import io.swagger.models.Response;
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -38,14 +30,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-import org.jfree.chart.axis.Tick;
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
-=======
-import org.jfree.chart.axis.Tick;
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -53,26 +37,14 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-<<<<<<< HEAD
-<<<<<<< HEAD
 import org.springframework.format.annotation.DateTimeFormat;
-=======
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
-=======
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-<<<<<<< HEAD
-<<<<<<< HEAD
 import java.time.LocalDate;
-=======
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
-=======
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -367,8 +339,6 @@ public class RequestOppositionRest {
         return ResponseEntity.ok(requestOppositions);
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     @Operation(summary = "Filtrer la liste des Demandes d'opposition ", tags = "Demande d'opposition", responses = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = RequestOpposition.class)))),
             @ApiResponse(responseCode = "404", description = "RequestOpposition not found", content = @Content(mediaType = "Application/Json")),
@@ -413,10 +383,6 @@ public class RequestOppositionRest {
         return ResponseEntity.ok(requestOppositions);
     }
 
-=======
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
-=======
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
     @Operation(summary = "Recupérer la liste des Demandes d'opposition par Gestion de coupon", tags = "Demande d'opposition", responses = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = RequestOpposition.class)))),
             @ApiResponse(responseCode = "404", description = "RequestOpposition not found", content = @Content(mediaType = "Application/Json")),
@@ -467,21 +433,9 @@ public class RequestOppositionRest {
         responseRequestOppositionDTO.setIdClient(client);
         responseRequestOppositionDTO.setNameClient(client.getCompleteName());
         responseRequestOppositionDTO.setIdCommercialAttache(serviceClient);
-<<<<<<< HEAD
-<<<<<<< HEAD
         responseRequestOppositionDTO.setNameCommercialAttache(serviceClient.getFirstName()+ "   " +serviceClient.getLastName());
         responseRequestOppositionDTO.setIdSalesManager(managerCoupon);
         responseRequestOppositionDTO.setNameSaleManager(managerCoupon.getFirstName()+ "   " +managerCoupon.getLastName());
-=======
-        responseRequestOppositionDTO.setNzmeServiceClient(serviceClient.getFirstName()+ "   " +serviceClient.getLastName());
-        responseRequestOppositionDTO.setIdSalesManager(managerCoupon);
-        responseRequestOppositionDTO.setNameManagerCoupon(managerCoupon.getFirstName()+ "   " +managerCoupon.getLastName());
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
-=======
-        responseRequestOppositionDTO.setNzmeServiceClient(serviceClient.getFirstName()+ "   " +serviceClient.getLastName());
-        responseRequestOppositionDTO.setIdSalesManager(managerCoupon);
-        responseRequestOppositionDTO.setNameManagerCoupon(managerCoupon.getFirstName()+ "   " +managerCoupon.getLastName());
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
         responseRequestOppositionDTO.setInternalReference(requestOpposition.getInternalReference());
         responseRequestOppositionDTO.setCreatedAt(requestOpposition.getCreatedAt());
 

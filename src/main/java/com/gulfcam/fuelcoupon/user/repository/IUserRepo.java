@@ -1,25 +1,11 @@
 package com.gulfcam.fuelcoupon.user.repository;
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 import com.gulfcam.fuelcoupon.user.entity.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-=======
-=======
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
-import com.gulfcam.fuelcoupon.user.entity.RoleUser;
-import com.gulfcam.fuelcoupon.user.entity.StatusUser;
-import com.gulfcam.fuelcoupon.user.entity.Users;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-<<<<<<< HEAD
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
-=======
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -51,16 +37,8 @@ public interface IUserRepo extends IUserBaseRepo<Users> {
 
 	Page<Users> findTop20ByStatus(StatusUser status, Pageable p);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 	List<Users> getUsersByTypeAccount(TypeAccount typeAccount);
 
 
     Page<Users> findAll(Specification<Users> specification, Pageable pageable);
-=======
-
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
-=======
-
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 }

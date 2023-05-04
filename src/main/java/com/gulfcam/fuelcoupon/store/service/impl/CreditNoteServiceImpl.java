@@ -1,7 +1,5 @@
 package com.gulfcam.fuelcoupon.store.service.impl;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 import com.gulfcam.fuelcoupon.client.entity.Client;
 import com.gulfcam.fuelcoupon.order.dto.ResponseOrderDTO;
 import com.gulfcam.fuelcoupon.order.entity.TypeVoucher;
@@ -9,54 +7,24 @@ import com.gulfcam.fuelcoupon.store.dto.ResponseCreditNoteDTO;
 import com.gulfcam.fuelcoupon.store.entity.Coupon;
 import com.gulfcam.fuelcoupon.store.entity.CreditNote;
 import com.gulfcam.fuelcoupon.store.entity.Station;
-=======
-import com.gulfcam.fuelcoupon.order.dto.ResponseOrderDTO;
-import com.gulfcam.fuelcoupon.store.dto.ResponseCreditNoteDTO;
-import com.gulfcam.fuelcoupon.store.entity.Coupon;
-import com.gulfcam.fuelcoupon.store.entity.CreditNote;
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
-=======
-import com.gulfcam.fuelcoupon.order.dto.ResponseOrderDTO;
-import com.gulfcam.fuelcoupon.store.dto.ResponseCreditNoteDTO;
-import com.gulfcam.fuelcoupon.store.entity.Coupon;
-import com.gulfcam.fuelcoupon.store.entity.CreditNote;
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import com.gulfcam.fuelcoupon.store.repository.ICreditNoteRepo;
 import com.gulfcam.fuelcoupon.store.service.ICouponService;
 import com.gulfcam.fuelcoupon.store.service.ICreditNoteService;
 import com.gulfcam.fuelcoupon.store.service.IStationService;
-<<<<<<< HEAD
-<<<<<<< HEAD
 import com.gulfcam.fuelcoupon.utilities.entity.EStatus;
 import com.gulfcam.fuelcoupon.utilities.entity.Status;
 import com.gulfcam.fuelcoupon.utilities.repository.IStatusRepo;
-=======
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
-=======
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-<<<<<<< HEAD
-<<<<<<< HEAD
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-=======
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
-=======
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -73,15 +41,9 @@ public class CreditNoteServiceImpl implements ICreditNoteService {
     IStationService iStationService;
 
     @Autowired
-<<<<<<< HEAD
-<<<<<<< HEAD
     IStatusRepo iStatusRepo;
 
     @Autowired
-=======
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
-=======
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
     ResourceBundleMessageSource messageSource;
 
     @Override
@@ -149,8 +111,6 @@ public class CreditNoteServiceImpl implements ICreditNoteService {
     public void deleteCreditNote(CreditNote creditNote) {
         iCreditNoteRepo.delete(creditNote);
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
 
     @Override
     public Page<ResponseCreditNoteDTO> filtres(String stationName, String statusName, String internalRef, LocalDate date, int page, int size, String sort, String order) {
@@ -205,8 +165,4 @@ public class CreditNoteServiceImpl implements ICreditNoteService {
         }
         return new PageImpl<>(responseCreditNoteDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), creditNotes.getTotalElements());
     }
-=======
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
-=======
->>>>>>> 0e0546e1a1696567d3c70419c5fcf4c1501b95d6
 }

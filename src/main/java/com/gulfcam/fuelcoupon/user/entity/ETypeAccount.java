@@ -1,7 +1,6 @@
 package com.gulfcam.fuelcoupon.user.entity;
 
 public enum ETypeAccount {
-
 	STORE_KEEPER,
 	MANAGER_COUPON,
 	MANAGER_SPACES_2,
@@ -15,5 +14,5 @@ public enum ETypeAccount {
 	TREASURY,
 	CUSTOMER_SERVICE,
 	MANAGER_STATION,
-	POMPIST,
+	POMPIST
 }

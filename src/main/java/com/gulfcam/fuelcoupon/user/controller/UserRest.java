@@ -1,7 +1,6 @@
 package com.gulfcam.fuelcoupon.user.controller;
 
 import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
-
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
 import com.gulfcam.fuelcoupon.order.entity.TypeVoucher;
 import com.gulfcam.fuelcoupon.store.dto.ResponseCouponDTO;
@@ -15,16 +14,6 @@ import com.gulfcam.fuelcoupon.user.service.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
-import com.gulfcam.fuelcoupon.user.dto.ResponseUsersDTO;
-import com.gulfcam.fuelcoupon.user.dto.UserResDto;
-import com.gulfcam.fuelcoupon.user.entity.Users;
-import com.gulfcam.fuelcoupon.user.service.IUserService;
-import io.swagger.v3.oas.annotations.Operation;
-import com.gulfcam.fuelcoupon.user.dto.ResponseUsersDTO;
-import com.gulfcam.fuelcoupon.user.dto.UserResDto;
-import com.gulfcam.fuelcoupon.user.entity.Users;
-import com.gulfcam.fuelcoupon.user.service.IUserService;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -326,7 +315,6 @@ public class UserRest {
 	}
 
 
-
 	@Operation(summary = "Liste des utilisateurs par type de compte", tags = "users", responses = {
 			@ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json")),
 			@ApiResponse(responseCode = "404", description = "File not found", content = @Content(mediaType = "Application/Json")), })
@@ -360,4 +348,5 @@ public class UserRest {
 		Page<ResponseUsersDTO> list = userService.filtres(status, type, firstName, lastName, idStore, Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
 		return ResponseEntity.ok(list);
 	}
+
 }
