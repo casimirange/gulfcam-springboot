@@ -4,20 +4,17 @@ import com.gulfcam.fuelcoupon.authentication.dto.*;
 import com.gulfcam.fuelcoupon.authentication.service.IAuthorizationService;
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.authentication.service.UserDetailsImpl;
+import com.gulfcam.fuelcoupon.cryptage.AESUtil;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
 import com.gulfcam.fuelcoupon.store.entity.Store;
 import com.gulfcam.fuelcoupon.store.service.IStoreService;
 import com.gulfcam.fuelcoupon.user.dto.*;
 import com.gulfcam.fuelcoupon.user.entity.*;
-import com.gulfcam.fuelcoupon.user.repository.IOldPasswordRepo;
 import com.gulfcam.fuelcoupon.user.repository.IRoleUserRepo;
 import com.gulfcam.fuelcoupon.user.repository.ITypeAccountRepository;
 import com.gulfcam.fuelcoupon.user.repository.IUserRepo;
 import com.gulfcam.fuelcoupon.user.service.IEmailService;
 import com.gulfcam.fuelcoupon.user.service.IUserService;
-import com.gulfcam.fuelcoupon.utilities.entity.ESettingPropertie;
-import com.gulfcam.fuelcoupon.utilities.entity.SettingProperties;
-import com.gulfcam.fuelcoupon.utilities.service.IUtilitieService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,7 +27,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,7 +48,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
-import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -87,9 +82,6 @@ public class AuthenticationRest {
     IStoreService iStoreService;
 
     @Autowired
-    IUtilitieService utilitieService;
-
-    @Autowired
     private IRoleUserRepo roleRepo;
 
     @Autowired
@@ -118,6 +110,9 @@ public class AuthenticationRest {
     @Value("${mail.replyTo[0]}")
     String mailReplyTo;
 
+    @Value("${app.key}")
+    String AES_KEY;
+    AESUtil aes = new AESUtil();
 
     @Parameters(@Parameter(name = "tel", required = true))
     @Operation(summary = "Confirmation du login pour activation du compte", tags = "authentification", responses = {
@@ -192,17 +187,29 @@ public class AuthenticationRest {
             @ApiResponse(responseCode = "401", description = "", content = @Content(mediaType = "Application/Json"))})
 
     @PostMapping("/sign-in")
-    public ResponseEntity<Object> authenticateUser(@Valid @RequestBody AuthReqDto userAuthDto) throws Exception {
-        Users user = new Users(userAuthDto.getLogin(), userAuthDto.getPassword());
-        if (userAuthDto.getLogin().contains("@")) {
-            Optional<Users> user2 = userService.getByEmail(userAuthDto.getLogin());
+    public ResponseEntity<Object> authenticateUser(@Valid @RequestBody AuthReqDto userAuthDto){
+
+
+//        String login2 = aes.decrypt(userAuthDto.getLogin());
+//        String pwd2 = aes.decrypt(userAuthDto.getPassword());
+        log.info("loging crypté " + userAuthDto.getLogin());
+        log.info("password crypté " + userAuthDto.getPassword());
+
+        String login = aes.decrypt(AES_KEY, userAuthDto.getLogin());
+        log.info("loging décrypté " + login);
+        String pwd = aes.decrypt(AES_KEY, userAuthDto.getPassword());
+        log.info("password décrypté " + pwd);
+
+        Users user = new Users(login, pwd);
+        if (login.contains("@")) {
+            Optional<Users> user2 = userService.getByEmail(login);
             if (user2.isPresent()) {
-                user = new Users(user2.get().getEmail(), userAuthDto.getPassword());
+                user = new Users(user2.get().getEmail(), pwd);
             }
         }else{
-            Optional<Users> user2 = userService.getByPinCode(Integer.parseInt(userAuthDto.getLogin()));
+            Optional<Users> user2 = userService.getByPinCode(Integer.parseInt(login));
             if (user2.isPresent()) {
-                user = new Users(user2.get().getEmail(), userAuthDto.getPassword());
+                user = new Users(user2.get().getEmail(), pwd);
             }
         }
 
@@ -227,7 +234,10 @@ public class AuthenticationRest {
             log.info("Email  send successfull for user: " + email);
             log.info("Code OTP : " + code);
 
-            return ResponseEntity.ok().body(new SignInResponse(true, messageSource.getMessage("messages.code-otp", null, LocaleContextHolder.getLocale()), bearerToken, false));
+//            log.info("crypté " + aes.encrypt(userAuthDto));
+//            log.info("décrypté " + aes.decrypt(aes.encrypt(new SignInResponse(true, messageSource.getMessage("messages.code-otp", null, LocaleContextHolder.getLocale()), bearerToken, false))));
+
+            return ResponseEntity.ok().body((new SignInResponse(true, messageSource.getMessage("messages.code-otp", null, LocaleContextHolder.getLocale()), aes.encrypt(AES_KEY, bearerToken), false)));
 
 
         }
@@ -348,7 +358,10 @@ public class AuthenticationRest {
             @ApiResponse(responseCode = "200", description = "Succès de l'opération", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Users.class)))),
             @ApiResponse(responseCode = "400", description = "code de vérification incorrect", content = @Content(mediaType = "Application/Json"))})
     @GetMapping("/verify")
-    public ResponseEntity<?> verifyCode(@NotEmpty @RequestParam(name = "code", required = true) String code) {
+    public ResponseEntity<?> verifyCode(@NotEmpty @RequestParam(name = "code", required = true) String codes) {
+        log.info("code crypté " + codes);
+        String code = aes.decrypt(AES_KEY, codes);
+        log.info("code décrypté " + code);
         Users users = authorizationService.getUserInContextApp();
         log.info("user_otp_code" + users.getOtpCode() + "otpCodeCreatedAt:" + users.getOtpCodeCreatedAT());
         if (code.equals(users.getOtpCode()) && ChronoUnit.MINUTES.between(users.getOtpCodeCreatedAT(), LocalDateTime.now()) < 5) {
@@ -357,7 +370,7 @@ public class AuthenticationRest {
             String refreshToken = jwtUtils.generateJwtToken(users.getEmail(),
                     jwtUtils.getExpirationRefreshToken(), jwtUtils.getSecretRefreshToken(), true);
             userService.editToken(users.getUserId(), refreshToken);
-            List<String> roles = users.getRoles().stream().map(item -> item.getName().name())
+            List<String> roles = users.getRoles().stream().map(item -> aes.encrypt(AES_KEY, item.getName().name()))
                     .collect(Collectors.toList());
             updateExistingUser(users.getEmail(), null);
             userService.updateDateLastLoginUser(users.getUserId());
@@ -365,9 +378,17 @@ public class AuthenticationRest {
             userService.editToken(users.getUserId(), null);
             users.setOtpCode(null);
             users.setOtpCodeCreatedAT(null);
+            String account = aes.encrypt(AES_KEY,users.getTypeAccount().getName().name());
+            String firstname = aes.encrypt(AES_KEY,users.getFirstName());
+            String lastname = aes.encrypt(AES_KEY,users.getLastName());
+            String idStore = aes.encrypt(AES_KEY,users.getIdStore().toString());
+            String uid = aes.encrypt(AES_KEY,users.getInternalReference().toString());
+            String id = aes.encrypt(AES_KEY,users.getUserId().toString());
+            String email = aes.encrypt(AES_KEY,users.getEmail());
             userRepo.save(users);
             log.info("user " + users.getOtpCode() + " authenticated");
-            return ResponseEntity.ok(new AuthSignInResDto(bearerToken, refreshToken, "Bearer", users, roles, true));
+            return ResponseEntity.ok(new AuthSignInResDto(aes.encrypt(AES_KEY,bearerToken), aes.encrypt(AES_KEY,refreshToken), "Bearer", aes.encryptObject(AES_KEY,users), roles, account
+                    , firstname, lastname, idStore, uid, id, true));
 
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

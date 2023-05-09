@@ -17,8 +17,16 @@ public class AuthSignInResDto {
 	private String bearerToken;
 	private String refreshToken;
 	private String tokenType;
-	private Users user;
+//	private Users user;
+//	private List<String> roles;
+	private String user;
 	private List<String> roles;
+	private String account;
+	private String firstname;
+	private String lastname;
+	private String idStore;
+	private String uid;
+	private String id;
 	private boolean authenticated;
 	public AuthSignInResDto(String bearerToken) {
 		super();
