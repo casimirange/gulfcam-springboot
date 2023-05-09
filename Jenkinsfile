@@ -110,6 +110,13 @@ pipeline {
                sh 'ssh -o StrictHostKeyChecking=no -t $USERNAME@$SSH_HOST  "docker pull ${registryProject}:${BUILD_NUMBER} && docker ps -q --filter name=$APPLICATION_NAME | grep -q . && docker stop $APPLICATION_NAME || true && docker rm $APPLICATION_NAME || true && docker run -p 9009:8080 -d --restart=always --name $APPLICATION_NAME --network=local-network --memory=500m --memory-reservation=250m ${registryProject}:${BUILD_NUMBER}"'
             }
          }
+         post{
+            always{
+               emailext to: "$RECIPIENTS",
+               subject: "${env.JOB_NAME}:${currentBuild.currentResult}",
+               body: "${currentBuild.currentResult}: Job ${env.JOB_NAME} is ${currentBuild.currentResult}."
+            }
+         }
       }
    }
 }
