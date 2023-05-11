@@ -104,9 +104,6 @@ pipeline {
          }
       }
 stage('Deploy on gulfcam dev server'){
-         when {
-            expression { "${REMOTE_BRANCH_NAME}" == 'stagging' }
-         }
 
          steps{
             sshagent(credentials : ['connect-ssh-dev-server']) {
