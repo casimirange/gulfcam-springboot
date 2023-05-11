@@ -103,8 +103,26 @@ pipeline {
             }
          }
       }
+stage('Deploy on gulfcam dev server'){
+         when {
+            expression { "${REMOTE_BRANCH_NAME}" == 'stagging' }
+         }
 
-      stage('Deploy on dev server'){
+         steps{
+            sshagent(credentials : ['connect-ssh-dev-server']) {
+               sh 'ssh -o StrictHostKeyChecking=no -t $USERNAME@$SSH_HOST_GULFCAM  "docker pull ${registryProject}:${BUILD_NUMBER} && docker ps -q --filter name=$APPLICATION_NAME | grep -q . && docker stop $APPLICATION_NAME || true && docker rm $APPLICATION_NAME || true && docker run -p 9009:8080 -d -v uploads-gulfcam:/uploads --restart=always --name $APPLICATION_NAME --network=local-network ${registryProject}:${BUILD_NUMBER}"'
+            }
+         }
+         post{
+            always{
+               emailext to: "$RECIPIENTS",
+               subject: "${env.JOB_NAME}:${currentBuild.currentResult}:${env.GIT_COMMIT}",
+               body: "Job ${env.JOB_NAME} is ${currentBuild.currentResult}."
+            }
+         }
+      }
+
+      /*stage('Deploy on dev server'){
          steps{
             sshagent(credentials : ['connect-ssh-dev-server']) {
                sh 'ssh -o StrictHostKeyChecking=no -t $USERNAME@$SSH_HOST  "docker pull ${registryProject}:${BUILD_NUMBER} && docker ps -q --filter name=$APPLICATION_NAME | grep -q . && docker stop $APPLICATION_NAME || true && docker rm $APPLICATION_NAME || true && docker run -p 9009:8080 -d --restart=always --name $APPLICATION_NAME --network=local-network --memory=500m --memory-reservation=250m ${registryProject}:${BUILD_NUMBER}"'
@@ -117,7 +135,7 @@ pipeline {
                body: "${currentBuild.currentResult}: Job ${env.JOB_NAME} is ${currentBuild.currentResult}."
             }
          }
-      }
+      }*/
    }
 }
 
