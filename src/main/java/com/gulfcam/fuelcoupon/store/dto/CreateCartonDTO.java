@@ -11,32 +11,32 @@ public class CreateCartonDTO {
 
     @Schema(description = "debut numéro de série du carton: exemple 0000001 ou 1300001 ")
     @NotNull(message = "{serialNumber.required}")
-    private int serialTo;
+    private String serialTo;
 
     @Schema(description = "Fin numéro de série du carton: exemple 1000000 ou 1450000 ")
     @NotNull(message = "{serialNumber.required}")
-    private int serialFrom;
+    private String serialFrom;
 
     @Schema(allowableValues = {"10000", "3000", "5000"}, description = "Type de Bon: exemple 10000, 5000, 3000 (ce sont les premiers chiffres en debut des numero de serie) ")
     @NotNull(message = "{typeVoucher.required}")
-    private int typeVoucher;
+    private String typeVoucher;
 
     @Schema(description = "reference interne du gestionnaire espace 1")
-    private Long idSpaceManager1;
+    private String idSpaceManager1;
 
     @Schema(description = "reference interne de l'entrepôt de stockage")
     @NotNull(message = "{storehouse.required}")
-    private Long idStoreHouseStockage;
+    private String idStoreHouseStockage;
 
     @Schema(description = "Numéro de carton: Exmple 101 ou 130 ")
     @NotNull(message = "{serialNumber.required}")
-    private int number;
+    private String number;
 
     @Schema(description = "debut de plage de coupon: exemple 0000001 ou 1300001 ")
     @NotNull(message = "{serialNumber.required}")
-    private int to;
+    private String to;
 
     @Schema(description = "Fin de plage de coupon: exemple 1000001 ou 1010000 ")
     @NotNull(message = "{serialNumber.required}")
-    private int from;
+    private String from;
 }

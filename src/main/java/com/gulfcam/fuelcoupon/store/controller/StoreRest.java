@@ -1,8 +1,12 @@
 package com.gulfcam.fuelcoupon.store.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.client.entity.Client;
+import com.gulfcam.fuelcoupon.cryptage.AESUtil;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
 import com.gulfcam.fuelcoupon.store.dto.CreateStoreDTO;
 import com.gulfcam.fuelcoupon.store.entity.Store;
@@ -21,6 +25,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -71,6 +76,11 @@ public class StoreRest {
     @Value("${mail.replyTo[0]}")
     String mailReplyTo;
 
+    JsonMapper jsonMapper = new JsonMapper();
+    AESUtil aes = new AESUtil();
+    @Value("${app.key}")
+    String key;
+
     @Operation(summary = "création des informations pour un Magasin", tags = "Magasin", responses = {
             @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Store.class)))),
             @ApiResponse(responseCode = "404", description = "Store not found", content = @Content(mediaType = "Application/Json")),
@@ -78,18 +88,21 @@ public class StoreRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
     @PostMapping()
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> addStore(@Valid @RequestBody CreateStoreDTO createStoreDTO) {
+    public ResponseEntity<?> addStore(@Valid @RequestBody CreateStoreDTO createStoreDTO) throws JsonProcessingException {
 
         Store store = new Store();
         store.setInternalReference(jwtUtils.generateInternalReference());
         store.setCreatedAt(LocalDateTime.now());
-        store.setLocalization(createStoreDTO.getLocalization());
+        store.setLocalization(aes.decrypt(key, createStoreDTO.getLocalization()));
 
         Status status = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
         store.setStatus(status);
 
         iStoreService.createStore(store);
-        return ResponseEntity.ok(store);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(store);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Modification des informations pour un Magasin", tags = "Magasin", responses = {
@@ -97,21 +110,24 @@ public class StoreRest {
             @ApiResponse(responseCode = "404", description = "Store not found", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
-    @PutMapping("/{internalReference:[0-9]+}")
+    @PutMapping("/{internalReference}")
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> updateStore(@Valid @RequestBody CreateStoreDTO createStoreDTO, @PathVariable Long internalReference) {
+    public ResponseEntity<?> updateStore(@Valid @RequestBody CreateStoreDTO createStoreDTO, @PathVariable String internalReference) throws JsonProcessingException {
 
-        if (!iStoreService.getByInternalReference(internalReference).isPresent()) {
+        if (!iStoreService.getByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
         }
-        Store store = iStoreService.getByInternalReference(internalReference).get();
+        Store store = iStoreService.getByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))).get();
         store.setUpdateAt(LocalDateTime.now());
-        store.setLocalization(createStoreDTO.getLocalization());
+        store.setLocalization(aes.decrypt(key, createStoreDTO.getLocalization()));
 
         iStoreService.createStore(store);
 
-        return ResponseEntity.ok(store);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(store);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Recupérer Un Magasin par sa reference interne", tags = "Magasin", responses = {
@@ -119,9 +135,13 @@ public class StoreRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/{internalReference:[0-9]+}")
-    public ResponseEntity<?> getStoreByInternalReference(@PathVariable Long internalReference) {
-        return ResponseEntity.ok(iStoreService.getByInternalReference(internalReference).get());
+    @GetMapping("/{internalReference}")
+    public ResponseEntity<?> getStoreByInternalReference(@PathVariable String internalReference) throws JsonProcessingException {
+        Store store = iStoreService.getByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))).get();
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(store);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Grouper la somme des carnet par magasin", tags = "Magasin", responses = {
@@ -129,9 +149,13 @@ public class StoreRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/group/{internalReference:[0-9]+}")
-    public ResponseEntity<?> groupNoteBootByInternalReference(@PathVariable Long internalReference) {
-        return ResponseEntity.ok(iStoreService.groupNoteBootByInternalReference(internalReference));
+    @GetMapping("/group/{internalReference}")
+    public ResponseEntity<?> groupNoteBootByInternalReference(@PathVariable Long internalReference) throws JsonProcessingException {
+//        return ResponseEntity.ok();
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(iStoreService.groupNoteBootByInternalReference(internalReference));
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
 
@@ -141,9 +165,12 @@ public class StoreRest {
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @GetMapping("/like/{localization}")
-    public ResponseEntity<?> getStoresByLocalizationLike(@PathVariable String localization) {
+    public ResponseEntity<?> getStoresByLocalizationLike(@PathVariable String localization) throws JsonProcessingException {
         List<Store> stores = iStoreService.getStoresByLocalizationLike(localization);
-        return ResponseEntity.ok(stores);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(stores);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Supprimer un Magasin", tags = "Magasin", responses = {
@@ -172,8 +199,11 @@ public class StoreRest {
     public ResponseEntity<?> getAllStores(@RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                              @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                              @RequestParam(required = false, defaultValue = "id") String sort,
-                                             @RequestParam(required = false, defaultValue = "desc") String order) {
+                                             @RequestParam(required = false, defaultValue = "desc") String order) throws JsonProcessingException {
         Page<Store> list = iStoreService.getAllStores(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
-        return ResponseEntity.ok(list);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(list);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
     }

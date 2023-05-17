@@ -1,8 +1,12 @@
 package com.gulfcam.fuelcoupon.store.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.client.entity.Client;
+import com.gulfcam.fuelcoupon.cryptage.AESUtil;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
 import com.gulfcam.fuelcoupon.store.dto.CreateStationDTO;
 import com.gulfcam.fuelcoupon.store.dto.ResponseStationDTO;
@@ -24,6 +28,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -76,7 +81,10 @@ public class StationRest {
     String mailFrom;
     @Value("${mail.replyTo[0]}")
     String mailReplyTo;
-
+    JsonMapper jsonMapper = new JsonMapper();
+    AESUtil aes = new AESUtil();
+    @Value("${app.key}")
+    String key;
     @Operation(summary = "création des informations pour une Station", tags = "Station", responses = {
             @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Station.class)))),
             @ApiResponse(responseCode = "404", description = "Station not found", content = @Content(mediaType = "Application/Json")),
@@ -84,16 +92,16 @@ public class StationRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
     @PostMapping()
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> addStation(@Valid @RequestBody CreateStationDTO createStationDTO) {
+    public ResponseEntity<?> addStation(@Valid @RequestBody CreateStationDTO createStationDTO) throws JsonProcessingException {
 
-        if (iStationService.existsStationByPinCode(createStationDTO.getPinCode())) {
+        if (iStationService.existsStationByPinCode(Integer.parseInt(aes.decrypt(key, createStationDTO.getPinCode())))) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.pincode_exists", null, LocaleContextHolder.getLocale())));
         }
         Users managerStation = new Users();
 
         if (createStationDTO.getManagerStagion()  != null) {
-            managerStation = iUserService.getByInternalReference(createStationDTO.getManagerStagion());
+            managerStation = iUserService.getByInternalReference(Long.parseLong(aes.decrypt(key, createStationDTO.getManagerStagion())));
 
             if(managerStation.getUserId() == null)
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
@@ -103,17 +111,19 @@ public class StationRest {
         Station station = new Station();
         station.setInternalReference(jwtUtils.generateInternalReference());
         station.setCreatedAt(LocalDateTime.now());
-        station.setPinCode(createStationDTO.getPinCode());
-        station.setIdManagerStation(createStationDTO.getManagerStagion());
-        station.setBalance(createStationDTO.getBalance());
-        station.setDesignation(createStationDTO.getDesignation());
-        station.setLocalization(createStationDTO.getLocalization());
-        station.setDesignation(createStationDTO.getDesignation());
+        station.setPinCode(Integer.parseInt(aes.decrypt(key, createStationDTO.getPinCode())));
+        station.setIdManagerStation(Long.parseLong(aes.decrypt(key, createStationDTO.getManagerStagion())));
+        station.setBalance(Float.parseFloat(aes.decrypt(key, createStationDTO.getBalance())));
+        station.setLocalization(aes.decrypt(key, createStationDTO.getLocalization()));
+        station.setDesignation(aes.decrypt(key, createStationDTO.getDesignation()));
         Status status = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
         station.setStatus(status);
 
         iStationService.createStation(station);
-        return ResponseEntity.ok(station);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(station);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Modification des informations pour une Station", tags = "Station", responses = {
@@ -121,20 +131,20 @@ public class StationRest {
             @ApiResponse(responseCode = "404", description = "Station not found", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
-    @PutMapping("/{internalReference:[0-9]+}")
+    @PutMapping("/{internalReference}")
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> updateStation(@Valid @RequestBody CreateStationDTO createStationDTO, @PathVariable Long internalReference) {
+    public ResponseEntity<?> updateStation(@Valid @RequestBody CreateStationDTO createStationDTO, @PathVariable String internalReference) throws JsonProcessingException {
 
-        if (!iStationService.getByInternalReference(internalReference).isPresent()) {
-            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
-                    messageSource.getMessage("messages.station_exists", null, LocaleContextHolder.getLocale())));
-        }
-        Station station = iStationService.getByInternalReference(internalReference).get();
+//        if (!iStationService.getByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))).isPresent()) {
+//            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+//                    messageSource.getMessage("messages.station_exists", null, LocaleContextHolder.getLocale())));
+//        }
+        Station station = iStationService.getByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))).get();
 
         Users managerStation = new Users();
 
         if (createStationDTO.getManagerStagion()  != null) {
-            managerStation = iUserService.getByInternalReference(createStationDTO.getManagerStagion());
+            managerStation = iUserService.getByInternalReference(Long.parseLong(aes.decrypt(key, createStationDTO.getManagerStagion())));
 
             if(managerStation.getUserId() == null)
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
@@ -142,17 +152,19 @@ public class StationRest {
         }
 
         if (createStationDTO.getManagerStagion() != null)
-            station.setIdManagerStation(createStationDTO.getManagerStagion());
         station.setUpdateAt(LocalDateTime.now());
-        station.setPinCode(createStationDTO.getPinCode());
-        station.setBalance(createStationDTO.getBalance());
-        station.setDesignation(createStationDTO.getDesignation());
-        station.setLocalization(createStationDTO.getLocalization());
-        station.setDesignation(createStationDTO.getDesignation());
+        station.setPinCode(Integer.parseInt(aes.decrypt(key, createStationDTO.getPinCode())));
+        station.setIdManagerStation(Long.parseLong(aes.decrypt(key, createStationDTO.getManagerStagion())));
+        station.setBalance(Float.parseFloat(aes.decrypt(key, createStationDTO.getBalance())));
+        station.setLocalization(aes.decrypt(key, createStationDTO.getLocalization()));
+        station.setDesignation(aes.decrypt(key, createStationDTO.getDesignation()));
 
         iStationService.createStation(station);
 
-        return ResponseEntity.ok(station);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(station);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Recupérer Une Station par sa reference interne", tags = "Station", responses = {
@@ -160,9 +172,13 @@ public class StationRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/{internalReference:[0-9]+}")
-    public ResponseEntity<Station> getStationByInternalReference(@PathVariable Long internalReference) {
-        return ResponseEntity.ok(iStationService.getByInternalReference(internalReference).get());
+    @GetMapping("/{internalReference}")
+    public ResponseEntity<?> getStationByInternalReference(@PathVariable String internalReference) throws JsonProcessingException {
+        Station station = iStationService.getByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))).get();
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(station);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Recupérer Une Station par son code pin", tags = "Station", responses = {
@@ -170,9 +186,13 @@ public class StationRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/pincode/{pinCode:[0-9]+}")
-    public ResponseEntity<Station> getStationByPinCode(@PathVariable int pinCode) {
-        return ResponseEntity.ok(iStationService.getStationByPinCode(pinCode).get());
+    @GetMapping("/pincode/{pinCode}")
+    public ResponseEntity<?> getStationByPinCode(@PathVariable String pinCode) throws JsonProcessingException {
+        Station station = iStationService.getStationByPinCode(Integer.parseInt(aes.decrypt(key, pinCode))).get();
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(station);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Supprimer une Station", tags = "Station", responses = {
@@ -201,9 +221,12 @@ public class StationRest {
     public ResponseEntity<?> getAllStations(@RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                              @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                              @RequestParam(required = false, defaultValue = "id") String sort,
-                                             @RequestParam(required = false, defaultValue = "desc") String order) {
+                                             @RequestParam(required = false, defaultValue = "desc") String order) throws JsonProcessingException {
         Page<ResponseStationDTO> list = iStationService.getAllStations(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
-        return ResponseEntity.ok(list);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(list);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Recupérer la liste des station par désignation", tags = "Station", responses = {
@@ -212,9 +235,12 @@ public class StationRest {
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @GetMapping("/like/{designation}")
-    public ResponseEntity<?> getStationsByDesignationContains(@PathVariable String designation) {
+    public ResponseEntity<?> getStationsByDesignationContains(@PathVariable String designation) throws JsonProcessingException {
         List<Station> stationList = iStationService.getStationsByDesignationContains(designation);
-        return ResponseEntity.ok(stationList);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(stationList);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Filtrer les station", tags = "Station", responses = {
@@ -230,8 +256,11 @@ public class StationRest {
                                             @RequestParam(required = false, value = "idManagerStation") String idManagerStation,
                                             @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                             @RequestParam(required = false, defaultValue = "id") String sort,
-                                            @RequestParam(required = false, defaultValue = "desc") String order) {
-        Page<ResponseStationDTO> stationList = iStationService.filtres(designation, localization, pinCode, idManagerStation, Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
-        return ResponseEntity.ok(stationList);
+                                            @RequestParam(required = false, defaultValue = "desc") String order) throws JsonProcessingException {
+        Page<ResponseStationDTO> list = iStationService.filtres(designation, localization, pinCode, idManagerStation, Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(list);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
     }

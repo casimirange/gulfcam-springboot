@@ -1,7 +1,11 @@
 package com.gulfcam.fuelcoupon.store.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
+import com.gulfcam.fuelcoupon.cryptage.AESUtil;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
 import com.gulfcam.fuelcoupon.order.entity.Item;
 import com.gulfcam.fuelcoupon.order.entity.TypeVoucher;
@@ -33,6 +37,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -101,7 +106,10 @@ public class StockMovementRest {
     String mailReplyTo;
     @Value("${app.typeTransfert}")
     String typeTransfert;
-
+    JsonMapper jsonMapper = new JsonMapper();
+    AESUtil aes = new AESUtil();
+    @Value("${app.key}")
+    String key;
     @Operation(summary = "Ordre de transfert de cartons inter magasins", tags = "Mouvement en stock", responses = {
             @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = StockMovement.class)))),
             @ApiResponse(responseCode = "404", description = "StockMovement not found", content = @Content(mediaType = "Application/Json")),
@@ -109,24 +117,24 @@ public class StockMovementRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
     @PostMapping()
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> addStockMovement(@Valid @RequestBody CreateStockMovementDTO createStockMovementDTO) {
+    public ResponseEntity<?> addStockMovement(@Valid @RequestBody CreateStockMovementDTO createStockMovementDTO) throws JsonProcessingException {
 
         Storehouse storehouse = new Storehouse();
         TypeVoucher typeVoucher = new TypeVoucher();
         if (createStockMovementDTO.getIdStoreHouseStockage() != null) {
-            if(!iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouseStockage()).isPresent())
+            if(!iStorehouseService.getByInternalReference(Long.parseLong(aes.decrypt(key, createStockMovementDTO.getIdStoreHouseStockage()))).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.storehouse_exists", null, LocaleContextHolder.getLocale())));
-            storehouse = iStorehouseService.getByInternalReference(createStockMovementDTO.getIdStoreHouseStockage()).get();
+            storehouse = iStorehouseService.getByInternalReference(Long.parseLong(aes.decrypt(key, createStockMovementDTO.getIdStoreHouseStockage()))).get();
         }
 
         Store storeTo = iStoreService.getByInternalReference(storehouse.getIdStore()).get();
 
-        for (Long item: createStockMovementDTO.getListCartons()){
-            if(!iCartonService.getByInternalReference(item).isPresent())
+        for (String item: createStockMovementDTO.getListCartons()){
+            if(!iCartonService.getByInternalReference(Long.parseLong(aes.decrypt(key, item))).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.carton_exists", null, LocaleContextHolder.getLocale())));
-            Carton carton = iCartonService.getByInternalReference(item).get();
+            Carton carton = iCartonService.getByInternalReference(Long.parseLong(aes.decrypt(key, item))).get();
 
             Storehouse storehouse1 = iStorehouseService.getByInternalReference(carton.getIdStoreHouse()).get();
             StockMovement stockMovement = new StockMovement();
@@ -179,11 +187,14 @@ public class StockMovementRest {
         emailProps.put("storehouseStockage", storehouse.getInternalReference()+" - "+storehouse.getType()+" - "+storehouse.getName());
 
         if(createStockMovementDTO.getIdSpaceManager1() != null){
-            Users storeKeeper = iUserService.getByInternalReference(createStockMovementDTO.getIdSpaceManager1());
+            Users storeKeeper = iUserService.getByInternalReference(Long.parseLong(aes.decrypt(key, createStockMovementDTO.getIdSpaceManager1())));
             emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, storeKeeper.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_ORDER_TRANSFER, ApplicationConstant.TEMPLATE_EMAIL_ORDER_TRANSFER));
         }
 
-        return ResponseEntity.ok(createStockMovementDTO);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(createStockMovementDTO);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
 
@@ -280,8 +291,11 @@ public class StockMovementRest {
     public ResponseEntity<?> getAllStockMovements(@RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                              @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                              @RequestParam(required = false, defaultValue = "id") String sort,
-                                             @RequestParam(required = false, defaultValue = "desc") String order) {
+                                             @RequestParam(required = false, defaultValue = "desc") String order) throws JsonProcessingException {
         Page<ResponseStockMovementDTO> list = iStockMovementService.getAllStockMovements(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
-        return ResponseEntity.ok(list);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(list);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
     }

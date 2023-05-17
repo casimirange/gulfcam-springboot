@@ -45,7 +45,7 @@ public class Users extends Auditable<String> {
 	private Long internalReference;
 
 	@Column(unique = true,nullable = false)
-	@Email
+	@Email()
 	private String email;
 
 	@Schema(description = "mot de passe de l'utilisateur", example = "ebkn46Ai?")

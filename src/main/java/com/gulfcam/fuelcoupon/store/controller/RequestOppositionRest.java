@@ -1,9 +1,13 @@
 package com.gulfcam.fuelcoupon.store.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.client.entity.Client;
 import com.gulfcam.fuelcoupon.client.service.IClientService;
+import com.gulfcam.fuelcoupon.cryptage.AESUtil;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
 import com.gulfcam.fuelcoupon.order.service.ITypeVoucherService;
 import com.gulfcam.fuelcoupon.store.dto.CreateRequestOppositionDTO;
@@ -30,6 +34,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -98,7 +103,10 @@ public class RequestOppositionRest {
     String mailFrom;
     @Value("${mail.replyTo[0]}")
     String mailReplyTo;
-
+    JsonMapper jsonMapper = new JsonMapper();
+    AESUtil aes = new AESUtil();
+    @Value("${app.key}")
+    String key;
     @Operation(summary = "création des informations pour une Demande d'opposition", tags = "Demande d'opposition", responses = {
             @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = RequestOpposition.class)))),
             @ApiResponse(responseCode = "404", description = "RequestOpposition not found", content = @Content(mediaType = "Application/Json")),
@@ -106,7 +114,7 @@ public class RequestOppositionRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
     @PostMapping()
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> addRequestOpposition(@Valid @RequestBody CreateRequestOppositionDTO createRequestOppositionDTO) {
+    public ResponseEntity<?> addRequestOpposition(@Valid @RequestBody CreateRequestOppositionDTO createRequestOppositionDTO) throws JsonProcessingException {
 
         Users salesManager = new Users();
         Users commercialAttache = new Users();
@@ -116,22 +124,22 @@ public class RequestOppositionRest {
         Client client = new Client();
 
         if (createRequestOppositionDTO.getIdClient()  != null) {
-            if(!iClientService.getClientByInternalReference(createRequestOppositionDTO.getIdClient()).isPresent())
+            if(!iClientService.getClientByInternalReference(Long.parseLong(aes.decrypt(key, createRequestOppositionDTO.getIdClient()))).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.client_exists", null, LocaleContextHolder.getLocale())));
-            client = iClientService.getClientByInternalReference(createRequestOppositionDTO.getIdClient()).get();
+            client = iClientService.getClientByInternalReference(Long.parseLong(aes.decrypt(key, createRequestOppositionDTO.getIdClient()))).get();
 
         }
 
         if (createRequestOppositionDTO.getIdSalesManager() != null) {
-            salesManager = iUserService.getByInternalReference(createRequestOppositionDTO.getIdSalesManager());
+            salesManager = iUserService.getByInternalReference(Long.parseLong(aes.decrypt(key, createRequestOppositionDTO.getIdSalesManager())));
             if(salesManager.getUserId() == null)
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
         }
 
         if (createRequestOppositionDTO.getIdCommercialAttache() != null) {
-            commercialAttache = iUserService.getByInternalReference(createRequestOppositionDTO.getIdCommercialAttache());
+            commercialAttache = iUserService.getByInternalReference(Long.parseLong(aes.decrypt(key, createRequestOppositionDTO.getIdCommercialAttache())));
             if(commercialAttache.getUserId() == null)
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
@@ -140,11 +148,11 @@ public class RequestOppositionRest {
         RequestOpposition requestOpposition = new RequestOpposition();
         requestOpposition.setInternalReference(jwtUtils.generateInternalReference());
         requestOpposition.setCreatedAt(LocalDateTime.now());
-        requestOpposition.setDescription(createRequestOppositionDTO.getDescription());
-        requestOpposition.setReason(createRequestOppositionDTO.getReason());
-        requestOpposition.setIdSalesManager(createRequestOppositionDTO.getIdSalesManager());
-        requestOpposition.setIdCommercialAttache(createRequestOppositionDTO.getIdCommercialAttache());
-        requestOpposition.setIdClient(createRequestOppositionDTO.getIdClient());
+        requestOpposition.setDescription(aes.decrypt(key, createRequestOppositionDTO.getDescription()));
+        requestOpposition.setReason(aes.decrypt(key, createRequestOppositionDTO.getReason()));
+//        requestOpposition.setIdSalesManager(Long.parseLong(aes.decrypt(key, createRequestOppositionDTO.getIdSalesManager())));
+        requestOpposition.setIdCommercialAttache(Long.parseLong(aes.decrypt(key, createRequestOppositionDTO.getIdCommercialAttache())));
+        requestOpposition.setIdClient(Long.parseLong(aes.decrypt(key, createRequestOppositionDTO.getIdClient())));
         Status status = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
         Status statusCouponActived = iStatusRepo.findByName(EStatus.ACTIVATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.ACTIVATED +  "  not found"));
         requestOpposition.setStatus(status);
@@ -152,9 +160,9 @@ public class RequestOppositionRest {
         iRequestOppositionService.createRequestOpposition(requestOpposition);
         List<ResponseCouponMailDTO> couponList = new ArrayList<>();
         for (int i = 0; i< createRequestOppositionDTO.getSerialCoupons().size(); i++){
-            coupon = iCouponService.getCouponBySerialNumber(createRequestOppositionDTO.getSerialCoupons().get(i)).get();
+            coupon = iCouponService.getCouponBySerialNumber(aes.decrypt(key, createRequestOppositionDTO.getSerialCoupons().get(i))).get();
             ticket = new Ticket();
-            if(createRequestOppositionDTO.getIdClient().equals(coupon.getIdClient()) && coupon.getStatus().equals(statusCouponActived)){
+            if(client.getInternalReference().equals(coupon.getIdClient()) && coupon.getStatus().equals(statusCouponActived)){
                 responseCouponMailDTO= new ResponseCouponMailDTO();
                 responseCouponMailDTO.setIdTypeVoucher(iTypeVoucherService.getByInternalReference(coupon.getIdTypeVoucher()).get());
                 responseCouponMailDTO.setInternalReference(coupon.getInternalReference());
@@ -183,15 +191,18 @@ public class RequestOppositionRest {
         emailProps.put("raison", requestOpposition.getReason());
         emailProps.put("couponList", couponList);
         if(createRequestOppositionDTO.getIdSalesManager() != null){
-            Users salesManagerUser = iUserService.getByInternalReference(createRequestOppositionDTO.getIdSalesManager());
+            Users salesManagerUser = iUserService.getByInternalReference(Long.parseLong(aes.decrypt(key, createRequestOppositionDTO.getIdSalesManager())));
             emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, salesManagerUser.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_DEMANDE_OPPOSITION+" #"+requestOpposition.getInternalReference(), ApplicationConstant.TEMPLATE_EMAIL_DEMANDE_OPPOSITION));
         }
         if(createRequestOppositionDTO.getIdCommercialAttache() != null){
-            Users storeKeeper = iUserService.getByInternalReference(createRequestOppositionDTO.getIdCommercialAttache());
+            Users storeKeeper = iUserService.getByInternalReference(Long.parseLong(aes.decrypt(key, createRequestOppositionDTO.getIdCommercialAttache())));
             emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, storeKeeper.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_DEMANDE_OPPOSITION+" #"+requestOpposition.getInternalReference(), ApplicationConstant.TEMPLATE_EMAIL_DEMANDE_OPPOSITION));
         }
 
-        return ResponseEntity.ok(requestOpposition);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(requestOpposition);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
 
@@ -200,15 +211,15 @@ public class RequestOppositionRest {
             @ApiResponse(responseCode = "404", description = "RequestOpposition not found", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
-    @PostMapping("/{internalReference:[0-9]+}")
+    @PostMapping("/{internalReference}")
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> validRequestOpposition(@PathVariable Long internalReference) {
+    public ResponseEntity<?> validRequestOpposition(@PathVariable String internalReference) {
 
-        if (!iRequestOppositionService.getByInternalReference(internalReference).isPresent()) {
+        if (!iRequestOppositionService.getByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.requestopposition_exists", null, LocaleContextHolder.getLocale())));
         }
-        RequestOpposition requestOpposition = iRequestOppositionService.getByInternalReference(internalReference).get();
+        RequestOpposition requestOpposition = iRequestOppositionService.getByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))).get();
 
         Client client = iClientService.getClientByInternalReference(requestOpposition.getIdClient()).get();
         Coupon coupon = new Coupon();
@@ -271,54 +282,57 @@ public class RequestOppositionRest {
             @ApiResponse(responseCode = "404", description = "RequestOpposition not found", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
-    @PutMapping("/{internalReference:[0-9]+}")
+    @PutMapping("/{internalReference}")
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> updateRequestOpposition(@Valid @RequestBody CreateRequestOppositionDTO createRequestOppositionDTO, @PathVariable Long internalReference) {
+    public ResponseEntity<?> updateRequestOpposition(@Valid @RequestBody CreateRequestOppositionDTO createRequestOppositionDTO, @PathVariable String internalReference) throws JsonProcessingException {
 
-        if (!iRequestOppositionService.getByInternalReference(internalReference).isPresent()) {
+        if (!iRequestOppositionService.getByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.requestopposition_exists", null, LocaleContextHolder.getLocale())));
         }
-        RequestOpposition requestOpposition = iRequestOppositionService.getByInternalReference(internalReference).get();
+        RequestOpposition requestOpposition = iRequestOppositionService.getByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))).get();
 
         Users managerCoupon = new Users();
         Users serviceClient = new Users();
         Client client = new Client();
 
         if (createRequestOppositionDTO.getIdClient()  != null) {
-            if(!iClientService.getClientByInternalReference(createRequestOppositionDTO.getIdClient()).isPresent())
+            if(!iClientService.getClientByInternalReference(Long.parseLong(aes.decrypt(key, createRequestOppositionDTO.getIdClient()))).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.client_exists", null, LocaleContextHolder.getLocale())));
-            client = iClientService.getClientByInternalReference(createRequestOppositionDTO.getIdClient()).get();
+            client = iClientService.getClientByInternalReference(Long.parseLong(aes.decrypt(key, createRequestOppositionDTO.getIdClient()))).get();
 
         }
         if (createRequestOppositionDTO.getIdSalesManager() != null) {
-            managerCoupon = iUserService.getByInternalReference(createRequestOppositionDTO.getIdSalesManager());
+            managerCoupon = iUserService.getByInternalReference(Long.parseLong(aes.decrypt(key, createRequestOppositionDTO.getIdSalesManager())));
             if(managerCoupon.getUserId() == null)
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
         }
 
         if (createRequestOppositionDTO.getIdCommercialAttache() != null) {
-            serviceClient = iUserService.getByInternalReference(createRequestOppositionDTO.getIdCommercialAttache());
+            serviceClient = iUserService.getByInternalReference(Long.parseLong(aes.decrypt(key, createRequestOppositionDTO.getIdCommercialAttache())));
             if(serviceClient.getUserId() == null)
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
         }
 
         requestOpposition.setUpdateAt(LocalDateTime.now());
-        requestOpposition.setDescription(createRequestOppositionDTO.getDescription());
-        requestOpposition.setReason(createRequestOppositionDTO.getReason());
+        requestOpposition.setDescription(aes.decrypt(key, createRequestOppositionDTO.getDescription()));
+        requestOpposition.setReason(aes.decrypt(key, createRequestOppositionDTO.getReason()));
         if (createRequestOppositionDTO.getIdSalesManager() != null)
-            requestOpposition.setIdSalesManager(createRequestOppositionDTO.getIdSalesManager());
+            requestOpposition.setIdSalesManager(Long.parseLong(aes.decrypt(key, createRequestOppositionDTO.getIdSalesManager())));
         if (createRequestOppositionDTO.getIdCommercialAttache() != null)
-            requestOpposition.setIdCommercialAttache(createRequestOppositionDTO.getIdCommercialAttache());
+            requestOpposition.setIdCommercialAttache(Long.parseLong(aes.decrypt(key, createRequestOppositionDTO.getIdCommercialAttache())));
         if (createRequestOppositionDTO.getIdClient() != null)
-            requestOpposition.setIdClient(createRequestOppositionDTO.getIdClient());
+            requestOpposition.setIdClient(Long.parseLong(aes.decrypt(key, createRequestOppositionDTO.getIdClient())));
 
         iRequestOppositionService.createRequestOpposition(requestOpposition);
 
-        return ResponseEntity.ok(requestOpposition);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(requestOpposition);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Recupérer la liste des Demandes d'opposition par Service client", tags = "Demande d'opposition", responses = {
@@ -367,7 +381,7 @@ public class RequestOppositionRest {
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @GetMapping("/filter")
-    public ResponseEntity<Page<ResponseRequestOppositionDTO>> filtres(
+    public ResponseEntity<?> filtres(
                                                               @RequestParam(required = false, value = "client") String clientName,
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)            @RequestParam(required = false, value = "date") LocalDate date,
                                                               @RequestParam(required = false, value = "status") String status,
@@ -376,11 +390,14 @@ public class RequestOppositionRest {
                                                               @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                                               @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                                               @RequestParam(required = false, defaultValue = "id") String sort,
-                                                              @RequestParam(required = false, defaultValue = "desc") String order) {
+                                                              @RequestParam(required = false, defaultValue = "desc") String order) throws JsonProcessingException {
 
-        Page<ResponseRequestOppositionDTO> requestOppositions = iRequestOppositionService.filtres(clientName, date, status, comA, saleManager,
+        Page<ResponseRequestOppositionDTO> list = iRequestOppositionService.filtres(clientName, date, status, comA, saleManager,
                 Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
-        return ResponseEntity.ok(requestOppositions);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(list);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Recupérer la liste des Demandes d'opposition par Gestion de coupon", tags = "Demande d'opposition", responses = {
@@ -406,14 +423,14 @@ public class RequestOppositionRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/{internalReference:[0-9]+}")
-    public ResponseEntity<?> getRequestOppositionById(@PathVariable Long internalReference) {
+    @GetMapping("/{internalReference}")
+    public ResponseEntity<?> getRequestOppositionById(@PathVariable String internalReference) throws JsonProcessingException {
 
-        if (!iRequestOppositionService.getByInternalReference(internalReference).isPresent()) {
+        if (!iRequestOppositionService.getByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.requestopposition_exists", null, LocaleContextHolder.getLocale())));
         }
-        RequestOpposition requestOpposition = iRequestOppositionService.getByInternalReference(internalReference).get();
+        RequestOpposition requestOpposition = iRequestOppositionService.getByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))).get();
 
         Client client;
         Users serviceClient;
@@ -422,7 +439,7 @@ public class RequestOppositionRest {
 
         client = iClientService.getClientByInternalReference(requestOpposition.getIdClient()).get();
         serviceClient = iUserService.getByInternalReference(requestOpposition.getIdCommercialAttache());
-        managerCoupon = iUserService.getByInternalReference(requestOpposition.getIdSalesManager());
+//        managerCoupon = iUserService.getByInternalReference(requestOpposition.getIdSalesManager());
         responseRequestOppositionDTO = new ResponseRequestOppositionDTO();
         responseRequestOppositionDTO.setStatus(requestOpposition.getStatus());
         responseRequestOppositionDTO.setId(requestOpposition.getId());
@@ -434,12 +451,16 @@ public class RequestOppositionRest {
         responseRequestOppositionDTO.setNameClient(client.getCompleteName());
         responseRequestOppositionDTO.setIdCommercialAttache(serviceClient);
         responseRequestOppositionDTO.setNameCommercialAttache(serviceClient.getFirstName()+ "   " +serviceClient.getLastName());
-        responseRequestOppositionDTO.setIdSalesManager(managerCoupon);
-        responseRequestOppositionDTO.setNameSaleManager(managerCoupon.getFirstName()+ "   " +managerCoupon.getLastName());
+//        responseRequestOppositionDTO.setIdSalesManager(managerCoupon);
+//        responseRequestOppositionDTO.setNameSaleManager(managerCoupon.getFirstName()+ "   " +managerCoupon.getLastName());
         responseRequestOppositionDTO.setInternalReference(requestOpposition.getInternalReference());
         responseRequestOppositionDTO.setCreatedAt(requestOpposition.getCreatedAt());
 
-        return ResponseEntity.ok(responseRequestOppositionDTO);
+//        return ResponseEntity.ok(responseRequestOppositionDTO);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(responseRequestOppositionDTO);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Supprimer une Demande d'opposition", tags = "Demande d'opposition", responses = {
@@ -468,8 +489,11 @@ public class RequestOppositionRest {
     public ResponseEntity<?> getAllRequestOppositions(@RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                              @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                              @RequestParam(required = false, defaultValue = "id") String sort,
-                                             @RequestParam(required = false, defaultValue = "desc") String order) {
+                                             @RequestParam(required = false, defaultValue = "desc") String order) throws JsonProcessingException {
         Page<ResponseRequestOppositionDTO> list = iRequestOppositionService.getAllRequestOppositions(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
-        return ResponseEntity.ok(list);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(list);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
     }

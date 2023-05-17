@@ -1,9 +1,13 @@
 package com.gulfcam.fuelcoupon.store.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.client.entity.Client;
 import com.gulfcam.fuelcoupon.client.service.IClientService;
+import com.gulfcam.fuelcoupon.cryptage.AESUtil;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
 import com.gulfcam.fuelcoupon.order.entity.*;
 import com.gulfcam.fuelcoupon.order.service.IItemService;
@@ -32,6 +36,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -117,7 +122,10 @@ public class CouponRest {
     String mailFrom;
     @Value("${mail.replyTo[0]}")
     String mailReplyTo;
-
+    JsonMapper jsonMapper = new JsonMapper();
+    AESUtil aes = new AESUtil();
+    @Value("${app.key}")
+    String key;
     @Operation(summary = "création des informations pour un Coupon", tags = "Coupon", responses = {
             @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Coupon.class)))),
             @ApiResponse(responseCode = "404", description = "Coupon not found", content = @Content(mediaType = "Application/Json")),
@@ -273,16 +281,19 @@ public class CouponRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/client/{idClient:[0-9]+}")
-    public ResponseEntity<Page<ResponseCouponDTO>> getCouponsByIdClient(@PathVariable Long idClient,
+    @GetMapping("/client/{idClient}")
+    public ResponseEntity<?> getCouponsByIdClient(@PathVariable String idClient,
                                                              @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                                              @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                                              @RequestParam(required = false, defaultValue = "idClient") String sort,
-                                                             @RequestParam(required = false, defaultValue = "desc") String order) {
+                                                             @RequestParam(required = false, defaultValue = "desc") String order) throws JsonProcessingException {
 
-        Page<ResponseCouponDTO> cartons = iCouponService.getCouponsByIdClient(idClient,
+        Page<ResponseCouponDTO> cartons = iCouponService.getCouponsByIdClient(Long.parseLong(aes.decrypt(key, idClient)),
                 Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
-        return ResponseEntity.ok(cartons);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(cartons);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Recupérer la liste des Coupons par Client sous forme de fichier excel et envoyé par Mail", tags = "Coupon", responses = {
@@ -317,17 +328,20 @@ public class CouponRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/station/{idStation:[0-9]+}")
-    public ResponseEntity<Page<ResponseCouponDTO>> getCouponsByIdStation(@PathVariable Long idStation,
+    @GetMapping("/station/{idStation}")
+    public ResponseEntity<?> getCouponsByIdStation(@PathVariable String idStation,
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)              @RequestParam(required = false, value = "date", defaultValue = "") LocalDate date,
                                                                 @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                                                 @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                                                 @RequestParam(required = false, defaultValue = "idStation") String sort,
-                                                                @RequestParam(required = false, defaultValue = "desc") String order) {
+                                                                @RequestParam(required = false, defaultValue = "desc") String order) throws JsonProcessingException {
 
-        Page<ResponseCouponDTO> cartons = iCouponService.getCouponsByIdStation(idStation, date,
+        Page<ResponseCouponDTO> cartons = iCouponService.getCouponsByIdStation(Long.parseLong(aes.decrypt(key, idStation)), date,
                 Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
-        return ResponseEntity.ok(cartons);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(cartons);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Recupérer la liste des Coupons par Carnet", tags = "Coupon", responses = {
@@ -336,16 +350,19 @@ public class CouponRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/notebook/{idNotebook:[0-9]+}")
-    public ResponseEntity<Page<ResponseCouponDTO>> getCouponsByIdNotebook(@PathVariable Long idNotebook,
+    @GetMapping("/notebook/{idNotebook}")
+    public ResponseEntity<?> getCouponsByIdNotebook(@PathVariable String idNotebook,
                                                              @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                                              @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                                              @RequestParam(required = false, defaultValue = "idNotebook") String sort,
-                                                             @RequestParam(required = false, defaultValue = "desc") String order) {
+                                                             @RequestParam(required = false, defaultValue = "desc") String order) throws JsonProcessingException {
 
-        Page<ResponseCouponDTO> cartons = iCouponService.getCouponsByIdNotebook(idNotebook,
+        Page<ResponseCouponDTO> cartons = iCouponService.getCouponsByIdNotebook(Long.parseLong(aes.decrypt(key, idNotebook)),
                 Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
-        return ResponseEntity.ok(cartons);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(cartons);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Recupérer la liste des Coupons par Ticket", tags = "Coupon", responses = {
@@ -354,16 +371,19 @@ public class CouponRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/ticket/{idTicket:[0-9]+}")
-    public ResponseEntity<Page<Coupon>> getCouponsByIdTicket(@PathVariable Long idTicket,
+    @GetMapping("/ticket/{idTicket}")
+    public ResponseEntity<?> getCouponsByIdTicket(@PathVariable String idTicket,
                                                              @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                                              @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                                              @RequestParam(required = false, defaultValue = "idTicket") String sort,
-                                                             @RequestParam(required = false, defaultValue = "desc") String order) {
+                                                             @RequestParam(required = false, defaultValue = "desc") String order) throws JsonProcessingException {
 
-        Page<Coupon> cartons = iCouponService.getCouponsByIdTicket(idTicket,
+        Page<Coupon> cartons = iCouponService.getCouponsByIdTicket(Long.parseLong(aes.decrypt(key, idTicket)),
                 Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
-        return ResponseEntity.ok(cartons);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(cartons);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Recupérer Un Coupon par sa reference interne", tags = "Coupon", responses = {
@@ -371,9 +391,13 @@ public class CouponRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/{internalReference:[0-9]+}")
-    public ResponseEntity<Coupon> getCouponByInternalReference(@PathVariable Long internalReference) {
-        return ResponseEntity.ok(iCouponService.getByInternalReference(internalReference).get());
+    @GetMapping("/{internalReference}")
+    public ResponseEntity<?> getCouponByInternalReference(@PathVariable String internalReference) throws JsonProcessingException {
+        Coupon coupon = iCouponService.getByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))).get();
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(coupon);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Recupérer Un Coupon par son Numéro de série", tags = "Coupon", responses = {
@@ -382,8 +406,12 @@ public class CouponRest {
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @GetMapping("/serial/{serialNumber}")
-    public ResponseEntity<Coupon> getCouponBySerialNumber(@PathVariable String serialNumber) {
-        return ResponseEntity.ok(iCouponService.getCouponBySerialNumber(serialNumber).get());
+    public ResponseEntity<?> getCouponBySerialNumber(@PathVariable String serialNumber) throws JsonProcessingException {
+        Coupon coupon = iCouponService.getCouponBySerialNumber(aes.decrypt(key, serialNumber)).get();
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(coupon);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Accepter Un Coupon par son Numéro de série", tags = "Coupon", responses = {
@@ -392,13 +420,13 @@ public class CouponRest {
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @PutMapping("/accept/serial/{serialNumber}")
-    public ResponseEntity<?> acceptCoupon(@Valid @RequestBody AcceptCouponDTO acceptCouponDTO, @PathVariable String serialNumber) {
-        if (!iCouponService.getCouponBySerialNumber(serialNumber).isPresent()) {
+    public ResponseEntity<?> acceptCoupon(@Valid @RequestBody AcceptCouponDTO acceptCouponDTO, @PathVariable String serialNumber) throws JsonProcessingException {
+        if (!iCouponService.getCouponBySerialNumber(aes.decrypt(key, serialNumber)).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.coupon_exists", null, LocaleContextHolder.getLocale())));
         }
 
-        Coupon coupon = iCouponService.getCouponBySerialNumber(serialNumber).get();
+        Coupon coupon = iCouponService.getCouponBySerialNumber(aes.decrypt(key, serialNumber)).get();
         Status statusCouponActived = iStatusRepo.findByName(EStatus.ACTIVATED).orElseThrow(()-> new ResourceNotFoundException("Statut du coupon:  "  +  EStatus.ACTIVATED +  "  not found"));
         if (coupon.getStatus() != statusCouponActived) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
@@ -408,10 +436,10 @@ public class CouponRest {
         Notebook notebook = iNotebookService.getByInternalReference(coupon.getIdNotebook()).get();
         Status status = iStatusRepo.findByName(EStatus.USED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.USED +  "  not found"));
         coupon.setStatus(status);
-        coupon.setIdStation(acceptCouponDTO.getIdStation());
+        coupon.setIdStation(Long.parseLong(aes.decrypt(key, acceptCouponDTO.getIdStation().toString())));
         coupon.setUpdateAt(LocalDateTime.now());
         coupon.setProductionDate(acceptCouponDTO.getProductionDate());
-        coupon.setModulo(acceptCouponDTO.getModulo());
+        coupon.setModulo(Integer.parseInt(aes.decrypt(key, acceptCouponDTO.getModulo()+"")));
         iCouponService.createCoupon(coupon);
 
         notebook.setStatus(status);
@@ -432,7 +460,7 @@ public class CouponRest {
         Map<String, Object> emailProps = new HashMap<>();
         TypeVoucher typeVoucher = iTypeVoucherService.getByInternalReference(coupon.getIdTypeVoucher()).get();
         emailProps.put("coupon", coupon.getInternalReference()+" - "+typeVoucher.getAmount()+" FCFA - "+coupon.getSerialNumber());
-        emailProps.put("station", iStationService.getByInternalReference(acceptCouponDTO.getIdStation()).get());
+        emailProps.put("station", iStationService.getByInternalReference(Long.parseLong(aes.decrypt(key, acceptCouponDTO.getIdStation()))).get());
 
         List<Users> usersList = iUserService.getUsers();
 
@@ -448,7 +476,10 @@ public class CouponRest {
             }
         }
 
-        return ResponseEntity.ok(coupon);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(coupon);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Affectation d'un carnet a un client après validation de la commande par scan d'un numéro de coupon", tags = "Coupon", responses = {
@@ -457,19 +488,19 @@ public class CouponRest {
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @PostMapping("/affect/serial/{serialNumber}")
-    public ResponseEntity<?> affectCoupon(@PathVariable String serialNumber, @RequestParam("idClient") Long idClient) {
+    public ResponseEntity<?> affectCoupon(@PathVariable String serialNumber, @RequestParam("idClient") String idClient) throws JsonProcessingException {
 
-        if (!iCouponService.getCouponBySerialNumber(serialNumber).isPresent()) {
+        if (!iCouponService.getCouponBySerialNumber(aes.decrypt(key, serialNumber)).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.coupon_exists", null, LocaleContextHolder.getLocale())));
         }
-        Coupon coupon = iCouponService.getCouponBySerialNumber(serialNumber).get();
+        Coupon coupon = iCouponService.getCouponBySerialNumber(aes.decrypt(key, serialNumber)).get();
         List<Coupon> couponList = iCouponService.getCouponsByIdNotebook(coupon.getIdNotebook());
         Status status = iStatusRepo.findByName(EStatus.ACTIVATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.ACTIVATED +  "  not found"));
         coupon.setStatus(status);
         for (Coupon item: couponList){
             item.setStatus(status);
-            item.setIdClient(idClient);
+            item.setIdClient(Long.parseLong(aes.decrypt(key, idClient)));
             item.setUpdateAt(LocalDateTime.now());
             iCouponService.createCoupon(item);
         }
@@ -505,7 +536,10 @@ public class CouponRest {
 
         iUnitService.createUnit(unit);
 
-        return ResponseEntity.ok(couponList);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(couponList);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Supprimer un Coupon", tags = "Coupon", responses = {
@@ -514,8 +548,8 @@ public class CouponRest {
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @DeleteMapping("/{internalReference:[0-9]+}")
-    public ResponseEntity<Object> deleteCoupon(@PathVariable Long internalReference) {
-        Coupon coupon = iCouponService.getByInternalReference(internalReference).get();
+    public ResponseEntity<Object> deleteCoupon(@PathVariable String internalReference) {
+        Coupon coupon = iCouponService.getByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))).get();
         iCouponService.deleteCoupon(coupon);
         return ResponseEntity.ok(new MessageResponseDto(
                 messageSource.getMessage("messages.request_successful-delete", null, LocaleContextHolder.getLocale())));
@@ -534,35 +568,38 @@ public class CouponRest {
     public ResponseEntity<?> getAllCartons(@RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                              @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                              @RequestParam(required = false, defaultValue = "id") String sort,
-                                             @RequestParam(required = false, defaultValue = "desc") String order) {
+                                             @RequestParam(required = false, defaultValue = "desc") String order) throws JsonProcessingException {
         Page<ResponseCouponDTO> list = iCouponService.getAllCoupons(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
-        return ResponseEntity.ok(list);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(list);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
+
+//    @Parameters(value = {
+//            @Parameter(name = "sort", schema = @Schema(allowableValues = {"id", "createdAt"})),
+//            @Parameter(name = "order", schema = @Schema(allowableValues = {"asc", "desc"}))})
+//    @Operation(summary = "Liste des Coupons", tags = "Coupon", responses = {
+//            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json")),
+//            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
+//            @ApiResponse(responseCode = "404", description = "Coupon not found", content = @Content(mediaType = "Application/Json")),
+//            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
+//    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+//    @GetMapping("/filtre")
+//    public ResponseEntity<?> filterCoupons(@RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
+//                                           @RequestParam(required = false, value = "serialnumber", defaultValue = "null") String serialNumber,
+//                                           @RequestParam(required = false, value = "status", defaultValue = "null") String status,
+//                                           @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
+//                                           @RequestParam(required = false, defaultValue = "id") String sort,
+//                                           @RequestParam(required = false, defaultValue = "desc") String order) {
+//        Page<ResponseCouponDTO> list = iCouponService.filterCoupons(serialNumber, status, Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
+//        return ResponseEntity.ok(list);
+//    }
 
     @Parameters(value = {
             @Parameter(name = "sort", schema = @Schema(allowableValues = {"id", "createdAt"})),
             @Parameter(name = "order", schema = @Schema(allowableValues = {"asc", "desc"}))})
-    @Operation(summary = "Liste des Coupons", tags = "Coupon", responses = {
-            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json")),
-            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
-            @ApiResponse(responseCode = "404", description = "Coupon not found", content = @Content(mediaType = "Application/Json")),
-            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
-    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/filtre")
-    public ResponseEntity<?> filterCoupons(@RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
-                                           @RequestParam(required = false, value = "serialnumber", defaultValue = "null") String serialNumber,
-                                           @RequestParam(required = false, value = "status", defaultValue = "null") String status,
-                                           @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
-                                           @RequestParam(required = false, defaultValue = "id") String sort,
-                                           @RequestParam(required = false, defaultValue = "desc") String order) {
-        Page<ResponseCouponDTO> list = iCouponService.filterCoupons(serialNumber, status, Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
-        return ResponseEntity.ok(list);
-    }
-
-    @Parameters(value = {
-            @Parameter(name = "sort", schema = @Schema(allowableValues = {"id", "createdAt"})),
-            @Parameter(name = "order", schema = @Schema(allowableValues = {"asc", "desc"}))})
-    @Operation(summary = "Liste des Coupons", tags = "Coupon", responses = {
+    @Operation(summary = "Filtrer la Liste des Coupons", tags = "Coupon", responses = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "404", description = "Coupon not found", content = @Content(mediaType = "Application/Json")),
@@ -577,8 +614,11 @@ public class CouponRest {
                                            @RequestParam(required = false, value = "station") String stationName,
                                            @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                            @RequestParam(required = false, defaultValue = "id") String sort,
-                                           @RequestParam(required = false, defaultValue = "desc") String order) {
+                                           @RequestParam(required = false, defaultValue = "desc") String order) throws JsonProcessingException {
         Page<ResponseCouponDTO> list = iCouponService.filtres(serialNumber, status, clientName, type, stationName, Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
-        return ResponseEntity.ok(list);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(list);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
     }

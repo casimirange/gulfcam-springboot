@@ -16,7 +16,7 @@ import java.util.List;
 @Setter
 public class UserReqDto {
 
-	@Email(message = "{email.verified}")
+//	@Email()
 	@NotNull(message = "email.required")
 	private String email;
 
@@ -26,11 +26,11 @@ public class UserReqDto {
 
 	@NotNull(message = "{pinCode.required}")
 	@Schema(description = "Code pin")
-	private int pinCode;
+	private String pinCode;
 
 	@NotNull(message = "{idStore.required}")
 	@Schema(description = "Reference interne du magasin associé")
-	private Long idStore;
+	private String idStore;
 
 	@Size(min = 6,message = "{password.lenght}")
 	@NotNull(message = "{password.required}")

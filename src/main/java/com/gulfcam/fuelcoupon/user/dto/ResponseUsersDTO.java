@@ -26,9 +26,9 @@ import java.util.Set;
 @Setter
 public class ResponseUsersDTO extends Auditable<String> {
 
-	private Long userId;
+	private String userId;
 
-	private Long internalReference;
+	private String internalReference;
 
 	private String email;
 

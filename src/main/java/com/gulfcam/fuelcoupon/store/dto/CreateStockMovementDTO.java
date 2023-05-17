@@ -15,13 +15,13 @@ public class CreateStockMovementDTO {
 
     @Schema(description = "reference interne de l'entrepôt de stockage de destination")
     @NotNull(message = "{storehouse.required}")
-    private Long idStoreHouseStockage;
+    private String idStoreHouseStockage;
 
     @Schema(description = "reference interne du gestionnaire espace 1")
-    private Long idSpaceManager1;
+    private String idSpaceManager1;
 
     @Schema(description = "Liste de cartons a ")
     @NotNull(message = "{carton.required}")
-    private List<Long> listCartons ;
+    private List<String> listCartons ;
 
 }

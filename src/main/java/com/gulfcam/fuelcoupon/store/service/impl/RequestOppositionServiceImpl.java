@@ -46,8 +46,8 @@ public class RequestOppositionServiceImpl implements IRequestOppositionService {
     @Autowired
     IClientService iClientService;
 
-    @Autowired
-    ITicketService iTicketService;
+//    @Autowired
+//    ITicketService iTicketService;
 
     @Override
     public Optional<RequestOpposition> getByInternalReference(Long internelReference) {

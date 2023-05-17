@@ -13,10 +13,10 @@ public class AcceptCouponDTO {
 
     @Schema(description = "Reference interne de la station")
     @NotNull(message = "{station.required}")
-    private Long idStation;
+    private String idStation;
 
     @Schema(description = "Modulo du coupon")
-    private int modulo;
+    private String modulo;
 
     @Schema(description = "Date de fabrication")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")

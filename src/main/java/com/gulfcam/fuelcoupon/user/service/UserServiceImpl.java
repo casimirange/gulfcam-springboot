@@ -2,6 +2,8 @@ package com.gulfcam.fuelcoupon.user.service;
 
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.client.entity.Client;
+import com.gulfcam.fuelcoupon.cryptage.AESUtil;
+import com.gulfcam.fuelcoupon.cryptage.CryptageImpl;
 import com.gulfcam.fuelcoupon.order.entity.TypeVoucher;
 import com.gulfcam.fuelcoupon.store.entity.Coupon;
 import com.gulfcam.fuelcoupon.store.entity.Station;
@@ -14,6 +16,7 @@ import com.gulfcam.fuelcoupon.utilities.entity.EStatus;
 import com.gulfcam.fuelcoupon.utilities.entity.Status;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
@@ -62,6 +65,13 @@ public class UserServiceImpl implements IUserService {
 
 	@Autowired
 	private ResourceBundleMessageSource messageSource;
+	@Autowired
+	private CryptageImpl cryptage;
+
+	@Value("${app.key}")
+	private String AES_KEY;
+
+	private AESUtil aes = new AESUtil();
 
 	@Override
 	@Transactional
@@ -104,7 +114,12 @@ public class UserServiceImpl implements IUserService {
 	public Users getById(Long id) {
 		Users user = userRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(
 				messageSource.getMessage("messages.user_not_found", null, LocaleContextHolder.getLocale())));
-
+//		user.setTelephone(aes.encrypt(AES_KEY, user.getTelephone()));
+//		user.setEmail(aes.encrypt(AES_KEY, user.getEmail()));
+//		user.setFirstName(aes.encrypt(AES_KEY, user.getFirstName()));
+//		user.setLastName(aes.encrypt(AES_KEY, user.getLastName()));
+//		user.setInternalReference(Long.parseLong(aes.encrypt(AES_KEY, user.getInternalReference().toString())));
+//		user.setInternalReference(Long.parseLong(aes.encrypt(AES_KEY, user.getInternalReference().toString())));
 		return user;
 	}
 
@@ -276,9 +291,9 @@ public class UserServiceImpl implements IUserService {
 	@Override
 	@Transactional
 	public String editPassword(Users user, UserEditPasswordDto u) {
-		OldPassword oldPassword = oldPasswordRepo.save(new OldPassword(encoder.encode(u.getPassword())));
+		OldPassword oldPassword = oldPasswordRepo.save(new OldPassword(encoder.encode(aes.decrypt(AES_KEY, u.getPassword()))));
 		user.getOldPasswords().add(oldPassword);
-		user.setPassword(encoder.encode(u.getPassword()));
+		user.setPassword(encoder.encode(aes.decrypt(AES_KEY, u.getPassword())));
 		user.setTokenAuth(null);
 		userRepo.save(user);
 		return "Mot de passe changé avec succès";
@@ -367,7 +382,7 @@ public class UserServiceImpl implements IUserService {
 		for (Users user: usersList){
 			responseUsersDTO = new ResponseUsersDTO();
 			responseUsersDTO.setStatus(user.getStatus());
-			responseUsersDTO.setUserId(user.getUserId());
+			responseUsersDTO.setUserId(user.getUserId().toString());
 			responseUsersDTO.setEmail(user.getEmail());
 			responseUsersDTO.setRoleNames(user.getRoleNames());
 			responseUsersDTO.setFirstName(user.getFirstName());
@@ -381,7 +396,7 @@ public class UserServiceImpl implements IUserService {
 			responseUsersDTO.setOtpCode(user.getOtpCode());
 			responseUsersDTO.setStore((user.getIdStore() == null)? null: iStoreService.getByInternalReference(user.getIdStore()).get());
 			responseUsersDTO.setNameStore((user.getIdStore() == null)? null: iStoreService.getByInternalReference(user.getIdStore()).get().getLocalization());
-			responseUsersDTO.setInternalReference(user.getInternalReference());
+			responseUsersDTO.setInternalReference(user.getInternalReference().toString());
 			responseUsersDTO.setCreatedDate(user.getCreatedDate());
 			responseUsersDTO.setDateLastLogin(user.getDateLastLogin());
 			responseUsersDTOList.add(responseUsersDTO);
@@ -427,15 +442,38 @@ public class UserServiceImpl implements IUserService {
 		ResponseUsersDTO responseUsersDTO;
 		List<ResponseUsersDTO> responseUsersDTOList = new ArrayList<>();
 
+//		for (Users user: users){
+//			responseUsersDTO = new ResponseUsersDTO();
+//			responseUsersDTO.setStatus(user.getStatus());
+//			responseUsersDTO.setUserId(aes.encrypt(AES_KEY, user.getUserId().toString()));
+//			responseUsersDTO.setEmail(aes.encrypt(AES_KEY, user.getEmail()));
+//			responseUsersDTO.setRoleNames(user.getRoleNames());
+//			responseUsersDTO.setFirstName(aes.encrypt(AES_KEY, user.getFirstName()));
+//			responseUsersDTO.setLastName(aes.encrypt(AES_KEY, user.getLastName()));
+////			responseUsersDTO.setIdStore(aes.encrypt(AES_KEY, user.getIdStore()));
+//			responseUsersDTO.setPosition(aes.encrypt(AES_KEY, user.getPosition()));
+//			responseUsersDTO.setPinCode(user.getPinCode());
+//			responseUsersDTO.setRoles(user.getRoles());
+//			responseUsersDTO.setTelephone(aes.encrypt(AES_KEY, user.getTelephone()));
+//			responseUsersDTO.setTypeAccount(user.getTypeAccount());
+//			responseUsersDTO.setOtpCode(aes.encrypt(AES_KEY, user.getOtpCode()));
+//			responseUsersDTO.setStore((user.getIdStore() == null)? null: iStoreService.getByInternalReference(user.getIdStore()).get());
+//			responseUsersDTO.setNameStore((user.getIdStore() == null)? null: aes.encrypt(AES_KEY, iStoreService.getByInternalReference(user.getIdStore()).get().getLocalization()));
+//			responseUsersDTO.setInternalReference(aes.encrypt(AES_KEY, user.getInternalReference().toString()));
+//			responseUsersDTO.setCreatedDate(user.getCreatedDate());
+//			responseUsersDTO.setDateLastLogin(user.getDateLastLogin());
+//			responseUsersDTOList.add(responseUsersDTO);
+//
+//		}
 		for (Users user: users){
 			responseUsersDTO = new ResponseUsersDTO();
 			responseUsersDTO.setStatus(user.getStatus());
-			responseUsersDTO.setUserId(user.getUserId());
+			responseUsersDTO.setUserId(user.getUserId().toString());
 			responseUsersDTO.setEmail(user.getEmail());
 			responseUsersDTO.setRoleNames(user.getRoleNames());
 			responseUsersDTO.setFirstName(user.getFirstName());
 			responseUsersDTO.setLastName(user.getLastName());
-			responseUsersDTO.setIdStore(user.getIdStore());
+//			responseUsersDTO.setIdStore(aes.encrypt(AES_KEY, user.getIdStore()));
 			responseUsersDTO.setPosition(user.getPosition());
 			responseUsersDTO.setPinCode(user.getPinCode());
 			responseUsersDTO.setRoles(user.getRoles());
@@ -444,7 +482,7 @@ public class UserServiceImpl implements IUserService {
 			responseUsersDTO.setOtpCode(user.getOtpCode());
 			responseUsersDTO.setStore((user.getIdStore() == null)? null: iStoreService.getByInternalReference(user.getIdStore()).get());
 			responseUsersDTO.setNameStore((user.getIdStore() == null)? null: iStoreService.getByInternalReference(user.getIdStore()).get().getLocalization());
-			responseUsersDTO.setInternalReference(user.getInternalReference());
+			responseUsersDTO.setInternalReference(user.getInternalReference().toString());
 			responseUsersDTO.setCreatedDate(user.getCreatedDate());
 			responseUsersDTO.setDateLastLogin(user.getDateLastLogin());
 			responseUsersDTOList.add(responseUsersDTO);

@@ -13,7 +13,7 @@ public class CreateCreditNoteDTO {
 
     @Schema(description = "reference interne de la station")
     @NotNull(message = "{idStation.required}")
-    private Long idStation;
+    private String idStation;
 
     @Schema(description = "Liste de coupons")
     private List<String> serialCoupons ;

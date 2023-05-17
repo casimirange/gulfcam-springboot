@@ -1,7 +1,11 @@
 package com.gulfcam.fuelcoupon.order.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
+import com.gulfcam.fuelcoupon.cryptage.AESUtil;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
 import com.gulfcam.fuelcoupon.order.dto.CreateItemDTO;
 import com.gulfcam.fuelcoupon.order.dto.CreateUnitDTO;
@@ -30,6 +34,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -83,7 +88,10 @@ public class UnitRest {
     String mailFrom;
     @Value("${mail.replyTo[0]}")
     String mailReplyTo;
-
+    JsonMapper jsonMapper = new JsonMapper();
+    AESUtil aes = new AESUtil();
+    @Value("${app.key}")
+    String key;
     @Operation(summary = "création des informations pour une Unité", tags = "Unité", responses = {
             @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Unit.class)))),
             @ApiResponse(responseCode = "404", description = "Unit not found", content = @Content(mediaType = "Application/Json")),
@@ -191,16 +199,19 @@ public class UnitRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/store/{idStore:[0-9]+}")
-    public ResponseEntity<Page<Unit>> getItemsByIdStoreHouse(@PathVariable Long idStore,
+    @GetMapping("/store/{idStore}")
+    public ResponseEntity<?> getItemsByIdStoreHouse(@PathVariable String idStore,
                                                               @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                                               @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                                               @RequestParam(required = false, defaultValue = "idTypeVoucher") String sort,
-                                                              @RequestParam(required = false, defaultValue = "desc") String order) {
+                                                              @RequestParam(required = false, defaultValue = "desc") String order) throws JsonProcessingException {
 
-        Page<Unit> units = iUnitService.getUnitsByIdStore(idStore,
+        Page<Unit> list = iUnitService.getUnitsByIdStore(Long.parseLong(aes.decrypt(key, idStore)),
                 Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
-        return ResponseEntity.ok(units);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(list);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Recupérer Une Unité par sa reference interne", tags = "Unité", responses = {

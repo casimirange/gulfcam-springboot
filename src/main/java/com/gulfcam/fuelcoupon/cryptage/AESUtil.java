@@ -1,4 +1,8 @@
 package com.gulfcam.fuelcoupon.cryptage;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import io.swagger.v3.core.util.Json;
+import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,6 +18,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 public class AESUtil {
 
@@ -76,7 +83,7 @@ public class AESUtil {
         }
     }
 
-    public String encryptObject(String salt, String iv, String passPhrase, Object plainText) {
+    public Object encryptObject(String salt, String iv, String passPhrase, Object plainText) {
         try {
             SecretKey secretKey = generateKey(salt, passPhrase);
             byte[] encrypted = doFinal(Cipher.ENCRYPT_MODE, secretKey, iv, plainText.toString().getBytes(StandardCharsets.UTF_8));
@@ -104,12 +111,19 @@ public class AESUtil {
         }
     }
 
-    public String encryptObject(String passPhrase, Object plainText) {
+    public JSONObject encryptObject(String passPhrase, Object plainText) {
         try {
             String salt = toHex(generateRandom(keySize / 8));
             String iv = toHex(generateRandom(IV_SIZE / 8));
-            String cipherText = encrypt(salt, iv, passPhrase, plainText.toString());
-            return salt + iv + cipherText;
+            Object cipherText = encryptObject(salt, iv, passPhrase, plainText);
+            String x = salt + iv + cipherText;
+            GsonBuilder builder = new GsonBuilder();
+            builder.setPrettyPrinting();
+            Gson gson = builder.create();
+            Map<String, String> map = new HashMap<>();
+            map.put("key", x);
+            JSONObject jsonObject = new JSONObject(map);
+            return jsonObject;
         } catch (Exception e) {
             return null;
         }
@@ -141,7 +155,8 @@ public class AESUtil {
                 encrypted = fromBase64(cipherText);
             }
             byte[] decrypted = doFinal(Cipher.DECRYPT_MODE, key, iv, encrypted);
-            return new String(Objects.requireNonNull(decrypted), StandardCharsets.UTF_8);
+            String mj = new String(Objects.requireNonNull(decrypted), StandardCharsets.UTF_8);
+            return (Object) mj;
         } catch (Exception e) {
             return null;
         }
@@ -165,7 +180,9 @@ public class AESUtil {
             int ivLength = IV_SIZE / 4;
             String iv = cipherText.substring(saltLength, saltLength + ivLength);
             String ct = cipherText.substring(saltLength + ivLength);
-            return decrypt(salt, iv, passPhrase, ct);
+//            JSONObject jsonObject = decryptObject(salt, iv, passPhrase, ct);
+
+            return decryptObject(salt, iv, passPhrase, ct);
         } catch (Exception e) {
             return null;
         }

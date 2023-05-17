@@ -1,7 +1,11 @@
 package com.gulfcam.fuelcoupon.store.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
+import com.gulfcam.fuelcoupon.cryptage.AESUtil;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
 import com.gulfcam.fuelcoupon.order.entity.TypeVoucher;
 import com.gulfcam.fuelcoupon.order.service.ITypeVoucherService;
@@ -31,6 +35,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONObject;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -101,6 +106,10 @@ public class CartonRest {
     String mailFrom;
     @Value("${mail.replyTo[0]}")
     String mailReplyTo;
+    JsonMapper jsonMapper = new JsonMapper();
+    AESUtil aes = new AESUtil();
+    @Value("${app.key}")
+    String key;
 
     @Operation(summary = "création des informations pour un Carton ou Ordre de stockage", tags = "Carton", responses = {
             @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Carton.class)))),
@@ -109,39 +118,39 @@ public class CartonRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
     @PostMapping()
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> addCarton(@Valid @RequestBody CreateCartonDTO createCartonDTO) {
-
+    public ResponseEntity<?> addCarton(@RequestBody CreateCartonDTO createCartonDTO) throws JsonProcessingException {
+        log.info("idmanager " + aes.decrypt(key, createCartonDTO.getIdStoreHouseStockage().toString()));
         Users storeKeeper = new Users();
         Storehouse storehouse = new Storehouse();
-        List<Carton> cartonList = iCartonService.getCartonsByIdStoreHouse(createCartonDTO.getIdStoreHouseStockage());
+        List<Carton> cartonList = iCartonService.getCartonsByIdStoreHouse(Long.parseLong(aes.decrypt(key, createCartonDTO.getIdStoreHouseStockage().toString())));
 
         for (Carton item: cartonList){
-            if(item.getNumber() == createCartonDTO.getNumber()){
+            if(item.getNumber() == Integer.parseInt(aes.decrypt(key, createCartonDTO.getNumber()+""))){
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.carton_to_storehouse_exists", null, LocaleContextHolder.getLocale())));
             }
 
-            if(item.getFrom() == createCartonDTO.getFrom() || item.getTo() == createCartonDTO.getTo()){
+            if(item.getFrom() == Integer.parseInt(aes.decrypt(key, createCartonDTO.getFrom()+"")) || item.getTo() == Integer.parseInt(aes.decrypt(key, createCartonDTO.getTo()+""))){
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.plage_to_storehouse_exists", null, LocaleContextHolder.getLocale())));
             }
         }
-        if (createCartonDTO.getTypeVoucher() != 0) {
-            if(!iTypeVoucherService.getTypeVoucherByAmountEquals(createCartonDTO.getTypeVoucher()).isPresent())
+        if (Integer.parseInt(aes.decrypt(key, createCartonDTO.getTypeVoucher()+"")) != 0) {
+            if(!iTypeVoucherService.getTypeVoucherByAmountEquals(Integer.parseInt(aes.decrypt(key, createCartonDTO.getTypeVoucher() +""))).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.typeVoucher_exists", null, LocaleContextHolder.getLocale())));
 
         }
-        if (createCartonDTO.getIdStoreHouseStockage()  != null) {
-            if(!iStorehouseService.getByInternalReference(createCartonDTO.getIdStoreHouseStockage()).isPresent())
+        if (createCartonDTO.getIdStoreHouseStockage() != null) {
+            if(!iStorehouseService.getByInternalReference(Long.parseLong(aes.decrypt(key, createCartonDTO.getIdStoreHouseStockage().toString()))).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.storehouse_exists", null, LocaleContextHolder.getLocale())));
-            storehouse = iStorehouseService.getByInternalReference(createCartonDTO.getIdStoreHouseStockage()).get();
+            storehouse = iStorehouseService.getByInternalReference(Long.parseLong(aes.decrypt(key, createCartonDTO.getIdStoreHouseStockage().toString()))).get();
 
         }
 
         if (createCartonDTO.getIdSpaceManager1() != null) {
-            storeKeeper = iUserService.getByInternalReference(createCartonDTO.getIdSpaceManager1());
+            storeKeeper = iUserService.getByInternalReference(Long.parseLong(aes.decrypt(key, createCartonDTO.getIdSpaceManager1().toString())));
             if(storeKeeper.getUserId() == null)
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
@@ -150,14 +159,14 @@ public class CartonRest {
         Carton carton = new Carton();
         carton.setInternalReference(jwtUtils.generateInternalReference());
         carton.setCreatedAt(LocalDateTime.now());
-        carton.setFrom(createCartonDTO.getFrom());
-        carton.setSerialFrom(createCartonDTO.getSerialFrom());
-        carton.setSerialTo(createCartonDTO.getSerialTo());
-        carton.setNumber(createCartonDTO.getNumber());
-        carton.setTo(createCartonDTO.getTo());
-        carton.setTypeVoucher(createCartonDTO.getTypeVoucher());
-        carton.setIdStoreHouse(createCartonDTO.getIdStoreHouseStockage());
-        carton.setIdSpaceManager1(createCartonDTO.getIdSpaceManager1());
+        carton.setFrom(Integer.parseInt(aes.decrypt(key, createCartonDTO.getFrom()+"")));
+        carton.setSerialFrom(Integer.parseInt(aes.decrypt(key, createCartonDTO.getSerialFrom()+"")));
+        carton.setSerialTo(Integer.parseInt(aes.decrypt(key, createCartonDTO.getSerialTo()+"")));
+        carton.setNumber(Integer.parseInt(aes.decrypt(key, createCartonDTO.getNumber()+"")));
+        carton.setTo(Integer.parseInt(aes.decrypt(key, createCartonDTO.getTo()+"")));
+        carton.setTypeVoucher(Integer.parseInt(aes.decrypt(key, createCartonDTO.getTypeVoucher()+"")));
+        carton.setIdStoreHouse(Long.parseLong(aes.decrypt(key, createCartonDTO.getIdStoreHouseStockage().toString())));
+        carton.setIdSpaceManager1(Long.parseLong(aes.decrypt(key, createCartonDTO.getIdSpaceManager1().toString())));
 
         Status status = iStatusRepo.findByName(EStatus.AVAILABLE).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.AVAILABLE +  "  not found"));
         carton.setStatus(status);
@@ -165,7 +174,10 @@ public class CartonRest {
 
         Map<String, Object> CartonEncoded = new HashMap<>();
         CartonEncoded = iCartonService.createCarton(carton, +1);
-        return ResponseEntity.ok(carton);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(carton);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
 
@@ -176,25 +188,25 @@ public class CartonRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
     @PostMapping("/supply")
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> orderSupply(@RequestParam("idCarton") Long idCarton, @RequestParam("idStoreHouseSell") Long idStoreHouseSell) {
+    public ResponseEntity<?> orderSupply(@RequestParam("idCarton") String idCarton, @RequestParam("idStoreHouseSell") String idStoreHouseSell) throws JsonProcessingException {
 
         Users storeKeeper = new Users();
         Storehouse storehouse = new Storehouse();
 
 
         if (idStoreHouseSell != null) {
-            if(!iStorehouseService.getByInternalReference(idStoreHouseSell).isPresent())
+            if(!iStorehouseService.getByInternalReference(Long.parseLong(aes.decrypt(key, idStoreHouseSell))).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.storehouse_exists", null, LocaleContextHolder.getLocale())));
-            storehouse = iStorehouseService.getByInternalReference(idStoreHouseSell).get();
+            storehouse = iStorehouseService.getByInternalReference(Long.parseLong(aes.decrypt(key, idStoreHouseSell))).get();
 
         }
 
-        if (!iCartonService.getByInternalReference(idCarton).isPresent()) {
+        if (!iCartonService.getByInternalReference(Long.parseLong(aes.decrypt(key, idCarton))).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.carton_exists", null, LocaleContextHolder.getLocale())));
         }
-        Carton carton = iCartonService.getByInternalReference(idCarton).get();
+        Carton carton = iCartonService.getByInternalReference(Long.parseLong(aes.decrypt(key, idCarton))).get();
 
         if (carton.getStatus().getName() == EStatus.DISABLED) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
@@ -210,7 +222,10 @@ public class CartonRest {
         CartonEncoded = iCartonService.supplyStoreHouse(carton, storehouse);
         carton = (Carton) CartonEncoded.get("carton");
 //        generateCoupon(carton);
-        return ResponseEntity.ok(carton);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(carton);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
 
@@ -223,43 +238,44 @@ public class CartonRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     public ResponseEntity<?> updateCarton(@Valid @RequestBody CreateCartonDTO createCartonDTO, @PathVariable Long internalReference) {
 
-        Users storeKeeper = new Users();
-        Storehouse storehouse = new Storehouse();
-        if (!iCartonService.getByInternalReference(internalReference).isPresent()) {
-            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
-                    messageSource.getMessage("messages.carton_exists", null, LocaleContextHolder.getLocale())));
-        }
-        Carton carton = iCartonService.getByInternalReference(internalReference).get();
+//        Users storeKeeper = new Users();
+//        Storehouse storehouse = new Storehouse();
+//        if (!iCartonService.getByInternalReference(internalReference).isPresent()) {
+//            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+//                    messageSource.getMessage("messages.carton_exists", null, LocaleContextHolder.getLocale())));
+//        }
+//        Carton carton = iCartonService.getByInternalReference(internalReference).get();
+//
+//        if (createCartonDTO.getIdStoreHouseStockage()  != null) {
+//            if(!iStorehouseService.getByInternalReference(createCartonDTO.getIdStoreHouseStockage()).isPresent())
+//                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+//                        messageSource.getMessage("messages.storehouse_exists", null, LocaleContextHolder.getLocale())));
+//            storehouse = iStorehouseService.getByInternalReference(createCartonDTO.getIdStoreHouseStockage()).get();
+//
+//        }
+//
+//        if (createCartonDTO.getIdSpaceManager1() != null) {
+//            storeKeeper = iUserService.getByInternalReference(createCartonDTO.getIdSpaceManager1());
+//            if(storeKeeper.getUserId() == null)
+//                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+//                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
+//        }
+//        carton.setUpdateAt(LocalDateTime.now());
+//        carton.setFrom(createCartonDTO.getFrom());
+//        carton.setSerialFrom(createCartonDTO.getSerialFrom());
+//        carton.setSerialTo(createCartonDTO.getSerialTo());
+//        carton.setNumber(createCartonDTO.getNumber());
+//        carton.setTo(createCartonDTO.getTo());
+//        carton.setTypeVoucher(createCartonDTO.getTypeVoucher());
+//        if(createCartonDTO.getIdStoreHouseStockage() != null)
+//            carton.setIdStoreHouse(createCartonDTO.getIdStoreHouseStockage());
+//        if(createCartonDTO.getIdSpaceManager1() != null)
+//            carton.setIdSpaceManager1(createCartonDTO.getIdSpaceManager1());
+//
+//        iCartonService.createCarton(carton, 0);
 
-        if (createCartonDTO.getIdStoreHouseStockage()  != null) {
-            if(!iStorehouseService.getByInternalReference(createCartonDTO.getIdStoreHouseStockage()).isPresent())
-                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
-                        messageSource.getMessage("messages.storehouse_exists", null, LocaleContextHolder.getLocale())));
-            storehouse = iStorehouseService.getByInternalReference(createCartonDTO.getIdStoreHouseStockage()).get();
-
-        }
-
-        if (createCartonDTO.getIdSpaceManager1() != null) {
-            storeKeeper = iUserService.getByInternalReference(createCartonDTO.getIdSpaceManager1());
-            if(storeKeeper.getUserId() == null)
-                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
-                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
-        }
-        carton.setUpdateAt(LocalDateTime.now());
-        carton.setFrom(createCartonDTO.getFrom());
-        carton.setSerialFrom(createCartonDTO.getSerialFrom());
-        carton.setSerialTo(createCartonDTO.getSerialTo());
-        carton.setNumber(createCartonDTO.getNumber());
-        carton.setTo(createCartonDTO.getTo());
-        carton.setTypeVoucher(createCartonDTO.getTypeVoucher());
-        if(createCartonDTO.getIdStoreHouseStockage() != null)
-            carton.setIdStoreHouse(createCartonDTO.getIdStoreHouseStockage());
-        if(createCartonDTO.getIdSpaceManager1() != null)
-            carton.setIdSpaceManager1(createCartonDTO.getIdSpaceManager1());
-
-        iCartonService.createCarton(carton, 0);
-
-        return ResponseEntity.ok(carton);
+//        return ResponseEntity.ok(carton);
+        return null;
     }
 
     @Operation(summary = "Recupérer la liste des Cartons par Gestionnaire espace 1", tags = "Carton", responses = {
@@ -286,16 +302,19 @@ public class CartonRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/storehouse/{idStoreHouse:[0-9]+}")
-    public ResponseEntity<Page<Carton>> getCartonsByIdStoreHouse(@PathVariable Long idStoreHouse,
+    @GetMapping("/storehouse/{idStoreHouse}")
+    public ResponseEntity<?> getCartonsByIdStoreHouse(@PathVariable String idStoreHouse,
                                                                  @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                                                  @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                                                  @RequestParam(required = false, defaultValue = "idStoreHouse") String sort,
-                                                                 @RequestParam(required = false, defaultValue = "desc") String order) {
+                                                                 @RequestParam(required = false, defaultValue = "desc") String order) throws JsonProcessingException {
 
-        Page<Carton> cartons = iCartonService.getCartonsByIdStoreHouse(idStoreHouse,
+        Page<Carton> cartons = iCartonService.getCartonsByIdStoreHouse(Long.parseLong(aes.decrypt(key, idStoreHouse)),
                 Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
-        return ResponseEntity.ok(cartons);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(cartons);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Recupérer Un Carton par sa reference interne", tags = "Carton", responses = {
@@ -303,9 +322,13 @@ public class CartonRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/{internalReference:[0-9]+}")
-    public ResponseEntity<Carton> getCartonByInternalReference(@PathVariable Long internalReference) {
-        return ResponseEntity.ok(iCartonService.getByInternalReference(internalReference).get());
+    @GetMapping("/{internalReference}")
+    public ResponseEntity<?> getCartonByInternalReference(@PathVariable String internalReference) throws JsonProcessingException {
+        Carton carton = iCartonService.getByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))).get();
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(carton);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Supprimer un Carton", tags = "Carton", responses = {
@@ -334,9 +357,12 @@ public class CartonRest {
     public ResponseEntity<?> getAllCartons(@RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                            @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                            @RequestParam(required = false, defaultValue = "id") String sort,
-                                           @RequestParam(required = false, defaultValue = "desc") String order) {
+                                           @RequestParam(required = false, defaultValue = "desc") String order) throws JsonProcessingException {
         Page<ResponseCartonDTO> list = iCartonService.getAllCartons(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
-        return ResponseEntity.ok(list);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(list);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Parameters(value = {
@@ -358,8 +384,11 @@ public class CartonRest {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)            @RequestParam(required = false, value = "date" ) LocalDate date,
                                            @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                            @RequestParam(required = false, defaultValue = "id") String sort,
-                                           @RequestParam(required = false, defaultValue = "desc") String order) {
+                                           @RequestParam(required = false, defaultValue = "desc") String order) throws JsonProcessingException {
         Page<ResponseCartonDTO> list = iCartonService.filtres(number, status, storeHouse, date, spacemanager1, type, Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
-        return ResponseEntity.ok(list);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(list);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 }

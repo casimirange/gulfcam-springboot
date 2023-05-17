@@ -1,11 +1,15 @@
 package com.gulfcam.fuelcoupon.order.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.client.entity.Client;
 import com.gulfcam.fuelcoupon.client.entity.ETypeClient;
 import com.gulfcam.fuelcoupon.client.entity.TypeClient;
 import com.gulfcam.fuelcoupon.client.service.IClientService;
+import com.gulfcam.fuelcoupon.cryptage.AESUtil;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
 import com.gulfcam.fuelcoupon.order.dto.*;
 import com.gulfcam.fuelcoupon.order.entity.*;
@@ -29,6 +33,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONObject;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
@@ -127,6 +132,11 @@ public class OrderRest {
     String mailReplyTo;
     @Value("${app.api.base.url}")
     private String api_base_url;
+
+    JsonMapper jsonMapper = new JsonMapper();
+    AESUtil aes = new AESUtil();
+    @Value("${app.key}")
+    String key;
 
     SimpleDateFormat dateFor = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -256,7 +266,10 @@ public class OrderRest {
         }
 
         iOrderService.createOrder(order);
-        return ResponseEntity.ok(order);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(order);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Modification des informations pour une commande", tags = "Order", responses = {
@@ -266,7 +279,7 @@ public class OrderRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
     @PutMapping("/{InternalReference:[0-9]+}")
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> updateOrder(@Valid @RequestBody CreateOrderDTO createOrderDTO, @PathVariable Long InternalReference) {
+    public ResponseEntity<?> updateOrder(@Valid @RequestBody CreateOrderDTO createOrderDTO, @PathVariable Long InternalReference) throws JsonProcessingException {
 
         if (!iOrderService.getByInternalReference(InternalReference).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
@@ -356,7 +369,10 @@ public class OrderRest {
 
         iOrderService.createOrder(order);
 
-        return ResponseEntity.ok(order);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(order);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Effectuer un paiement pour une commande", tags = "Order", responses = {
@@ -364,11 +380,11 @@ public class OrderRest {
             @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
-    @PostMapping("/accept/{InternalReference:[0-9]+}")
+    @PostMapping("/accept/{InternalReference}")
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> acceptOrder(@RequestBody MultipartFile file, @PathVariable Long InternalReference, @RequestParam("idFund") Long idFund, @RequestParam("idPaymentMethod") Long idPaymentMethod, @RequestParam("paymentReference") String paymentReference, @RequestParam("docType") String docType) throws JRException, IOException {
+    public ResponseEntity<?> acceptOrder(@RequestBody MultipartFile file, @PathVariable String InternalReference, @RequestParam("idFund") String idFund, @RequestParam("idPaymentMethod") String idPaymentMethod, @RequestParam("paymentReference") String paymentReference, @RequestParam("docType") String docType) throws JRException, IOException {
 
-        Order order = iOrderService.getByInternalReference(InternalReference).get();
+        Order order = iOrderService.getByInternalReference(Long.parseLong(aes.decrypt(key, InternalReference))).get();
         Client client = iClientService.getClientByInternalReference(order.getIdClient()).get();
         StatusOrder statusOrderCreated = iStatusOrderRepo.findByName(EStatusOrder.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.CREATED +  "  not found"));
         if (order.getStatus() != statusOrderCreated) {
@@ -382,8 +398,8 @@ public class OrderRest {
         order.setLinkInvoice(fileDownloadUri);
         order.setStatus(statusOrder);
         order.setUpdateAt(LocalDateTime.now());
-        order.setIdPaymentMethod(idPaymentMethod);
-        order.setIdFund(idFund);
+        order.setIdPaymentMethod(Long.parseLong(aes.decrypt(key, idPaymentMethod)));
+        order.setIdFund(Long.parseLong(aes.decrypt(key, idFund)));
         order.setPaymentReference(paymentReference);
         iOrderService.createOrder(order);
 
@@ -396,7 +412,7 @@ public class OrderRest {
 //        log.info("Email send successfull for user: " + client.getEmail());
 
         Map<String, Object> emailProps = new HashMap<>();
-        emailProps.put("internalReferenceOrder", InternalReference);
+        emailProps.put("internalReferenceOrder", Long.parseLong(aes.decrypt(key, InternalReference)));
         emailProps.put("internalReferenceClient", order.getClientReference());
         emailProps.put("internalReferenceStore", order.getIdStore());
         emailProps.put("delivryTime", order.getDeliveryTime());
@@ -430,11 +446,11 @@ public class OrderRest {
             @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
-    @PostMapping("/delivery/{internalReference:[0-9]+}")
+    @PostMapping("/delivery/{internalReference}")
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> devliveryOrder(@PathVariable Long internalReference, @RequestParam("idSalesManager") Long idSalesManager) throws JRException, IOException {
+    public ResponseEntity<?> devliveryOrder(@PathVariable String internalReference, @RequestParam("idSalesManager") String idSalesManager) throws JRException, IOException {
 
-        Order order = iOrderService.getByInternalReference(internalReference).get();
+        Order order = iOrderService.getByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))).get();
         Client client = iClientService.getClientByInternalReference(order.getIdClient()).get();
         StatusOrder statusOrderPaid = iStatusOrderRepo.findByName(EStatusOrder.PAID).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.PAID +  "  not found"));
         if (order.getStatus() != statusOrderPaid) {
@@ -445,7 +461,7 @@ public class OrderRest {
         StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.IN_PROCESS_OF_DELIVERY).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.IN_PROCESS_OF_DELIVERY +  "  not found"));
         order.setStatus(statusOrder);
         order.setUpdateAt(LocalDateTime.now());
-        order.setIdSalesManager(idSalesManager);
+        order.setIdSalesManager(Long.parseLong(aes.decrypt(key, idSalesManager)));
         iOrderService.createOrder(order);
 
         HttpHeaders headers = new HttpHeaders();
@@ -493,13 +509,13 @@ public class OrderRest {
     @Operation(summary = "Télécharger un document (Bon de commande, reçue ou preuve de paiement) pour une commande", tags = "Order", responses = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "404", description = "File not found", content = @Content(mediaType = "Application/Json")),})
-    @GetMapping("/file/{InternalReference:[0-9]+}/downloadFile")
-    public ResponseEntity<Object> downloadFile(@PathVariable("InternalReference") Long InternalReference, @Schema(required = true, allowableValues = {"INVOICE", "DELIVERY"}, description = "Type de document") @RequestParam("type") String type, @RequestParam("docType") String docType,
-                                               HttpServletRequest request) {
+    @GetMapping("/file/{InternalReference}/downloadFile")
+    public ResponseEntity<Object> downloadFile(@PathVariable("InternalReference") String InternalReference, @Schema(required = true, allowableValues = {"INVOICE", "DELIVERY"}, description = "Type de document") @RequestParam("type") String type, @RequestParam("docType") String docType,
+                                               HttpServletRequest request) throws JsonProcessingException {
 
         TypeDocument typeDocument = iTypeDocumentRepo.findByName(ETypeDocument.valueOf(type.toUpperCase())).orElseThrow(()-> new ResourceNotFoundException("Type de document:  "  +  type +  "  not found"));
 
-        String fileName = iDocumentStorageService.getDocumentName(InternalReference, docType, typeDocument.getId());
+        String fileName = iDocumentStorageService.getDocumentName(Long.parseLong(aes.decrypt(key, InternalReference)), docType, typeDocument.getId());
         Resource resource = null;
         if (fileName != null && !fileName.isEmpty()) {
             try {
@@ -518,9 +534,12 @@ public class OrderRest {
             if (contentType == null) {
                 contentType = "application/octet-stream";
             }
+            jsonMapper.registerModule(new JavaTimeModule());
+            Object json = jsonMapper.writeValueAsString(resource);
+            JSONObject cr = aes.encryptObject( key, json);
             return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                    .body(resource);
+                    .body(cr);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("File not found");
         }
@@ -531,11 +550,11 @@ public class OrderRest {
             @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
-    @PostMapping("/pay/{InternalReference:[0-9]+}")
+    @PostMapping("/pay/{InternalReference}")
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> payOrder(@PathVariable Long InternalReference, @RequestParam("idSalesManager") Long idSalesManager) throws JRException, IOException {
+    public ResponseEntity<?> payOrder(@PathVariable String InternalReference, @RequestParam("idSalesManager") String idSalesManager) throws JRException, IOException {
 
-        Order order = iOrderService.getByInternalReference(InternalReference).get();
+        Order order = iOrderService.getByInternalReference(Long.parseLong(aes.decrypt(key, InternalReference))).get();
         Client client = iClientService.getClientByInternalReference(order.getIdClient()).get();
         StatusOrder statusOrderAccept = iStatusOrderRepo.findByName(EStatusOrder.ACCEPTED).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.ACCEPTED +  "  not found"));
         if (order.getStatus() != statusOrderAccept) {
@@ -545,11 +564,11 @@ public class OrderRest {
         StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.PAID).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.PAID +  "  not found"));
         order.setStatus(statusOrder);
         order.setUpdateAt(LocalDateTime.now());
-        order.setIdSalesManager(idSalesManager);
+        order.setIdSalesManager(Long.parseLong(aes.decrypt(key, idSalesManager)));
         iOrderService.createOrder(order);
 
         Map<String, Object> emailProps = new HashMap<>();
-        emailProps.put("internalReferenceOrder", InternalReference);
+        emailProps.put("internalReferenceOrder", Long.parseLong(aes.decrypt(key, InternalReference)));
         emailProps.put("internalReferenceClient", order.getClientReference());
         emailProps.put("internalReferenceStore", order.getIdStore());
         emailProps.put("delivryTime", order.getDeliveryTime());
@@ -575,13 +594,15 @@ public class OrderRest {
             byte[] data = generateReceived(order, client);
 
             Map<String, Object> emailProps2 = new HashMap<>();
-            emailProps2.put("Internalreference", InternalReference);
+            emailProps2.put("Internalreference", Long.parseLong(aes.decrypt(key, InternalReference)));
             emailProps2.put("completename", client.getCompleteName());
             emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, ApplicationConstant.SUBJECT_EMAIL_NEW_RECEIVED+InternalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_RECEIVED, data));
             log.info("Email send successfull for user: " + client.getEmail());
         }
-
-        return ResponseEntity.ok(order);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(order);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Annuler une commande", tags = "Order", responses = {
@@ -589,22 +610,22 @@ public class OrderRest {
             @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
-    @PostMapping("/cancel/{InternalReference:[0-9]+}")
+    @PostMapping("/cancel/{InternalReference}")
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> cancelOrder(@PathVariable Long InternalReference, @RequestParam("idCommercialAttache") Long idCommercialAttache, @RequestParam("reasonForCancellation")  @Schema(description = "Raison d’annulation") String reasonForCancellation) {
+    public ResponseEntity<?> cancelOrder(@PathVariable String InternalReference, @RequestParam("idCommercialAttache") String idCommercialAttache, @RequestParam("reasonForCancellation")  @Schema(description = "Raison d’annulation") String reasonForCancellation) throws JsonProcessingException {
 
-        Order order = iOrderService.getByInternalReference(InternalReference).get();
+        Order order = iOrderService.getByInternalReference(Long.parseLong(aes.decrypt(key, InternalReference))).get();
         Client client = iClientService.getClientByInternalReference(order.getIdClient()).get();
 
         StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.ORDER_CANCEL).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.ORDER_CANCEL +  "  not found"));
         order.setStatus(statusOrder);
         order.setUpdateAt(LocalDateTime.now());
-        order.setIdCommercialAttache(idCommercialAttache);
+        order.setIdCommercialAttache(Long.parseLong(aes.decrypt(key, idCommercialAttache)));
         order.setReasonForCancellation(reasonForCancellation);
         iOrderService.createOrder(order);
 
         Map<String, Object> emailProps = new HashMap<>();
-        emailProps.put("internalReferenceOrder", InternalReference);
+        emailProps.put("internalReferenceOrder", Long.parseLong(aes.decrypt(key, InternalReference)));
         emailProps.put("internalReferenceClient", order.getClientReference());
         emailProps.put("internalReferenceStore", order.getIdStore());
         emailProps.put("delivryTime", order.getDeliveryTime());
@@ -614,14 +635,16 @@ public class OrderRest {
         emailProps.put("status", EStatusOrder.ORDER_CANCEL);
         emailProps.put("payementMethode", (order.getIdPaymentMethod() == null)? "":order.getIdPaymentMethod()+ " - "+iPaymentMethodService.getByInternalReference(order.getIdPaymentMethod()).get().getDesignation());
 
-        Users commercialAttache = iUserService.getByInternalReference(idCommercialAttache);
+        Users commercialAttache = iUserService.getByInternalReference(Long.parseLong(aes.decrypt(key, idCommercialAttache)));
         emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, commercialAttache.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_ORDER+InternalReference+" - "+EStatusOrder.ORDER_CANCEL, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_ORDER));
         log.info("Email  send successfull for user: " + commercialAttache.getEmail());
 
         emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_ORDER+InternalReference+" - "+EStatusOrder.ORDER_CANCEL, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_ORDER));
         log.info("Email  send successfull for user: " + client.getEmail());
-
-        return ResponseEntity.ok(order);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(order);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Annuler plusieurs commandes", tags = "Order", responses = {
@@ -672,11 +695,11 @@ public class OrderRest {
             @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
-    @PostMapping("/valid/delivery/{InternalReference:[0-9]+}")
+    @PostMapping("/valid/delivery/{InternalReference}")
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> validDeliveryOrder(@RequestBody MultipartFile file, @PathVariable Long InternalReference, @RequestParam("idSalesManager") Long idSalesManager) throws JRException, IOException {
+    public ResponseEntity<?> validDeliveryOrder(@RequestBody MultipartFile file, @PathVariable String InternalReference, @RequestParam("idSalesManager") String idSalesManager) throws JRException, IOException {
 
-        Order order = iOrderService.getByInternalReference(InternalReference).get();
+        Order order = iOrderService.getByInternalReference(Long.parseLong(aes.decrypt(key, InternalReference))).get();
         Client client = iClientService.getClientByInternalReference(order.getIdClient()).get();
         StatusOrder statusOrderDelivery = iStatusOrderRepo.findByName(EStatusOrder.IN_PROCESS_OF_DELIVERY).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.IN_PROCESS_OF_DELIVERY +  "  not found"));
         if (order.getStatus() != statusOrderDelivery) {
@@ -690,11 +713,11 @@ public class OrderRest {
         order.setLinkDelivery(fileDownloadUri);
         order.setStatus(statusOrder);
         order.setUpdateAt(LocalDateTime.now());
-        order.setIdSalesManager(idSalesManager);
+        order.setIdSalesManager(Long.parseLong(aes.decrypt(key, idSalesManager)));
         iOrderService.createOrder(order);
 
         Map<String, Object> emailProps = new HashMap<>();
-        emailProps.put("internalReferenceOrder", InternalReference);
+        emailProps.put("internalReferenceOrder", Long.parseLong(aes.decrypt(key, InternalReference)));
         emailProps.put("internalReferenceClient", order.getClientReference());
         emailProps.put("internalReferenceStore", order.getIdStore());
         emailProps.put("delivryTime", order.getDeliveryTime());
@@ -715,14 +738,16 @@ public class OrderRest {
             byte[] data = generateFacture(order, client);
 
             Map<String, Object> emailProps2 = new HashMap<>();
-            emailProps2.put("Internalreference", InternalReference);
+            emailProps2.put("Internalreference", Long.parseLong(aes.decrypt(key, InternalReference)));
             emailProps2.put("completename", client.getCompleteName());
             emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, ApplicationConstant.SUBJECT_EMAIL_NEW_FACTURE+InternalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_FACTURE, data));
             log.info("Email send successfull for user: " + client.getEmail());
         }
 
-
-        return ResponseEntity.ok(order);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(order);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Recupérer la liste des commandes par client sous forme de fichier excel et envoyé par Mail", tags = "Order", responses = {
@@ -731,13 +756,13 @@ public class OrderRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/export/excel/client/{idClient:[0-9]+}")
-    public ResponseEntity<?> exportOrdersByIdClient(@PathVariable Long idClient) {
-        Client client = iClientService.getClientByInternalReference(idClient).get();
-        ByteArrayInputStream data = iOrderService.exportOrdersByIdClient(idClient);
+    @GetMapping("/export/excel/client/{idClient}")
+    public ResponseEntity<?> exportOrdersByIdClient(@PathVariable String idClient) {
+        Client client = iClientService.getClientByInternalReference(Long.parseLong(aes.decrypt(key, idClient))).get();
+        ByteArrayInputStream data = iOrderService.exportOrdersByIdClient(Long.parseLong(aes.decrypt(key, idClient)));
 
         Map<String, Object> emailProps2 = new HashMap<>();
-        emailProps2.put("Internalreference", idClient);
+        emailProps2.put("Internalreference", Long.parseLong(aes.decrypt(key, idClient)));
         emailProps2.put("CompleteName", client.getCompleteName());
         emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, ApplicationConstant.SUBJECT_EMAIL_EXPORT_ORDERS_EXCEL, ApplicationConstant.TEMPLATE_EMAIL_EXPORT_ORDER_EXCEL, data.readAllBytes(),"export-commandes-" + idClient + ".xlsx", "application/vnd.ms-excel"));
         log.info("Email send successfull for user: " + client.getEmail());
@@ -756,16 +781,19 @@ public class OrderRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/client/{idClient:[0-9]+}")
-    public ResponseEntity<Page<ResponseOrderDTO>> getOrdersByIdClient(@PathVariable Long idClient,
+    @GetMapping("/client/{idClient}")
+    public ResponseEntity<?> getOrdersByIdClient(@PathVariable String idClient,
                                                            @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                                            @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                                            @RequestParam(required = false, defaultValue = "idClient") String sort,
-                                                           @RequestParam(required = false, defaultValue = "desc") String order) {
+                                                           @RequestParam(required = false, defaultValue = "desc") String order) throws JsonProcessingException {
 
-        Page<ResponseOrderDTO> orders = iOrderService.getOrdersByIdClient(idClient,
+        Page<ResponseOrderDTO> orders = iOrderService.getOrdersByIdClient(Long.parseLong(aes.decrypt(key, idClient)),
                 Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
-        return ResponseEntity.ok(orders);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(orders);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Recupérer la liste des commandes par caisse/trésorerie", tags = "Order", responses = {
@@ -903,7 +931,7 @@ public class OrderRest {
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @GetMapping("/filter")
-    public ResponseEntity<Page<ResponseOrderDTO>> filterOrders(@RequestParam(required = false, value = "store" ) String idStore,
+    public ResponseEntity<?> filterOrders(@RequestParam(required = false, value = "store" ) String idStore,
                                                                @RequestParam(required = false, value = "client" ) String clientName,
      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)            @RequestParam(required = false, value = "date" ) LocalDate date,
                                                                @RequestParam(required = false, value = "ref" ) String internalRef,
@@ -911,11 +939,14 @@ public class OrderRest {
                                                                @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                                                @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                                                @RequestParam(required = false, defaultValue = "id") String sort,
-                                                               @RequestParam(required = false, defaultValue = "desc") String order) {
+                                                               @RequestParam(required = false, defaultValue = "desc") String order) throws JsonProcessingException {
 
         Page<ResponseOrderDTO> orders = iOrderService.filtrerOrders(idStore, clientName, date, internalRef, status,
                 Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
-        return ResponseEntity.ok(orders);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(orders);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Recupérer Une commande par son Identifiant interne", tags = "Order", responses = {
@@ -923,9 +954,15 @@ public class OrderRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/{internalReference:[0-9]+}")
-    public ResponseEntity<Order> getOrderByInternalReference(@PathVariable Long internalReference) {
-        return ResponseEntity.ok(iOrderService.getByInternalReference(internalReference).get());
+    @GetMapping("/{internalReference}")
+    public ResponseEntity<?> getOrderByInternalReference(@PathVariable String internalReference) throws JsonProcessingException {
+        log.info("crypté "+ internalReference);
+        log.info("décrypté "+ aes.decrypt(key, internalReference));
+        ResponseOrderDTO orders = iOrderService.getOrderByInternalReference(Long.parseLong(aes.decrypt(key, internalReference)));
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(orders);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
 
@@ -934,9 +971,9 @@ public class OrderRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/invoice/{internalReference:[0-9]+}")
-    public ResponseEntity<?> generateInvoiceByInternalReference(@PathVariable Long internalReference) throws JRException, IOException {
-        Order order = iOrderService.getByInternalReference(internalReference).get();
+    @GetMapping("/invoice/{internalReference}")
+    public ResponseEntity<?> generateInvoiceByInternalReference(@PathVariable String internalReference) throws JRException, IOException {
+        Order order = iOrderService.getByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))).get();
         Client client = iClientService.getClientByInternalReference(order.getIdClient()).get();
         byte[] data = generateInvoice(order, client);
         List<Product> products = iProductService.getProductsByIdOrder(order.getInternalReference());
@@ -950,7 +987,7 @@ public class OrderRest {
             testTypeDocument = true;
         }
         Map<String, Object> emailProps2 = new HashMap<>();
-        emailProps2.put("Internalreference", internalReference);
+        emailProps2.put("Internalreference", Long.parseLong(aes.decrypt(key, internalReference)));
         emailProps2.put("TypeDocument", testTypeDocument? "PREFACTURE":"PROFORMA");
         emailProps2.put("CompleteName", client.getCompleteName());
         emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, testTypeDocument ? ApplicationConstant.SUBJECT_EMAIL_NEW_INVOICE2+internalReference: ApplicationConstant.SUBJECT_EMAIL_NEW_INVOICE+internalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_INVOICE, data));
@@ -959,7 +996,6 @@ public class OrderRest {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=invoice-" + order.getClientReference() + ".pdf");
-
         return ResponseEntity.ok().headers(headers).contentType(MediaType.APPLICATION_PDF).body(data);
     }
 
@@ -968,9 +1004,9 @@ public class OrderRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @PostMapping("/document/{internalReference:[0-9]+}")
-    public ResponseEntity<?> generateInvoiceOrDelivery(@PathVariable Long internalReference, @Schema(required = true, allowableValues = {"INVOICE", "DELIVERY"}, description = "Type de document") @RequestParam("type") String type) throws JRException, IOException {
-        Order order = iOrderService.getByInternalReference(internalReference).get();
+    @PostMapping("/document/{internalReference}")
+    public ResponseEntity<?> generateInvoiceOrDelivery(@PathVariable String internalReference, @Schema(required = true, allowableValues = {"INVOICE", "DELIVERY"}, description = "Type de document") @RequestParam("type") String type) throws JRException, IOException {
+        Order order = iOrderService.getByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))).get();
         Client client = iClientService.getClientByInternalReference(order.getIdClient()).get();
 
         byte[] data;
@@ -1019,8 +1055,10 @@ public class OrderRest {
                                        @RequestParam(required = false, defaultValue = "id") String status,
                                              @RequestParam(required = false, defaultValue = "desc") String order) throws IOException {
         Page<ResponseOrderDTO> list = iOrderService.getAllOrders(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order, createdAt, status);
-
-        return ResponseEntity.ok(list);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(list);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     private byte[] generateInvoice(Order order, Client client) throws JRException, IOException {

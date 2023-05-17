@@ -11,7 +11,7 @@ public class CreateStorehouseDTO {
 
     @Schema(description = "reference interne du magasin")
     @NotNull(message = "{store.required}")
-    private Long idStore;
+    private String idStore;
 
     @Schema(required = true, allowableValues = {"vente", "stockage"}, description = "Type d'entrepôt (vente / stockage)")
     @NotNull(message = "{type.required}")

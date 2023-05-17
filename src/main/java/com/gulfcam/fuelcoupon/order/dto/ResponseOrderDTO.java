@@ -1,6 +1,7 @@
 package com.gulfcam.fuelcoupon.order.dto;
 import com.gulfcam.fuelcoupon.client.entity.Client;
 import com.gulfcam.fuelcoupon.order.entity.PaymentMethod;
+import com.gulfcam.fuelcoupon.order.entity.Product;
 import com.gulfcam.fuelcoupon.order.entity.StatusOrder;
 import com.gulfcam.fuelcoupon.store.entity.Store;
 import com.gulfcam.fuelcoupon.user.entity.Users;
@@ -11,6 +12,7 @@ import org.hibernate.annotations.Type;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -58,6 +60,8 @@ public class ResponseOrderDTO {
 
     private PaymentMethod paymentMethod;
 
+    private String paymentName;
+
     private String paymentReference;
 
     private String reasonForCancellation;
@@ -67,5 +71,7 @@ public class ResponseOrderDTO {
     private LocalDateTime createdAt;
 
     private LocalDateTime updateAt;
+
+    private List<ResponseProductDTO> products;
 
 }

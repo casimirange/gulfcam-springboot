@@ -15,13 +15,13 @@ public class CreateStationDTO {
     private String designation;
 
     @Schema(description = "Reférence interne du gérant de la station")
-    private Long managerStagion;
+    private String managerStagion;
 
     @Schema(description = "Code PIN")
     @NotNull(message = "{pincode.required}")
-    private int pinCode;
+    private String pinCode;
 
     @Schema(description = "Solde")
-    private float balance;
+    private String balance;
 
 }

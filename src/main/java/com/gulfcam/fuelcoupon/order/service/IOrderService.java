@@ -26,6 +26,7 @@ public interface IOrderService {
     Page<ResponseOrderDTO> filterOrders(Long idStore, String name, LocalDate date, String internalRef, String statusName, int page, int size, String sort, String order);
     Page<ResponseOrderDTO> filtrerOrders(String idStore, String clientName, LocalDate date, String internalRef, String statusName, int page, int size, String sort, String order);
     Optional<Order> getOrderById(Long id);
+    ResponseOrderDTO getOrderByInternalReference(Long internelReference);
     Optional<Order> getByInternalReference(Long internelReference);
     void createOrder(Order order);
     void deleteOrder(Order order);

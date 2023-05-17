@@ -1,9 +1,13 @@
 package com.gulfcam.fuelcoupon.store.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.client.entity.Client;
 import com.gulfcam.fuelcoupon.client.service.IClientService;
+import com.gulfcam.fuelcoupon.cryptage.AESUtil;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
 import com.gulfcam.fuelcoupon.order.dto.ProductDTO;
 import com.gulfcam.fuelcoupon.order.entity.*;
@@ -38,6 +42,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONObject;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
@@ -117,7 +122,10 @@ public class CreditNoteRest {
     @Value("${mail.replyTo[0]}")
     String mailReplyTo;
     SimpleDateFormat dateFor = new SimpleDateFormat("dd/MM/yyyy");
-
+    JsonMapper jsonMapper = new JsonMapper();
+    AESUtil aes = new AESUtil();
+    @Value("${app.key}")
+    String key;
     @Operation(summary = "Valider les coupons utilisés", tags = "Note de crédit", responses = {
             @ApiResponse(responseCode = "201", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = RequestOpposition.class)))),
             @ApiResponse(responseCode = "404", description = "RequestOpposition not found", content = @Content(mediaType = "Application/Json")),
@@ -125,13 +133,13 @@ public class CreditNoteRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
     @PostMapping()
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> addCreditNote(@Valid @RequestBody CreateCreditNoteDTO createCreditNoteDTO) {
+    public ResponseEntity<?> addCreditNote(@Valid @RequestBody CreateCreditNoteDTO createCreditNoteDTO) throws JsonProcessingException {
 
         Coupon coupon;
         ResponseCouponMailDTO responseCouponMailDTO;
         CreditNote creditNote = new CreditNote();
         creditNote.setInternalReference(jwtUtils.generateInternalReference());
-        creditNote.setIdStation(createCreditNoteDTO.getIdStation());
+        creditNote.setIdStation(Long.parseLong(aes.decrypt(key, createCreditNoteDTO.getIdStation())));
         creditNote.setCreatedAt(LocalDateTime.now());
         Status statusCouponUsed = iStatusRepo.findByName(EStatus.USED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.USED +  "  not found"));
         Status status = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
@@ -140,7 +148,7 @@ public class CreditNoteRest {
         iCreditNoteService.createCreditNote(creditNote);
         List<ResponseCouponMailDTO> couponList = new ArrayList<>();
         for (int i = 0; i< createCreditNoteDTO.getSerialCoupons().size(); i++){
-            coupon = iCouponService.getCouponBySerialNumber(createCreditNoteDTO.getSerialCoupons().get(i)).get();
+            coupon = iCouponService.getCouponBySerialNumber(aes.decrypt(key, createCreditNoteDTO.getSerialCoupons().get(i))).get();
 
             if(coupon.getStatus().equals(statusCouponUsed)){
                 responseCouponMailDTO= new ResponseCouponMailDTO();
@@ -150,7 +158,7 @@ public class CreditNoteRest {
                 responseCouponMailDTO.setSerialNumber(coupon.getSerialNumber());
                 coupon.setIdCreditNote(creditNote.getInternalReference());
                 coupon.setUpdateAt(LocalDateTime.now());
-                coupon.setIdStation(createCreditNoteDTO.getIdStation());
+                coupon.setIdStation(Long.parseLong(aes.decrypt(key, createCreditNoteDTO.getIdStation())));
                 iCouponService.createCoupon(coupon);
                 couponList.add(responseCouponMailDTO);
             }
@@ -185,7 +193,10 @@ public class CreditNoteRest {
             }
         }
 
-        return ResponseEntity.ok(creditNote);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(creditNote);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Recupérer Une Note de crédit par sa reference interne", tags = "Note de crédit", responses = {
@@ -193,13 +204,13 @@ public class CreditNoteRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/{internalReference:[0-9]+}")
-    public ResponseEntity<ResponseCreditNoteDTO> getByInternalReference(@PathVariable Long internalReference) {
+    @GetMapping("/{internalReference}")
+    public ResponseEntity<?> getByInternalReference(@PathVariable String internalReference) throws JsonProcessingException {
 
-        CreditNote creditNote = iCreditNoteService.getByInternalReference(internalReference).get();
+        CreditNote creditNote = iCreditNoteService.getByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))).get();
         ResponseCreditNoteDTO responseCreditNoteDTO = new ResponseCreditNoteDTO();
 
-        responseCreditNoteDTO.setCoupon(iCouponService.getCouponsByIdCreditNote(internalReference));
+        responseCreditNoteDTO.setCoupon(iCouponService.getCouponsByIdCreditNote(Long.parseLong(aes.decrypt(key, internalReference))));
         responseCreditNoteDTO.setStation(iStationService.getByInternalReference(creditNote.getIdStation()).get());
         responseCreditNoteDTO.setInternalReference(creditNote.getInternalReference());
         responseCreditNoteDTO.setStatus(creditNote.getStatus());
@@ -207,7 +218,10 @@ public class CreditNoteRest {
         responseCreditNoteDTO.setUpdateAt(creditNote.getUpdateAt());
         responseCreditNoteDTO.setCreatedAt(creditNote.getCreatedAt());
 
-        return ResponseEntity.ok(responseCreditNoteDTO);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(responseCreditNoteDTO);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Générer Une Note de crédit par sa reference interne", tags = "Note de crédit", responses = {
@@ -215,11 +229,11 @@ public class CreditNoteRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/export/{internalReference:[0-9]+}")
-    public ResponseEntity<?> exportByInternalReference(@PathVariable Long internalReference) throws JRException, IOException {
+    @GetMapping("/export/{internalReference}")
+    public ResponseEntity<?> exportByInternalReference(@PathVariable String internalReference) throws JRException, IOException {
 
-        CreditNote creditNote = iCreditNoteService.getByInternalReference(internalReference).get();
-        List<Coupon> couponList = iCouponService.getCouponsByIdCreditNote(internalReference);
+        CreditNote creditNote = iCreditNoteService.getByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))).get();
+        List<Coupon> couponList = iCouponService.getCouponsByIdCreditNote(Long.parseLong(aes.decrypt(key, internalReference)));
         Station station = iStationService.getByInternalReference(creditNote.getIdStation()).get();
 
         Users managerStation = iUserService.getByInternalReference(station.getIdManagerStation());
@@ -254,10 +268,10 @@ public class CreditNoteRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/valid/{internalReference:[0-9]+}")
-    public ResponseEntity<?> validCreditNote(@PathVariable Long internalReference) {
+    @GetMapping("/valid/{internalReference}")
+    public ResponseEntity<?> validCreditNote(@PathVariable String internalReference) throws JsonProcessingException {
 
-        CreditNote creditNote = iCreditNoteService.getByInternalReference(internalReference).get();
+        CreditNote creditNote = iCreditNoteService.getByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))).get();
 
         Status statusCreditNote = iStatusRepo.findByName(EStatus.ACTIVATED).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatus.ACTIVATED +  "  not found"));
         if (creditNote.getStatus() == statusCreditNote) {
@@ -272,7 +286,7 @@ public class CreditNoteRest {
         creditNote.setStatus(status);
         iCreditNoteService.createCreditNote(creditNote);
 
-        List<Coupon> coupons = iCouponService.getCouponsByIdCreditNote(internalReference);
+        List<Coupon> coupons = iCouponService.getCouponsByIdCreditNote(Long.parseLong(aes.decrypt(key, internalReference)));
 
         for(int i=0; i<coupons.size(); i++){
             TypeVoucher typeVoucher = iTypeVoucherService.getByInternalReference(coupons.get(i).getIdTypeVoucher()).get();
@@ -308,7 +322,10 @@ public class CreditNoteRest {
             }
         }
 
-        return ResponseEntity.ok(responseCreditNoteDTO);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(responseCreditNoteDTO);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
 
@@ -339,9 +356,12 @@ public class CreditNoteRest {
     public ResponseEntity<?> getAllCreditNotes(@RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                                       @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                                       @RequestParam(required = false, defaultValue = "id") String sort,
-                                                      @RequestParam(required = false, defaultValue = "desc") String order) {
+                                                      @RequestParam(required = false, defaultValue = "desc") String order) throws JsonProcessingException {
         Page<ResponseCreditNoteDTO> list = iCreditNoteService.getAllCreditNotes(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
-        return ResponseEntity.ok(list);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(list);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Parameters(value = {
@@ -361,9 +381,12 @@ public class CreditNoteRest {
                                                       @RequestParam(required = false, value = "internalRef") String ref,
                                                       @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                                       @RequestParam(required = false, defaultValue = "id") String sort,
-                                                      @RequestParam(required = false, defaultValue = "desc") String order) {
+                                                      @RequestParam(required = false, defaultValue = "desc") String order) throws JsonProcessingException {
         Page<ResponseCreditNoteDTO> list = iCreditNoteService.filtres(stationName, status, ref, date, Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
-        return ResponseEntity.ok(list);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(list);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Parameters(value = {
@@ -375,13 +398,16 @@ public class CreditNoteRest {
             @ApiResponse(responseCode = "404", description = "Credit note not found", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/station/{idStation:[0-9]+}")
-    public ResponseEntity<?> getCreditNotesByIdStation(@PathVariable Long idStation,@RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
+    @GetMapping("/station/{idStation}")
+    public ResponseEntity<?> getCreditNotesByIdStation(@PathVariable String idStation,@RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                                       @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                                       @RequestParam(required = false, defaultValue = "id") String sort,
-                                                      @RequestParam(required = false, defaultValue = "desc") String order) {
-        Page<ResponseCreditNoteDTO> list = iCreditNoteService.getCreditNotesByIdStation(idStation, Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
-        return ResponseEntity.ok(list);
+                                                      @RequestParam(required = false, defaultValue = "desc") String order) throws JsonProcessingException {
+        Page<ResponseCreditNoteDTO> list = iCreditNoteService.getCreditNotesByIdStation(Long.parseLong(aes.decrypt(key, idStation)), Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(list);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
 

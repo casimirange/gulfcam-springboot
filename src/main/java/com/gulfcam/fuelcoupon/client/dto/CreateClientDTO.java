@@ -14,15 +14,12 @@ public class CreateClientDTO {
     @NotNull(message = "{completeName.required}")
     private String completeName;
 
-    @NotNull(message = "{companyName.required}")
     private String companyName;
-
+    @NotNull(message = "{address.required}")
     private String address;
-
+    @NotNull(message = "{phone.required}")
     private String phone;
 
-    @Email(message = "{email.verified}")
-    @NotNull(message = "{email.required}")
     private String email;
 
     private String niu;
