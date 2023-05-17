@@ -513,7 +513,7 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     public Optional<Order> getByInternalReference(Long id) {
-        return iOrderRepo.findById(id);
+        return iOrderRepo.getOrderByInternalReference(id);
     }
 
     @Override
@@ -528,7 +528,7 @@ public class OrderServiceImpl implements IOrderService {
         Users managerCoupon = new Users();
         Users spaceManager2 = new Users();
 
-        Page<Product> products = iProductRepo.getProductsByIdOrder(internelReference, PageRequest.of(0, 50, Sort.by(Sort.Direction.fromString("idOrder"), "desc")));
+        Page<Product> products = iProductRepo.getProductsByIdOrder(internelReference, PageRequest.of(0, 50));
         ResponseProductDTO responseProductDTO;
         List<ResponseProductDTO> responseProductDTOList = new ArrayList<>();
 
