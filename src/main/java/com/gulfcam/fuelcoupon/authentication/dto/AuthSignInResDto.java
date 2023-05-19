@@ -19,7 +19,7 @@ public class AuthSignInResDto {
 	private String tokenType;
 //	private Users user;
 //	private List<String> roles;
-	private String user;
+	private Users user;
 	private List<String> roles;
 	private String account;
 	private String firstname;

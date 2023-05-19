@@ -196,7 +196,7 @@ public class AuthenticationRest {
             @ApiResponse(responseCode = "401", description = "", content = @Content(mediaType = "Application/Json"))})
 
     @PostMapping("/sign-in")
-    public ResponseEntity<Object> authenticateUser(@Valid @RequestBody AuthReqDto userAuthDto) throws JsonProcessingException {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody AuthReqDto userAuthDto) throws JsonProcessingException {
 
         String login = aes.decrypt(AES_KEY, userAuthDto.getLogin());
         String pwd = aes.decrypt(AES_KEY, userAuthDto.getPassword());
@@ -238,21 +238,15 @@ public class AuthenticationRest {
 
 //            log.info("crypté " + aes.encrypt(userAuthDto));
             SignInResponse signInResponse = new SignInResponse(true, messageSource.getMessage("messages.code-otp", null, LocaleContextHolder.getLocale()), bearerToken, false);
-            ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
-            Object json = objectWriter.writeValueAsString(signInResponse);
-            log.info("resp " + json);
-            log.info("resp2 " + signInResponse.isUsing2FA());
+//            ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
+//            Object json = objectWriter.writeValueAsString(signInResponse);
+            jsonMapper.registerModule(new JavaTimeModule());
+            Object json = jsonMapper.writeValueAsString(signInResponse);
             JSONObject cr = aes.encryptObject( AES_KEY, json);
-            JSONObject cr1 = aes.encryptObject( AES_KEY, userAuthDto);
-            log.info("crypté " + cr);
-            log.info("crypté1 " + cr1);
-            log.info("décrypté " + aes.decryptObject(AES_KEY, cr.getAsString("key")));
-            log.info("décrypté1 " + aes.decryptObject(AES_KEY, cr1.getAsString("key")));
-            ObjectMapper mapper = new ObjectMapper();
 
             log.info("autre " + user);
 
-            return ResponseEntity.ok().body((new SignInResponse(true, messageSource.getMessage("messages.code-otp", null, LocaleContextHolder.getLocale()), aes.encrypt(AES_KEY, bearerToken), false)));
+            return ResponseEntity.ok().body(cr);
 //            return ResponseEntity.ok().body(cr);
 
 
@@ -270,10 +264,7 @@ public class AuthenticationRest {
     @PostMapping("/sign-up")
     public ResponseEntity<Object> add(@Valid @RequestBody UserReqDto userAddDto, HttpServletRequest request) throws JsonProcessingException {
         String pincode = String.valueOf(userAddDto.getPinCode());
-        log.info("le pincode1 est : "+ userAddDto.getPinCode());
-        log.info("le pincode2 est : "+ pincode);
-        log.info("le pincode3 est : "+ aes.decrypt(AES_KEY,pincode));
-        log.info("le pincode4 est : "+ aes.decrypt(AES_KEY,userAddDto.getPinCode()));
+
         if (userService.existsByEmail(aes.decrypt(AES_KEY,userAddDto.getEmail()), null)) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.email_exists", null, LocaleContextHolder.getLocale())));
@@ -386,10 +377,10 @@ public class AuthenticationRest {
             @ApiResponse(responseCode = "200", description = "Succès de l'opération", content = @Content(mediaType = "Application/Json", array = @ArraySchema(schema = @Schema(implementation = Users.class)))),
             @ApiResponse(responseCode = "400", description = "code de vérification incorrect", content = @Content(mediaType = "Application/Json"))})
     @GetMapping("/verify")
-    public ResponseEntity<?> verifyCode(@NotEmpty @RequestParam(name = "code", required = true) String codes) {
-        log.info("code otp1 : "+codes);
-        String code = aes.decrypt(AES_KEY, codes);
-        log.info("code otp2 : "+code);
+    public ResponseEntity<?> verifyCode(@NotEmpty @RequestParam(name = "code", required = true) String code) throws JsonProcessingException {
+//        log.info("code otp1 : "+codes);
+//        String code = aes.decrypt(AES_KEY, codes);
+//        log.info("code otp2 : "+code);
         Users users = authorizationService.getUserInContextApp();
         log.info("user :"+users);
             if (code.equals(users.getOtpCode()) && ChronoUnit.MINUTES.between(users.getOtpCodeCreatedAT(), LocalDateTime.now()) < 5) {
@@ -398,7 +389,7 @@ public class AuthenticationRest {
                 String refreshToken = jwtUtils.generateJwtToken(users.getEmail(),
                         jwtUtils.getExpirationRefreshToken(), jwtUtils.getSecretRefreshToken(), true);
                 userService.editToken(users.getUserId(), refreshToken);
-                List<String> roles = users.getRoles().stream().map(item -> aes.encrypt(AES_KEY, item.getName().name()))
+                List<String> roles = users.getRoles().stream().map(item -> item.getName().name())
                         .collect(Collectors.toList());
                 updateExistingUser(users.getEmail(), null);
                 userService.updateDateLastLoginUser(users.getUserId());
@@ -406,18 +397,23 @@ public class AuthenticationRest {
                 userService.editToken(users.getUserId(), null);
                 users.setOtpCode(null);
                 users.setOtpCodeCreatedAT(null);
-            String account = aes.encrypt(AES_KEY,users.getTypeAccount().getName().name());
-            String firstname = aes.encrypt(AES_KEY,users.getFirstName());
-            String lastname = aes.encrypt(AES_KEY,users.getLastName());
-            String idStore = aes.encrypt(AES_KEY,users.getIdStore().toString());
-            String uid = aes.encrypt(AES_KEY,users.getInternalReference().toString());
-            String id = aes.encrypt(AES_KEY,users.getUserId().toString());
-            String email = aes.encrypt(AES_KEY,users.getEmail());
+            String account = users.getTypeAccount().getName().name();
+            String firstname = users.getFirstName();
+            String lastname = users.getLastName();
+            String idStore = users.getIdStore().toString();
+            String uid = users.getInternalReference().toString();
+            String id = users.getUserId().toString();
+            String email = users.getEmail();
             userRepo.save(users);
             log.info("user " + users.getOtpCode() + " authenticated");
             log.info("user_otp_code" + users.getOtpCode() + "otpCodeCreatedAt:" + users.getOtpCodeCreatedAT());
-            return ResponseEntity.ok(new AuthSignInResDto(aes.encrypt(AES_KEY,bearerToken), aes.encrypt(AES_KEY,refreshToken), "Bearer", aes.encryptObject(AES_KEY,users).toString(), roles, account
-                    , firstname, lastname, idStore, uid, id, true));
+
+            AuthSignInResDto authSignInResDto = new AuthSignInResDto(bearerToken, refreshToken, "Bearer", users, roles, account
+                        , firstname, lastname, idStore, uid, id, true);
+            jsonMapper.registerModule(new JavaTimeModule());
+            Object json = jsonMapper.writeValueAsString(authSignInResDto);
+            JSONObject cr = aes.encryptObject( AES_KEY, json);
+            return ResponseEntity.ok(cr);
 
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
