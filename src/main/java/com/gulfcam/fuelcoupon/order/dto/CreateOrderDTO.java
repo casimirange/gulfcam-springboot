@@ -12,33 +12,33 @@ public class CreateOrderDTO {
 
     @Schema(description = "Reference interne du client")
     @NotNull(message = "{client.required}")
-    private Long idClient;
+    private String idClient;
 
     @Schema(description = "Reference interne Caisse/Trésorerie")
-    private Long idFund;
+    private String idFund;
 
     @Schema(description = "Reference interne de l'attaché commercial")
     @NotNull(message = "{idManagerStore.required}")
-    private Long idCommercialAttache;
+    private String idCommercialAttache;
 
     @Schema(description = "Reference interne du Directeur commercial")
-    private Long idSalesManager;
+    private String idSalesManager;
 
     @Schema(description = "Montant global NET")
-    private int NetAggregateAmount;
+    private String NetAggregateAmount;
 
     @Schema(description = "Montant global TTC")
-    private int TTCAggregateAmount;
+    private String TTCAggregateAmount;
 
     @Schema(description = "Reference interne du Gestionnaire espace 2")
-    private Long idSpaceManager2;
+    private String idSpaceManager2;
 
     @Schema(description = "Taxe applicable")
     private String tax;
 
     @Schema(description = "Reference interne du magasin")
     @NotNull(message = "{store.required}")
-    private Long idStore;
+    private String idStore;
 
     @Schema(required = true, allowableValues = {"Mail", "Appel", "Courrier papier", "Sur site"}, description = "Canal")
     private String channel;
@@ -48,7 +48,7 @@ public class CreateOrderDTO {
     private String deliveryTime;
 
     @Schema(description = "Reference interne de la méthode de paiement choisie")
-    private Long IdPaymentMethod;
+    private String IdPaymentMethod;
 
     private String paymentReference;
 

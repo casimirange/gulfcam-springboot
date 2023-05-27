@@ -158,73 +158,73 @@ public class OrderRest {
         PaymentMethod paymentMethod = new PaymentMethod();
 
         if (createOrderDTO.getIdClient()  != null) {
-            if(!iClientService.getClientByInternalReference(createOrderDTO.getIdClient()).isPresent())
+            if(!iClientService.getClientByInternalReference(Long.parseLong(aes.decrypt(key, createOrderDTO.getIdClient().toString()))).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.client_exists", null, LocaleContextHolder.getLocale())));
-            client = iClientService.getClientByInternalReference(createOrderDTO.getIdClient()).get();
+            client = iClientService.getClientByInternalReference(Long.parseLong(aes.decrypt(key, createOrderDTO.getIdClient().toString()))).get();
 
         }
         if (createOrderDTO.getIdSalesManager()  != null) {
-            salesmanager = iUserService.getByInternalReference(createOrderDTO.getIdSalesManager());
+            salesmanager = iUserService.getByInternalReference(Long.parseLong(aes.decrypt(key, createOrderDTO.getIdSalesManager().toString())));
 
             if(salesmanager.getUserId() == null)
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
         }
         if (createOrderDTO.getIdCommercialAttache()  != null) {
-            commercialAttache = iUserService.getByInternalReference(createOrderDTO.getIdCommercialAttache());
+            commercialAttache = iUserService.getByInternalReference(Long.parseLong(aes.decrypt(key, createOrderDTO.getIdCommercialAttache().toString())));
 
             if(commercialAttache.getUserId() == null)
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
         }
         if (createOrderDTO.getIdSpaceManager2()  != null) {
-            managerSpaceManager2 = iUserService.getByInternalReference(createOrderDTO.getIdSpaceManager2());
+            managerSpaceManager2 = iUserService.getByInternalReference(Long.parseLong(aes.decrypt(key, createOrderDTO.getIdSpaceManager2().toString())));
 
             if(managerSpaceManager2.getUserId() == null)
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
         }
-        if (createOrderDTO.getIdFund()  != null) {
-            fund = iUserService.getByInternalReference(createOrderDTO.getIdFund());
-
-            if(fund.getUserId() == null)
-                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
-                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
-        }
+//        if (createOrderDTO.getIdFund()  != null) {
+//            fund = iUserService.getByInternalReference(createOrderDTO.getIdFund());
+//
+//            if(fund.getUserId() == null)
+//                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+//                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
+//        }
         if (createOrderDTO.getIdStore()  != null) {
-            if(!iStoreService.getByInternalReference(createOrderDTO.getIdStore()).isPresent())
+            if(!iStoreService.getByInternalReference(Long.parseLong(aes.decrypt(key, createOrderDTO.getIdStore().toString()))).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
-            store = iStoreService.getByInternalReference(createOrderDTO.getIdStore()).get();
+            store = iStoreService.getByInternalReference(Long.parseLong(aes.decrypt(key, createOrderDTO.getIdStore().toString()))).get();
 
         }
-        if (createOrderDTO.getIdPaymentMethod()  != null) {
-            if(!iPaymentMethodService.getByInternalReference(createOrderDTO.getIdPaymentMethod()).isPresent())
-                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
-                        messageSource.getMessage("messages.payment_exists", null, LocaleContextHolder.getLocale())));
-            paymentMethod = iPaymentMethodService.getByInternalReference(createOrderDTO.getIdPaymentMethod()).get();
-
-        }
+//        if (createOrderDTO.getIdPaymentMethod()  != null) {
+//            if(!iPaymentMethodService.getByInternalReference(createOrderDTO.getIdPaymentMethod()).isPresent())
+//                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+//                        messageSource.getMessage("messages.payment_exists", null, LocaleContextHolder.getLocale())));
+//            paymentMethod = iPaymentMethodService.getByInternalReference(createOrderDTO.getIdPaymentMethod()).get();
+//
+//        }
 
         Long internalReference = jwtUtils.generateInternalReference();
         Order order = new Order();
         order.setInternalReference(internalReference);
         order.setCreatedAt(LocalDateTime.now());
-        order.setClientReference(createOrderDTO.getClientReference());
-        order.setIdClient(createOrderDTO.getIdClient());
-        order.setIdFund(createOrderDTO.getIdFund());
-        order.setIdSalesManager(createOrderDTO.getIdSalesManager());
-        order.setIdCommercialAttache(createOrderDTO.getIdCommercialAttache());
-        order.setChannel(createOrderDTO.getChannel());
-        order.setDescription(createOrderDTO.getDescription());
-        order.setDeliveryTime(createOrderDTO.getDeliveryTime());
-        order.setIdPaymentMethod(createOrderDTO.getIdPaymentMethod());
-        order.setNetAggregateAmount(createOrderDTO.getNetAggregateAmount());
-        order.setTTCAggregateAmount(createOrderDTO.getTTCAggregateAmount());
-        order.setTax(createOrderDTO.getTax());
-        order.setIdSpaceManager2(createOrderDTO.getIdSpaceManager2());
-        order.setIdStore(createOrderDTO.getIdStore());
+        order.setClientReference(createOrderDTO.getClientReference() != null ? aes.decrypt(key, createOrderDTO.getClientReference()) : "");
+        order.setIdClient(Long.parseLong(aes.decrypt(key, createOrderDTO.getIdClient().toString())));
+//        order.setIdFund(createOrderDTO.getIdFund());
+//        order.setIdSalesManager(createOrderDTO.getIdSalesManager());
+        order.setIdCommercialAttache(Long.parseLong(aes.decrypt(key, createOrderDTO.getIdCommercialAttache().toString())));
+        order.setChannel(aes.decrypt(key, createOrderDTO.getChannel()));
+        order.setDescription(createOrderDTO.getDescription() != null ? aes.decrypt(key, createOrderDTO.getDeliveryTime().toString()) :"");
+        order.setDeliveryTime(createOrderDTO.getDeliveryTime() != null ? aes.decrypt(key, createOrderDTO.getDeliveryTime().toString()) :"");
+//        order.setIdPaymentMethod(createOrderDTO.getIdPaymentMethod());
+        order.setNetAggregateAmount(Integer.parseInt(aes.decrypt(key, createOrderDTO.getNetAggregateAmount()+"")));
+        order.setTTCAggregateAmount(Integer.parseInt(aes.decrypt(key, createOrderDTO.getTTCAggregateAmount()+"")));
+        order.setTax(aes.decrypt(key, createOrderDTO.getTax()));
+//        order.setIdSpaceManager2(createOrderDTO.getIdSpaceManager2());
+        order.setIdStore(Long.parseLong(aes.decrypt(key, createOrderDTO.getIdStore().toString())));
         order.setPaymentReference(createOrderDTO.getPaymentReference());
 
         StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.CREATED +  "  not found"));
@@ -281,98 +281,99 @@ public class OrderRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     public ResponseEntity<?> updateOrder(@Valid @RequestBody CreateOrderDTO createOrderDTO, @PathVariable Long InternalReference) throws JsonProcessingException {
 
-        if (!iOrderService.getByInternalReference(InternalReference).isPresent()) {
-            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
-                    messageSource.getMessage("messages.order_exists", null, LocaleContextHolder.getLocale())));
-        }
-        Order order = iOrderService.getByInternalReference(InternalReference).get();
-        Client client = new Client();
-        Users salesmanager = new Users();
-        Users fund = new Users();
-        Users commercialAttache = new Users();
-        Users managerSpaceManager2 = new Users();
-        Store store = new Store();
-        PaymentMethod paymentMethod = new PaymentMethod();
-
-        if (createOrderDTO.getIdClient()  != null) {
-            if(!iClientService.getClientByInternalReference(createOrderDTO.getIdClient()).isPresent())
-                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
-                        messageSource.getMessage("messages.client_exists", null, LocaleContextHolder.getLocale())));
-            client = iClientService.getClientByInternalReference(createOrderDTO.getIdClient()).get();
-
-        }
-        if (createOrderDTO.getIdSalesManager()  != null) {
-            salesmanager = iUserService.getByInternalReference(createOrderDTO.getIdSalesManager());
-
-            if(salesmanager.getUserId() == null)
-                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
-                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
-        }
-        if (createOrderDTO.getIdCommercialAttache()  != null) {
-            commercialAttache = iUserService.getByInternalReference(createOrderDTO.getIdCommercialAttache());
-
-            if(commercialAttache.getUserId() == null)
-                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
-                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
-        }
-        if (createOrderDTO.getIdSpaceManager2()  != null) {
-            managerSpaceManager2 = iUserService.getByInternalReference(createOrderDTO.getIdSpaceManager2());
-
-            if(managerSpaceManager2.getUserId() == null)
-                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
-                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
-        }
-        if (createOrderDTO.getIdFund()  != null) {
-            fund = iUserService.getByInternalReference(createOrderDTO.getIdFund());
-
-            if(fund.getUserId() == null)
-                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
-                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
-        }
-        if (createOrderDTO.getIdStore()  != null) {
-            if(!iStoreService.getByInternalReference(createOrderDTO.getIdStore()).isPresent())
-                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
-                        messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
-            store = iStoreService.getByInternalReference(createOrderDTO.getIdStore()).get();
-
-        }
-        if (createOrderDTO.getIdPaymentMethod()  != null) {
-            if(!iPaymentMethodService.getByInternalReference(createOrderDTO.getIdPaymentMethod()).isPresent())
-                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
-                        messageSource.getMessage("messages.payment_exists", null, LocaleContextHolder.getLocale())));
-            paymentMethod = iPaymentMethodService.getByInternalReference(createOrderDTO.getIdPaymentMethod()).get();
-
-        }
-        order.setUpdateAt(LocalDateTime.now());
-        order.setClientReference(createOrderDTO.getClientReference());
-        if (createOrderDTO.getIdClient() != null)
-            order.setIdClient(createOrderDTO.getIdClient());
-        if (createOrderDTO.getIdFund() != null)
-            order.setIdFund(createOrderDTO.getIdFund());
-        if (createOrderDTO.getIdSalesManager() != null)
-            order.setIdSalesManager(createOrderDTO.getIdSalesManager());
-        if (createOrderDTO.getIdCommercialAttache() != null)
-            order.setIdCommercialAttache(createOrderDTO.getIdCommercialAttache());
-        order.setChannel(createOrderDTO.getChannel());
-        order.setDescription(createOrderDTO.getDescription());
-        order.setDeliveryTime(createOrderDTO.getDeliveryTime());
-        if (createOrderDTO.getIdPaymentMethod() != null)
-            order.setIdPaymentMethod(createOrderDTO.getIdPaymentMethod());
-        order.setNetAggregateAmount(createOrderDTO.getNetAggregateAmount());
-        order.setTTCAggregateAmount(createOrderDTO.getTTCAggregateAmount());
-        order.setTax(createOrderDTO.getTax());
-        if (createOrderDTO.getIdSpaceManager2() != null)
-            order.setIdSpaceManager2(createOrderDTO.getIdSpaceManager2());
-        if (createOrderDTO.getIdStore() != null)
-            order.setIdStore(createOrderDTO.getIdStore());
-        order.setPaymentReference(createOrderDTO.getPaymentReference());
-
-        iOrderService.createOrder(order);
-
-        jsonMapper.registerModule(new JavaTimeModule());
-        Object json = jsonMapper.writeValueAsString(order);
-        JSONObject cr = aes.encryptObject( key, json);
-        return ResponseEntity.ok(cr);
+//        if (!iOrderService.getByInternalReference(InternalReference).isPresent()) {
+//            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+//                    messageSource.getMessage("messages.order_exists", null, LocaleContextHolder.getLocale())));
+//        }
+//        Order order = iOrderService.getByInternalReference(InternalReference).get();
+//        Client client = new Client();
+//        Users salesmanager = new Users();
+//        Users fund = new Users();
+//        Users commercialAttache = new Users();
+//        Users managerSpaceManager2 = new Users();
+//        Store store = new Store();
+//        PaymentMethod paymentMethod = new PaymentMethod();
+//
+//        if (createOrderDTO.getIdClient()  != null) {
+//            if(!iClientService.getClientByInternalReference(createOrderDTO.getIdClient()).isPresent())
+//                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+//                        messageSource.getMessage("messages.client_exists", null, LocaleContextHolder.getLocale())));
+//            client = iClientService.getClientByInternalReference(createOrderDTO.getIdClient()).get();
+//
+//        }
+//        if (createOrderDTO.getIdSalesManager()  != null) {
+//            salesmanager = iUserService.getByInternalReference(createOrderDTO.getIdSalesManager());
+//
+//            if(salesmanager.getUserId() == null)
+//                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+//                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
+//        }
+//        if (createOrderDTO.getIdCommercialAttache()  != null) {
+//            commercialAttache = iUserService.getByInternalReference(createOrderDTO.getIdCommercialAttache());
+//
+//            if(commercialAttache.getUserId() == null)
+//                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+//                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
+//        }
+//        if (createOrderDTO.getIdSpaceManager2()  != null) {
+//            managerSpaceManager2 = iUserService.getByInternalReference(createOrderDTO.getIdSpaceManager2());
+//
+//            if(managerSpaceManager2.getUserId() == null)
+//                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+//                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
+//        }
+//        if (createOrderDTO.getIdFund()  != null) {
+//            fund = iUserService.getByInternalReference(createOrderDTO.getIdFund());
+//
+//            if(fund.getUserId() == null)
+//                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+//                        messageSource.getMessage("messages.user_exists", null, LocaleContextHolder.getLocale())));
+//        }
+//        if (createOrderDTO.getIdStore()  != null) {
+//            if(!iStoreService.getByInternalReference(createOrderDTO.getIdStore()).isPresent())
+//                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+//                        messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
+//            store = iStoreService.getByInternalReference(createOrderDTO.getIdStore()).get();
+//
+//        }
+//        if (createOrderDTO.getIdPaymentMethod()  != null) {
+//            if(!iPaymentMethodService.getByInternalReference(createOrderDTO.getIdPaymentMethod()).isPresent())
+//                return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+//                        messageSource.getMessage("messages.payment_exists", null, LocaleContextHolder.getLocale())));
+//            paymentMethod = iPaymentMethodService.getByInternalReference(createOrderDTO.getIdPaymentMethod()).get();
+//
+//        }
+//        order.setUpdateAt(LocalDateTime.now());
+//        order.setClientReference(createOrderDTO.getClientReference());
+//        if (createOrderDTO.getIdClient() != null)
+//            order.setIdClient(createOrderDTO.getIdClient());
+//        if (createOrderDTO.getIdFund() != null)
+//            order.setIdFund(createOrderDTO.getIdFund());
+//        if (createOrderDTO.getIdSalesManager() != null)
+//            order.setIdSalesManager(createOrderDTO.getIdSalesManager());
+//        if (createOrderDTO.getIdCommercialAttache() != null)
+//            order.setIdCommercialAttache(createOrderDTO.getIdCommercialAttache());
+//        order.setChannel(createOrderDTO.getChannel());
+//        order.setDescription(createOrderDTO.getDescription());
+//        order.setDeliveryTime(createOrderDTO.getDeliveryTime());
+//        if (createOrderDTO.getIdPaymentMethod() != null)
+//            order.setIdPaymentMethod(createOrderDTO.getIdPaymentMethod());
+//        order.setNetAggregateAmount(createOrderDTO.getNetAggregateAmount());
+//        order.setTTCAggregateAmount(createOrderDTO.getTTCAggregateAmount());
+//        order.setTax(createOrderDTO.getTax());
+//        if (createOrderDTO.getIdSpaceManager2() != null)
+//            order.setIdSpaceManager2(createOrderDTO.getIdSpaceManager2());
+//        if (createOrderDTO.getIdStore() != null)
+//            order.setIdStore(createOrderDTO.getIdStore());
+//        order.setPaymentReference(createOrderDTO.getPaymentReference());
+//
+//        iOrderService.createOrder(order);
+//
+//        jsonMapper.registerModule(new JavaTimeModule());
+//        Object json = jsonMapper.writeValueAsString(order);
+//        JSONObject cr = aes.encryptObject( key, json);
+//        return ResponseEntity.ok(cr);
+        return null;
     }
 
     @Operation(summary = "Effectuer un paiement pour une commande", tags = "Order", responses = {
