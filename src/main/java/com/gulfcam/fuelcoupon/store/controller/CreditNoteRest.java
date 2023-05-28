@@ -149,7 +149,6 @@ public class CreditNoteRest {
         List<ResponseCouponMailDTO> couponList = new ArrayList<>();
         for (int i = 0; i< createCreditNoteDTO.getSerialCoupons().size(); i++){
             coupon = iCouponService.getCouponBySerialNumber(aes.decrypt(key, createCreditNoteDTO.getSerialCoupons().get(i))).get();
-
             if(coupon.getStatus().equals(statusCouponUsed)){
                 responseCouponMailDTO= new ResponseCouponMailDTO();
                 responseCouponMailDTO.setIdTypeVoucher(iTypeVoucherService.getByInternalReference(coupon.getIdTypeVoucher()).get());
