@@ -395,7 +395,7 @@ public class OrderRest {
         StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.ACCEPTED).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.ACCEPTED +  "  not found"));
         TypeDocument typeDocument = iTypeDocumentRepo.findByName(ETypeDocument.INVOICE).orElseThrow(()-> new ResourceNotFoundException("Statut :  "  +  ETypeDocument.INVOICE +  "  not found"));
 //        String fileName = iDocumentStorageService.storeFile(file, InternalReference, docType, typeDocument);
-        String fileDownloadUri = api_base_url+"/api/v1.0/order/file/" + InternalReference + "/downloadFile?type=invoice&docType=" + docType;
+        String fileDownloadUri = api_base_url+"/api/v1.0/order/file/" + aes.decrypt(key, InternalReference) + "/downloadFile?type=invoice&docType=" + docType;
         order.setLinkInvoice(fileDownloadUri);
         order.setStatus(statusOrder);
         order.setUpdateAt(LocalDateTime.now());

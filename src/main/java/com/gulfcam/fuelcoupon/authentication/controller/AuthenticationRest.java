@@ -1,16 +1,12 @@
 package com.gulfcam.fuelcoupon.authentication.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.gulfcam.fuelcoupon.authentication.dto.*;
 import com.gulfcam.fuelcoupon.authentication.service.IAuthorizationService;
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.authentication.service.UserDetailsImpl;
-import com.gulfcam.fuelcoupon.cryptage.AES;
 import com.gulfcam.fuelcoupon.cryptage.AESUtil;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
 import com.gulfcam.fuelcoupon.store.entity.Store;
@@ -119,7 +115,7 @@ public class AuthenticationRest {
     String mailReplyTo;
 
     @Value("${app.key}")
-    String AES_KEY;
+    String key;
     AESUtil aes = new AESUtil();
     JsonMapper jsonMapper = new JsonMapper();
 
@@ -198,8 +194,8 @@ public class AuthenticationRest {
     @PostMapping("/sign-in")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody AuthReqDto userAuthDto) throws JsonProcessingException {
 
-        String login = aes.decrypt(AES_KEY, userAuthDto.getLogin());
-        String pwd = aes.decrypt(AES_KEY, userAuthDto.getPassword());
+        String login = aes.decrypt(key, userAuthDto.getLogin());
+        String pwd = aes.decrypt(key, userAuthDto.getPassword());
 
         Users user = new Users(login, pwd);
         if (login.contains("@")) {
@@ -242,7 +238,7 @@ public class AuthenticationRest {
 //            Object json = objectWriter.writeValueAsString(signInResponse);
             jsonMapper.registerModule(new JavaTimeModule());
             Object json = jsonMapper.writeValueAsString(signInResponse);
-            JSONObject cr = aes.encryptObject( AES_KEY, json);
+            JSONObject cr = aes.encryptObject(key, json);
 
             log.info("autre " + user);
 
@@ -265,45 +261,45 @@ public class AuthenticationRest {
     public ResponseEntity<Object> add(@Valid @RequestBody UserReqDto userAddDto, HttpServletRequest request) throws JsonProcessingException {
         String pincode = String.valueOf(userAddDto.getPinCode());
 
-        if (userService.existsByEmail(aes.decrypt(AES_KEY,userAddDto.getEmail()), null)) {
+        if (userService.existsByEmail(aes.decrypt(key,userAddDto.getEmail()), null)) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.email_exists", null, LocaleContextHolder.getLocale())));
         }
-        if (userService.existsByPinCode(Integer.parseInt(aes.decrypt(AES_KEY,userAddDto.getPinCode())))) {
+        if (userService.existsByPinCode(Integer.parseInt(aes.decrypt(key,userAddDto.getPinCode())))) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.pin_code_exists", null, LocaleContextHolder.getLocale())));
         }
-        if (userService.existsByTelephone(aes.decrypt(AES_KEY,userAddDto.getTelephone()), null)) {
+        if (userService.existsByTelephone(aes.decrypt(key,userAddDto.getTelephone()), null)) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.phone_exists", null, LocaleContextHolder.getLocale())));
         }
         Store store = new Store();
-        if (aes.decrypt(AES_KEY,userAddDto.getIdStore().toString()) != null) {
+        if (aes.decrypt(key,userAddDto.getIdStore().toString()) != null) {
 
-            if(!iStoreService.getByInternalReference(Long.parseLong(aes.decrypt(AES_KEY,userAddDto.getIdStore().toString()))).isPresent())
+            if(!iStoreService.getByInternalReference(Long.parseLong(aes.decrypt(key,userAddDto.getIdStore().toString()))).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.store_exists", null, LocaleContextHolder.getLocale())));
-            store =  iStoreService.getByInternalReference(Long.parseLong(aes.decrypt(AES_KEY,userAddDto.getIdStore()))).get();
+            store =  iStoreService.getByInternalReference(Long.parseLong(aes.decrypt(key,userAddDto.getIdStore()))).get();
         }
 
 //        Users u = modelMapper.map(userAddDto, Users.class);
         Users u = new Users();
         u.setUsing2FA(true);
-        u.setEmail(aes.decrypt(AES_KEY,userAddDto.getEmail()));
-        u.setTelephone(aes.decrypt(AES_KEY,userAddDto.getTelephone()));
-        u.setFirstName(aes.decrypt(AES_KEY,userAddDto.getFirstName()));
-        u.setLastName(aes.decrypt(AES_KEY,userAddDto.getLastName()));
+        u.setEmail(aes.decrypt(key,userAddDto.getEmail()));
+        u.setTelephone(aes.decrypt(key,userAddDto.getTelephone()));
+        u.setFirstName(aes.decrypt(key,userAddDto.getFirstName()));
+        u.setLastName(aes.decrypt(key,userAddDto.getLastName()));
         Set<RoleUser> roles = new HashSet<>();
-        RoleUser rolesUser = roleRepo.findByName(aes.decrypt(AES_KEY,userAddDto.getRoleName()) != null ? ERole.valueOf(aes.decrypt(AES_KEY,userAddDto.getRoleName())) : ERole.ROLE_USER).orElseThrow(()-> new ResourceNotFoundException("Role not found"));
+        RoleUser rolesUser = roleRepo.findByName(aes.decrypt(key,userAddDto.getRoleName()) != null ? ERole.valueOf(aes.decrypt(key,userAddDto.getRoleName())) : ERole.ROLE_USER).orElseThrow(()-> new ResourceNotFoundException("Role not found"));
         roles.add(rolesUser);
         u.setRoles(roles);
-        TypeAccount typeAccount = typeAccountRepo.findByName(aes.decrypt(AES_KEY,userAddDto.getTypeAccount()) != null ? ETypeAccount.valueOf(aes.decrypt(AES_KEY,userAddDto.getTypeAccount())) : ETypeAccount.MANAGER_STORE).orElseThrow(()-> new ResourceNotFoundException("Type de compte not found"));
+        TypeAccount typeAccount = typeAccountRepo.findByName(aes.decrypt(key,userAddDto.getTypeAccount()) != null ? ETypeAccount.valueOf(aes.decrypt(key,userAddDto.getTypeAccount())) : ETypeAccount.MANAGER_STORE).orElseThrow(()-> new ResourceNotFoundException("Type de compte not found"));
         u.setTypeAccount(typeAccount);
         u.setInternalReference(jwtUtils.generateInternalReference());
-        u.setPosition(aes.decrypt(AES_KEY,userAddDto.getPosition()));
-        u.setPinCode(Integer.parseInt(aes.decrypt(AES_KEY,userAddDto.getPinCode())));
-        u.setPassword(encoder.encode(aes.decrypt(AES_KEY,userAddDto.getPassword())));
-        u.setIdStore(Long.parseLong(aes.decrypt(AES_KEY,userAddDto.getIdStore().toString())));
+        u.setPosition(aes.decrypt(key,userAddDto.getPosition()));
+        u.setPinCode(Integer.parseInt(aes.decrypt(key,userAddDto.getPinCode())));
+        u.setPassword(encoder.encode(aes.decrypt(key,userAddDto.getPassword())));
+        u.setIdStore(Long.parseLong(aes.decrypt(key,userAddDto.getIdStore().toString())));
         u.setCreatedDate(LocalDateTime.now());
         Users user = new Users();
         String password = null;
@@ -323,7 +319,7 @@ public class AuthenticationRest {
 
         jsonMapper.registerModule(new JavaTimeModule());
         Object json = jsonMapper.writeValueAsString(userResDto);
-        JSONObject cr = aes.encryptObject( AES_KEY, json);
+        JSONObject cr = aes.encryptObject(key, json);
         return ResponseEntity.status(HttpStatus.CREATED).body(cr);
     }
 
@@ -368,7 +364,7 @@ public class AuthenticationRest {
         userResDto.setStore(store);
         jsonMapper.registerModule(new JavaTimeModule());
         Object json = jsonMapper.writeValueAsString(userResDto);
-        JSONObject cr = aes.encryptObject( AES_KEY, json);
+        JSONObject cr = aes.encryptObject(key, json);
         return ResponseEntity.status(HttpStatus.CREATED).body(cr);
     }
 
@@ -412,7 +408,7 @@ public class AuthenticationRest {
                         , firstname, lastname, idStore, uid, id, true);
             jsonMapper.registerModule(new JavaTimeModule());
             Object json = jsonMapper.writeValueAsString(authSignInResDto);
-            JSONObject cr = aes.encryptObject( AES_KEY, json);
+            JSONObject cr = aes.encryptObject(key, json);
             return ResponseEntity.ok(cr);
 
         } else {
@@ -486,7 +482,7 @@ public class AuthenticationRest {
         emailProps.put("lastname", user.getLastName());
         emailProps.put("code", user.getEmail());
         emailProps.put("username", user.getEmail());
-        emailProps.put("code", urlConfirmCode + aes.encrypt(AES_KEY, user.getTokenAuth()));
+        emailProps.put("code", urlConfirmCode + aes.encrypt(key, user.getTokenAuth()));
 
         emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), "", emailProps, ApplicationConstant.SUBJECT_PASSWORD_RESET, ApplicationConstant.TEMPLATE_PASSWORD_RESET));
         log.info("Email for reset password send successfull for user: " + user.getEmail());
@@ -515,7 +511,7 @@ public class AuthenticationRest {
         Users user2 = userService.resetPassword(user, userResetPwd.getPassword());
         jsonMapper.registerModule(new JavaTimeModule());
         Object json = jsonMapper.writeValueAsString(user2);
-        JSONObject cr = aes.encryptObject( AES_KEY, json);
+        JSONObject cr = aes.encryptObject(key, json);
         return ResponseEntity.ok(cr);
     }
 
@@ -526,14 +522,14 @@ public class AuthenticationRest {
     @PutMapping("/user/{id}/password-update")
     public ResponseEntity<?> editPassword(@PathVariable String id, @Valid @RequestBody UserEditPasswordDto userEditPasswordDto) {
         log.info("crypté "+ id);
-        log.info("décrypté "+ aes.decrypt(AES_KEY, id));
-        Users user = userService.getById(Long.parseLong(aes.decrypt(AES_KEY, id)));
-        if (!BCrypt.checkpw(aes.decrypt(AES_KEY, userEditPasswordDto.getOldPassword()), user.getPassword())) {
+        log.info("décrypté "+ aes.decrypt(key, id));
+        Users user = userService.getById(Long.parseLong(aes.decrypt(key, id)));
+        if (!BCrypt.checkpw(aes.decrypt(key, userEditPasswordDto.getOldPassword()), user.getPassword())) {
             return ResponseEntity.badRequest().body(new DefaultResponseDto("Ancien mot de passe incorrect", HttpStatus.BAD_REQUEST));
         }
         List<OldPassword> oldPasswords = user.getOldPasswords();
         for (OldPassword oldPassword : oldPasswords) {
-            if (BCrypt.checkpw(aes.decrypt(AES_KEY, userEditPasswordDto.getPassword()), oldPassword.getPassword())) {
+            if (BCrypt.checkpw(aes.decrypt(key, userEditPasswordDto.getPassword()), oldPassword.getPassword())) {
                 return ResponseEntity.badRequest().body(new DefaultResponseDto("Mot de passe déjà utilisé par le passé", HttpStatus.BAD_REQUEST));
             }
         }

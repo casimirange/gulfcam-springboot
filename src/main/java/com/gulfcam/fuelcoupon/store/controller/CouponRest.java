@@ -407,6 +407,7 @@ public class CouponRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @GetMapping("/serial/{serialNumber}")
     public ResponseEntity<?> getCouponBySerialNumber(@PathVariable String serialNumber) throws JsonProcessingException {
+        log.info("décrypté "+aes.decrypt(key, serialNumber));
         Coupon coupon = iCouponService.getCouponBySerialNumber(aes.decrypt(key, serialNumber)).get();
         jsonMapper.registerModule(new JavaTimeModule());
         Object json = jsonMapper.writeValueAsString(coupon);
@@ -489,7 +490,8 @@ public class CouponRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @PostMapping("/affect/serial/{serialNumber}")
     public ResponseEntity<?> affectCoupon(@PathVariable String serialNumber, @RequestParam("idClient") String idClient) throws JsonProcessingException {
-
+        log.info("coupon : "+ aes.decrypt(key, serialNumber));
+        log.info("client : "+ aes.decrypt(key, idClient));
         if (!iCouponService.getCouponBySerialNumber(aes.decrypt(key, serialNumber)).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.coupon_exists", null, LocaleContextHolder.getLocale())));

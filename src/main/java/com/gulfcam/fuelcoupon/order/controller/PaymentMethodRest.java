@@ -87,18 +87,21 @@ public class PaymentMethodRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
     @PostMapping()
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> addPaymentMethod(@Valid @RequestBody CreatePaymentMethodDTO createPaymentMethodDTO) {
+    public ResponseEntity<?> addPaymentMethod(@Valid @RequestBody CreatePaymentMethodDTO createPaymentMethodDTO) throws JsonProcessingException {
 
         PaymentMethod item = new PaymentMethod();
         item.setInternalReference(jwtUtils.generateInternalReference());
         item.setCreatedAt(LocalDateTime.now());
-        item.setDesignation(createPaymentMethodDTO.getDesignation());
+        item.setDesignation(aes.decrypt(key, createPaymentMethodDTO.getDesignation()));
 
         Status status = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
         item.setStatus(status);
 
         iPaymentMethodService.createPaymentMethod(item);
-        return ResponseEntity.ok(item);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(item);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Modification des informations pour une Méthode de paiement", tags = "Méthode de paiement", responses = {
@@ -106,22 +109,25 @@ public class PaymentMethodRest {
             @ApiResponse(responseCode = "404", description = "Client not found", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
-    @PutMapping("/{internalReference:[0-9]+}")
+    @PutMapping("/{internalReference}")
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> updatePaymentMethod(@Valid @RequestBody CreatePaymentMethodDTO createPaymentMethodDTO, @PathVariable Long internalReference) {
+    public ResponseEntity<?> updatePaymentMethod(@Valid @RequestBody CreatePaymentMethodDTO createPaymentMethodDTO, @PathVariable String internalReference) throws JsonProcessingException {
 
-        if (!iPaymentMethodService.getByInternalReference(internalReference).isPresent()) {
+        if (!iPaymentMethodService.getByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.payment_exists", null, LocaleContextHolder.getLocale())));
         }
-        PaymentMethod paymentMethod = iPaymentMethodService.getByInternalReference(internalReference).get();
+        PaymentMethod paymentMethod = iPaymentMethodService.getByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))).get();
         paymentMethod.setUpdateAt(LocalDateTime.now());
         paymentMethod.setCreatedAt(LocalDateTime.now());
-        paymentMethod.setDesignation(createPaymentMethodDTO.getDesignation());
+        paymentMethod.setDesignation(aes.decrypt(key, createPaymentMethodDTO.getDesignation()));
 
         iPaymentMethodService.createPaymentMethod(paymentMethod);
 
-        return ResponseEntity.ok(paymentMethod);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(paymentMethod);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Recupérer Une Méthode de paiement par sa reference interne", tags = "Pièce", responses = {
