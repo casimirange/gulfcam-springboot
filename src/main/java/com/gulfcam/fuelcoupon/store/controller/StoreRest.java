@@ -150,10 +150,10 @@ public class StoreRest {
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @GetMapping("/group/{internalReference}")
-    public ResponseEntity<?> groupNoteBootByInternalReference(@PathVariable Long internalReference) throws JsonProcessingException {
+    public ResponseEntity<?> groupNoteBootByInternalReference(@PathVariable String internalReference) throws JsonProcessingException {
 //        return ResponseEntity.ok();
         jsonMapper.registerModule(new JavaTimeModule());
-        Object json = jsonMapper.writeValueAsString(iStoreService.groupNoteBootByInternalReference(internalReference));
+        Object json = jsonMapper.writeValueAsString(iStoreService.groupNoteBootByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))));
         JSONObject cr = aes.encryptObject( key, json);
         return ResponseEntity.ok(cr);
     }

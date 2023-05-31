@@ -205,11 +205,20 @@ public class CreditNoteRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @GetMapping("/{internalReference}")
     public ResponseEntity<?> getByInternalReference(@PathVariable String internalReference) throws JsonProcessingException {
-
-        CreditNote creditNote = iCreditNoteService.getByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))).get();
+        String cn = "";
+        log.info("dépassé");
+        while (cn.isEmpty()){
+            cn = aes.decrypt(key, internalReference);
+            log.info("ref décrypté "+cn);
+        }
+        if (iCreditNoteService.getByInternalReference(Long.parseLong(cn)).isEmpty()){
+            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.NOT_FOUND,
+                    messageSource.getMessage("messages.coupon_exists", null, LocaleContextHolder.getLocale())));
+        }
+        CreditNote creditNote = iCreditNoteService.getByInternalReference(Long.parseLong(cn)).get();
         ResponseCreditNoteDTO responseCreditNoteDTO = new ResponseCreditNoteDTO();
 
-        responseCreditNoteDTO.setCoupon(iCouponService.getCouponsByIdCreditNote(Long.parseLong(aes.decrypt(key, internalReference))));
+        responseCreditNoteDTO.setCoupon(iCouponService.getCouponsByIdCreditNote(Long.parseLong(cn)));
         responseCreditNoteDTO.setStation(iStationService.getByInternalReference(creditNote.getIdStation()).get());
         responseCreditNoteDTO.setInternalReference(creditNote.getInternalReference());
         responseCreditNoteDTO.setStatus(creditNote.getStatus());

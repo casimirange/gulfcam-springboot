@@ -335,8 +335,17 @@ public class CouponRest {
                                                                 @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                                                 @RequestParam(required = false, defaultValue = "idStation") String sort,
                                                                 @RequestParam(required = false, defaultValue = "desc") String order) throws JsonProcessingException {
-
-        Page<ResponseCouponDTO> cartons = iCouponService.getCouponsByIdStation(Long.parseLong(aes.decrypt(key, idStation)), date,
+        String sn = "";
+        while (sn.isEmpty()){
+            sn = aes.decrypt(key, idStation);
+            log.info("station décrypté "+sn);
+        }
+//        Coupon coupon;
+//        if (iCouponService.getCouponBySerialNumber(sn).isEmpty()){
+//            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.NOT_FOUND,
+//                    messageSource.getMessage("messages.coupon_exists", null, LocaleContextHolder.getLocale())));
+//        }
+        Page<ResponseCouponDTO> cartons = iCouponService.getCouponsByIdStation(Long.parseLong(sn), date,
                 Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         jsonMapper.registerModule(new JavaTimeModule());
         Object json = jsonMapper.writeValueAsString(cartons);
@@ -407,8 +416,18 @@ public class CouponRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @GetMapping("/serial/{serialNumber}")
     public ResponseEntity<?> getCouponBySerialNumber(@PathVariable String serialNumber) throws JsonProcessingException {
-        log.info("décrypté "+aes.decrypt(key, serialNumber));
-        Coupon coupon = iCouponService.getCouponBySerialNumber(aes.decrypt(key, serialNumber)).get();
+        String sn = "";
+        while (sn.isEmpty()){
+            sn = aes.decrypt(key, serialNumber);
+            log.info("coupon décrypté "+sn);
+        }
+        Coupon coupon;
+        if (iCouponService.getCouponBySerialNumber(sn).isEmpty()){
+            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.NOT_FOUND,
+                    messageSource.getMessage("messages.coupon_exists", null, LocaleContextHolder.getLocale())));
+        }
+        coupon = iCouponService.getCouponBySerialNumber(sn).get();
+
         jsonMapper.registerModule(new JavaTimeModule());
         Object json = jsonMapper.writeValueAsString(coupon);
         JSONObject cr = aes.encryptObject( key, json);
@@ -422,12 +441,22 @@ public class CouponRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @PutMapping("/accept/serial/{serialNumber}")
     public ResponseEntity<?> acceptCoupon(@Valid @RequestBody AcceptCouponDTO acceptCouponDTO, @PathVariable String serialNumber) throws JsonProcessingException {
-        if (!iCouponService.getCouponBySerialNumber(aes.decrypt(key, serialNumber)).isPresent()) {
-            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+        String sn = "";
+        while (sn.isEmpty()){
+            sn = aes.decrypt(key, serialNumber);
+            log.info("coupon décrypté "+sn);
+        }
+        Coupon coupon;
+        if (iCouponService.getCouponBySerialNumber(sn).isEmpty()){
+            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.NOT_FOUND,
                     messageSource.getMessage("messages.coupon_exists", null, LocaleContextHolder.getLocale())));
         }
+//        if (!iCouponService.getCouponBySerialNumber(aes.decrypt(key, serialNumber)).isPresent()) {
+//            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+//                    messageSource.getMessage("messages.coupon_exists", null, LocaleContextHolder.getLocale())));
+//        }
 
-        Coupon coupon = iCouponService.getCouponBySerialNumber(aes.decrypt(key, serialNumber)).get();
+        coupon = iCouponService.getCouponBySerialNumber(sn).get();
         Status statusCouponActived = iStatusRepo.findByName(EStatus.ACTIVATED).orElseThrow(()-> new ResourceNotFoundException("Statut du coupon:  "  +  EStatus.ACTIVATED +  "  not found"));
         if (coupon.getStatus() != statusCouponActived) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
@@ -490,19 +519,32 @@ public class CouponRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @PostMapping("/affect/serial/{serialNumber}")
     public ResponseEntity<?> affectCoupon(@PathVariable String serialNumber, @RequestParam("idClient") String idClient) throws JsonProcessingException {
-        log.info("coupon : "+ aes.decrypt(key, serialNumber));
-        log.info("client : "+ aes.decrypt(key, idClient));
-        if (!iCouponService.getCouponBySerialNumber(aes.decrypt(key, serialNumber)).isPresent()) {
-            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+        String sn = "";
+        String cl = "";
+        while (sn.isEmpty()){
+            sn = aes.decrypt(key, serialNumber);
+            log.info("coupon décrypté "+sn);
+        }
+        while (cl.isEmpty()){
+            cl = aes.decrypt(key, idClient);
+            log.info("client décrypté "+cl);
+        }
+//        Coupon coupon;
+        if (iCouponService.getCouponBySerialNumber(sn).isEmpty()){
+            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.NOT_FOUND,
                     messageSource.getMessage("messages.coupon_exists", null, LocaleContextHolder.getLocale())));
         }
-        Coupon coupon = iCouponService.getCouponBySerialNumber(aes.decrypt(key, serialNumber)).get();
+//        if (!iCouponService.getCouponBySerialNumber(aes.decrypt(key, serialNumber)).isPresent()) {
+//            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+//                    messageSource.getMessage("messages.coupon_exists", null, LocaleContextHolder.getLocale())));
+//        }
+        Coupon coupon = iCouponService.getCouponBySerialNumber(sn).get();
         List<Coupon> couponList = iCouponService.getCouponsByIdNotebook(coupon.getIdNotebook());
         Status status = iStatusRepo.findByName(EStatus.ACTIVATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.ACTIVATED +  "  not found"));
         coupon.setStatus(status);
         for (Coupon item: couponList){
             item.setStatus(status);
-            item.setIdClient(Long.parseLong(aes.decrypt(key, idClient)));
+            item.setIdClient(Long.parseLong(cl));
             item.setUpdateAt(LocalDateTime.now());
             iCouponService.createCoupon(item);
         }
