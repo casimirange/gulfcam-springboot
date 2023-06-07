@@ -375,7 +375,7 @@ public class AuthenticationRest {
     @GetMapping("/verify")
     public ResponseEntity<?> verifyCode(@NotEmpty @RequestParam(name = "code", required = true) String code) throws JsonProcessingException {
 //        log.info("code otp1 : "+codes);
-//        String code = aes.decrypt(AES_KEY, codes);
+//        String code = aes.decrypt(key, codes);
 //        log.info("code otp2 : "+code);
         Users users = authorizationService.getUserInContextApp();
         log.info("user :"+users);
@@ -475,14 +475,14 @@ public class AuthenticationRest {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.requete_incorrect", null, LocaleContextHolder.getLocale())));
         }
-        Users user = userService.checkUserAndGenerateCode(resetPasswordDto.getLogin());
+        Users user = userService.checkUserAndGenerateCode(aes.decrypt(key, resetPasswordDto.getLogin()));
 
         Map<String, Object> emailProps = new HashMap<>();
         emailProps.put("firstname", user.getFirstName());
         emailProps.put("lastname", user.getLastName());
-        emailProps.put("code", user.getEmail());
+        emailProps.put("email", user.getEmail());
         emailProps.put("username", user.getEmail());
-        emailProps.put("code", urlConfirmCode + aes.encrypt(key, user.getTokenAuth()));
+        emailProps.put("code", urlConfirmCode + user.getTokenAuth());
 
         emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), "", emailProps, ApplicationConstant.SUBJECT_PASSWORD_RESET, ApplicationConstant.TEMPLATE_PASSWORD_RESET));
         log.info("Email for reset password send successfull for user: " + user.getEmail());
@@ -497,18 +497,19 @@ public class AuthenticationRest {
             @ApiResponse(responseCode = "400", description = "Mot de passe déjà utilisé par le passé", content = @Content(mediaType = "Application/Json"))})
 
     @PutMapping("/reset-password")
-    public ResponseEntity<Object> resetPassword2(@RequestParam String code, @RequestBody UserResetPassword userResetPwd)
+    public ResponseEntity<Object> resetPassword2(@RequestParam(required = true, value = "code") String code, @RequestBody UserResetPassword userResetPwd)
             throws Exception {
+
         Users user = userRepo.findByTokenAuth(code).orElseThrow(() -> new ResourceNotFoundException(
                 messageSource.getMessage("messages.user_not_found", null, LocaleContextHolder.getLocale())));
         List<OldPassword> oldPasswords = user.getOldPasswords();
         for (OldPassword oldPassword : oldPasswords) {
-            if (BCrypt.checkpw(userResetPwd.getPassword(), oldPassword.getPassword())) {
+            if (BCrypt.checkpw(aes.decrypt(key, userResetPwd.getPassword()), oldPassword.getPassword())) {
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,messageSource.getMessage("messages.password_already_use", null,
                         LocaleContextHolder.getLocale())));
             }
         }
-        Users user2 = userService.resetPassword(user, userResetPwd.getPassword());
+        Users user2 = userService.resetPassword(user, aes.decrypt(key, userResetPwd.getPassword()));
         jsonMapper.registerModule(new JavaTimeModule());
         Object json = jsonMapper.writeValueAsString(user2);
         JSONObject cr = aes.encryptObject(key, json);

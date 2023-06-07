@@ -310,10 +310,46 @@ public class CouponServiceImpl implements ICouponService {
     }
 
     @Override
-    public Page<ResponseCouponDTO> getCouponsByIdStation(Long idStation, LocalDate period, int page, int size, String sort, String order) {
-        LocalDate noDate = LocalDate.of(1900, Month.JANUARY, 1);
-        Predicate<ResponseCouponDTO> byDate = date -> date.getUpdateAt().toLocalDate().isEqual(period);
-        Page<Coupon> couponList = iCouponRepo.getCouponsByIdStation(idStation, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
+    public Page<ResponseCouponDTO> getCouponsByIdStation(Long idStation, LocalDate period, String serialNumber, String clientName, String status, String type, int page, int size, String sort, String order) {
+
+        Specification<Coupon> specification = ((root, query, criteriaBuilder) -> {
+
+            List<javax.persistence.criteria.Predicate> predicates = new ArrayList<>();
+
+            if (serialNumber != null && !serialNumber.isEmpty()){
+                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("serialNumber")), "%" + serialNumber + "%"));
+            }
+
+            if (clientName != null && !clientName.isEmpty()){
+                List<Client> clients = iClientService.getClientsByCompleteNameContains(clientName);
+                var ref = 0L;
+                if (!clients.isEmpty()){
+                    for (Client client : clients) {
+                        ref = !client.getInternalReference().toString().isEmpty() ? client.getInternalReference() : 0;
+                        predicates.add(criteriaBuilder.equal(criteriaBuilder.lower(root.get("idClient")), ref));
+                    }
+                }else {
+                    predicates.add(criteriaBuilder.equal(root.get("idClient"), ref ));
+                }
+            }
+
+            predicates.add(criteriaBuilder.equal(criteriaBuilder.lower(root.get("idStation")), idStation));
+
+
+            if (type != null && !type.isEmpty()){
+                Optional<TypeVoucher> typeVoucher = iTypeVoucherService.getByInternalReference(Long.parseLong(type));
+                predicates.add(criteriaBuilder.equal(criteriaBuilder.lower(root.get("idTypeVoucher")), typeVoucher.map(TypeVoucher::getInternalReference).orElse(null)));
+            }
+
+            if (status != null && !status.isEmpty()){
+                Status statut = iStatusRepo.findByName(EStatus.valueOf(status.toUpperCase())).get();
+                predicates.add(criteriaBuilder.equal(criteriaBuilder.lower(root.get("status")), statut));
+            }
+            return criteriaBuilder.and(predicates.toArray(new javax.persistence.criteria.Predicate[0]));
+        });
+
+        Page<Coupon> couponList = iCouponRepo.findAll(specification, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
+
 
         ResponseCouponDTO responseCouponDTO;
         List<ResponseCouponDTO> responseCouponDTOList = new ArrayList<>();
@@ -322,7 +358,6 @@ public class CouponServiceImpl implements ICouponService {
             responseCouponDTO = new ResponseCouponDTO();
             responseCouponDTO.setStatus(coupon.getStatus());
             responseCouponDTO.setId(coupon.getId());
-            responseCouponDTO.setSerialNumber(coupon.getSerialNumber());
             responseCouponDTO.setSerialNumber(coupon.getSerialNumber());
             responseCouponDTO.setIdClient(coupon.getIdClient());
             responseCouponDTO.setIdTypeVoucher(coupon.getIdTypeVoucher());
@@ -350,11 +385,54 @@ public class CouponServiceImpl implements ICouponService {
             responseCouponDTOList.add(responseCouponDTO);
 
         }
-        List<ResponseCouponDTO> responseCouponDTOList2 = responseCouponDTOList.stream()
-                .filter(period != null  ? byDate : date -> !date.getCreatedAt().toLocalDate().isEqual(noDate))
-                .collect(Collectors.toList());
-        Page<ResponseCouponDTO> responseNotebookDTOPage = new PageImpl<>(responseCouponDTOList2, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseCouponDTOList2.size());
-        return responseNotebookDTOPage;
+
+        return new PageImpl<>(responseCouponDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)),  couponList.getTotalElements());
+
+
+//        LocalDate noDate = LocalDate.of(1900, Month.JANUARY, 1);
+//        Predicate<ResponseCouponDTO> byDate = date -> date.getUpdateAt().toLocalDate().isEqual(period);
+//        Page<Coupon> couponList = iCouponRepo.getCouponsByIdStation(idStation, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
+//
+//        ResponseCouponDTO responseCouponDTO;
+//        List<ResponseCouponDTO> responseCouponDTOList = new ArrayList<>();
+//
+//        for (Coupon coupon: couponList){
+//            responseCouponDTO = new ResponseCouponDTO();
+//            responseCouponDTO.setStatus(coupon.getStatus());
+//            responseCouponDTO.setId(coupon.getId());
+//            responseCouponDTO.setSerialNumber(coupon.getSerialNumber());
+//            responseCouponDTO.setSerialNumber(coupon.getSerialNumber());
+//            responseCouponDTO.setIdClient(coupon.getIdClient());
+//            responseCouponDTO.setIdTypeVoucher(coupon.getIdTypeVoucher());
+//            responseCouponDTO.setIdRequestOpposition(coupon.getIdRequestOpposition());
+//            responseCouponDTO.setIdCreditNote(coupon.getIdCreditNote());
+//            responseCouponDTO.setIdTicket(coupon.getIdTicket());
+//            responseCouponDTO.setIdNotebook(coupon.getIdNotebook());
+//            responseCouponDTO.setIdStation(coupon.getIdStation());
+//            responseCouponDTO.setProductionDate(coupon.getProductionDate());
+//            responseCouponDTO.setModulo(coupon.getModulo());
+//            responseCouponDTO.setUpdateAt(coupon.getUpdateAt());
+//            responseCouponDTO.setClient((coupon.getIdClient() == null)? null: iClientService.getClientByInternalReference(coupon.getIdClient()).get());
+//            responseCouponDTO.setNameClient((coupon.getIdClient() == null)? null: iClientService.getClientByInternalReference(coupon.getIdClient()).get().getCompleteName());
+//            responseCouponDTO.setRequestOpposition((coupon.getIdRequestOpposition() == null)? null: iRequestOppositionService.getByInternalReference(coupon.getIdRequestOpposition()).get());
+//            responseCouponDTO.setStation((coupon.getIdStation() == null)? null: iStationService.getByInternalReference(coupon.getIdStation()).get());
+//            responseCouponDTO.setNameStation((coupon.getIdStation() == null)? null: iStationService.getByInternalReference(coupon.getIdStation()).get().getDesignation());
+////            responseCouponDTO.setTicket((coupon.getIdTicket() == null)? null: iTicketService.getByInternalReference(coupon.getIdTicket()).get());
+//            responseCouponDTO.setNotebook((coupon.getIdNotebook() == null)? null: iNotebookRepo.getNotebookByInternalReference(coupon.getIdNotebook()).get());
+//            responseCouponDTO.setCreditNote((coupon.getIdCreditNote() == null)? null: iCreditNoteRepo.getCreditNoteByInternalReference(coupon.getIdCreditNote()).get());
+//            responseCouponDTO.setTypeVoucher((coupon.getIdTypeVoucher() == null)? null: iTypeVoucherService.getByInternalReference(coupon.getIdTypeVoucher()).get());
+//            responseCouponDTO.setAmount((coupon.getIdTypeVoucher() == null)? null: iTypeVoucherService.getByInternalReference(coupon.getIdTypeVoucher()).get().getAmount());
+//            responseCouponDTO.setInternalReference(coupon.getInternalReference());
+//            responseCouponDTO.setCreatedAt(coupon.getCreatedAt());
+//            responseCouponDTO.setUpdateAt(coupon.getUpdateAt());
+//            responseCouponDTOList.add(responseCouponDTO);
+//
+//        }
+//        List<ResponseCouponDTO> responseCouponDTOList2 = responseCouponDTOList.stream()
+//                .filter(period != null  ? byDate : date -> !date.getCreatedAt().toLocalDate().isEqual(noDate))
+//                .collect(Collectors.toList());
+//        Page<ResponseCouponDTO> responseNotebookDTOPage = new PageImpl<>(responseCouponDTOList2, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), responseCouponDTOList2.size());
+//        return responseNotebookDTOPage;
     }
 
     @Override

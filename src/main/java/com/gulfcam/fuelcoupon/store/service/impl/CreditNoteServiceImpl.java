@@ -52,8 +52,29 @@ public class CreditNoteServiceImpl implements ICreditNoteService {
     }
 
     @Override
-    public Page<ResponseCreditNoteDTO> getCreditNotesByIdStation(Long idStation, int page, int size, String sort, String order) {
-        Page<CreditNote> creditNotes = iCreditNoteRepo.getCreditNotesByIdStation(idStation,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
+    public Page<ResponseCreditNoteDTO> getCreditNotesByIdStation(Long idStation, String status, String internalRef, LocalDate date, int page, int size, String sort, String order) {
+        Specification<CreditNote> specification = ((root, query, criteriaBuilder) -> {
+
+            List<javax.persistence.criteria.Predicate> predicates = new ArrayList<>();
+
+            if (internalRef != null && !internalRef.isEmpty()){
+                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("internalReference").as(String.class)), "%" + internalRef + "%"));
+            }
+
+            predicates.add(criteriaBuilder.equal(root.get("idStation"), idStation ));
+
+            if (date != null){
+                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("createdAt").as(String.class)), date.toString() + '%'));
+            }
+
+            if (status != null && !status.isEmpty()){
+                Status statut = iStatusRepo.findByName(EStatus.valueOf(status.toUpperCase())).get();
+                predicates.add(criteriaBuilder.equal(criteriaBuilder.lower(root.get("status")), statut));
+            }
+            return criteriaBuilder.and(predicates.toArray(new javax.persistence.criteria.Predicate[0]));
+        });
+
+        Page<CreditNote> creditNotes = iCreditNoteRepo.findAll(specification, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
 
         ResponseCreditNoteDTO responseCreditNoteDTO;
         List<ResponseCreditNoteDTO> responseCreditNoteDTOList = new ArrayList<>();
@@ -70,8 +91,26 @@ public class CreditNoteServiceImpl implements ICreditNoteService {
             responseCreditNoteDTOList.add(responseCreditNoteDTO);
 
         }
-        Page<ResponseCreditNoteDTO> responseCreditNotePage = new PageImpl<>(responseCreditNoteDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), iCreditNoteRepo.getCreditNotesByIdStation(idStation).size());
-        return responseCreditNotePage;
+        return new PageImpl<>(responseCreditNoteDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), creditNotes.getTotalElements());
+//        Page<CreditNote> creditNotes = iCreditNoteRepo.getCreditNotesByIdStation(idStation,(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort))));
+//
+//        ResponseCreditNoteDTO responseCreditNoteDTO;
+//        List<ResponseCreditNoteDTO> responseCreditNoteDTOList = new ArrayList<>();
+//
+//        for (CreditNote creditNote: creditNotes){
+//            responseCreditNoteDTO = new ResponseCreditNoteDTO();
+//            responseCreditNoteDTO.setStatus(creditNote.getStatus());
+//            responseCreditNoteDTO.setId(creditNote.getId());
+//            responseCreditNoteDTO.setUpdateAt(creditNote.getUpdateAt());
+//            responseCreditNoteDTO.setStation(iStationService.getByInternalReference(creditNote.getIdStation()).get());
+//            responseCreditNoteDTO.setInternalReference(creditNote.getInternalReference());
+//            responseCreditNoteDTO.setCreatedAt(creditNote.getCreatedAt());
+//            responseCreditNoteDTO.setCoupon(iCouponService.getCouponsByIdCreditNote(creditNote.getInternalReference()));
+//            responseCreditNoteDTOList.add(responseCreditNoteDTO);
+//
+//        }
+//        Page<ResponseCreditNoteDTO> responseCreditNotePage = new PageImpl<>(responseCreditNoteDTOList, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)), iCreditNoteRepo.getCreditNotesByIdStation(idStation).size());
+//        return responseCreditNotePage;
     }
 
     @Override

@@ -15,7 +15,7 @@ public interface ICreditNoteService {
     Page<ResponseCreditNoteDTO> getAllCreditNotes(int page, int size, String sort, String order);
     Optional<CreditNote> getCreditNoteById(Long id);
     Optional<CreditNote> getByInternalReference(Long internelReference);
-    Page<ResponseCreditNoteDTO> getCreditNotesByIdStation(Long idStation, int page, int size, String sort, String order);
+    Page<ResponseCreditNoteDTO> getCreditNotesByIdStation(Long idStation, String status, String internalRef, LocalDate date, int page, int size, String sort, String order);
     void createCreditNote(CreditNote creditNote);
     void deleteCreditNote(CreditNote creditNote);
 

@@ -199,8 +199,9 @@ public class StoreRest {
     public ResponseEntity<?> getAllStores(@RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                              @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                              @RequestParam(required = false, defaultValue = "id") String sort,
+                                             @RequestParam(required = false, value = "store" ) String idStore,
                                              @RequestParam(required = false, defaultValue = "desc") String order) throws JsonProcessingException {
-        Page<Store> list = iStoreService.getAllStores(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
+        Page<Store> list = iStoreService.getAllStores(aes.decrypt(key, idStore), Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         jsonMapper.registerModule(new JavaTimeModule());
         Object json = jsonMapper.writeValueAsString(list);
         JSONObject cr = aes.encryptObject( key, json);

@@ -84,18 +84,22 @@ public class TypeVoucherRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
     @PostMapping()
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> addTypeVoucher(@Valid @RequestBody CreateTypeVoucherDTO createTypeVoucherDTO) {
+    public ResponseEntity<?> addTypeVoucher(@Valid @RequestBody CreateTypeVoucherDTO createTypeVoucherDTO) throws JsonProcessingException {
 
         TypeVoucher typeVoucher = new TypeVoucher();
         typeVoucher.setInternalReference(jwtUtils.generateInternalReference());
         typeVoucher.setCreatedAt(LocalDateTime.now());
-        typeVoucher.setDesignation(createTypeVoucherDTO.getDesignation());
-        typeVoucher.setAmount(createTypeVoucherDTO.getAmount());
+        typeVoucher.setDesignation(aes.decrypt(key, createTypeVoucherDTO.getDesignation()));
+        typeVoucher.setAmount(Float.parseFloat(aes.decrypt(key, createTypeVoucherDTO.getAmount())));
         Status status = iStatusRepo.findByName(EStatus.CREATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.CREATED +  "  not found"));
         typeVoucher.setStatus(status);
 
         iTypeVoucherService.createTypeVoucher(typeVoucher);
-        return ResponseEntity.ok(typeVoucher);
+
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(typeVoucher);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Modification des informations pour un Type de bon", tags = "Type de bon", responses = {
@@ -103,22 +107,25 @@ public class TypeVoucherRest {
             @ApiResponse(responseCode = "404", description = "TypeVoucher not found", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
-    @PutMapping("/{internalReference:[0-9]+}")
+    @PutMapping("/{internalReference}")
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> updateTypeVoucher(@Valid @RequestBody CreateTypeVoucherDTO createTypeVoucherDTO, @PathVariable Long internalReference) {
+    public ResponseEntity<?> updateTypeVoucher(@Valid @RequestBody CreateTypeVoucherDTO createTypeVoucherDTO, @PathVariable String internalReference) throws JsonProcessingException {
 
-        if (!iTypeVoucherService.getByInternalReference(internalReference).isPresent()) {
+        if (!iTypeVoucherService.getByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.typeVoucher_exists", null, LocaleContextHolder.getLocale())));
         }
-        TypeVoucher typeVoucher = iTypeVoucherService.getByInternalReference(internalReference).get();
+        TypeVoucher typeVoucher = iTypeVoucherService.getByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))).get();
         typeVoucher.setUpdateAt(LocalDateTime.now());
-        typeVoucher.setDesignation(createTypeVoucherDTO.getDesignation());
-        typeVoucher.setAmount(createTypeVoucherDTO.getAmount());
+        typeVoucher.setDesignation(aes.decrypt(key, createTypeVoucherDTO.getDesignation()));
+        typeVoucher.setAmount(Float.parseFloat(aes.decrypt(key, createTypeVoucherDTO.getAmount())));
 
         iTypeVoucherService.createTypeVoucher(typeVoucher);
 
-        return ResponseEntity.ok(typeVoucher);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(typeVoucher);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Recupérer Un Type de bon par sa reference interne", tags = "Type de bon", responses = {
@@ -126,9 +133,13 @@ public class TypeVoucherRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/{internalReference:[0-9]+}")
-    public ResponseEntity<TypeVoucher> getTypeVoucherById(@PathVariable Long internalReference) {
-        return ResponseEntity.ok(iTypeVoucherService.getByInternalReference(internalReference).get());
+    @GetMapping("/{internalReference}")
+    public ResponseEntity<?> getTypeVoucherById(@PathVariable String internalReference) throws JsonProcessingException {
+        TypeVoucher typeVoucher = iTypeVoucherService.getByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))).get();
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(typeVoucher);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
     }
 
     @Operation(summary = "Supprimer un Type de bon", tags = "Type de bon", responses = {

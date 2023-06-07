@@ -302,21 +302,21 @@ public class CouponRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    @GetMapping("/export/excel/client/{idClient:[0-9]+}")
-    public ResponseEntity<?> exportCouponsByIdClient(@PathVariable Long idClient) {
+    @GetMapping("/export/excel/client/{idClient}")
+    public ResponseEntity<?> exportCouponsByIdClient(@PathVariable String idClient) {
 
-        Client client = iClientService.getClientByInternalReference(idClient).get();
-        ByteArrayInputStream data = iCouponService.exportCouponsByIdClient(idClient);
+        Client client = iClientService.getClientByInternalReference(Long.parseLong(aes.decrypt(key, idClient))).get();
+        ByteArrayInputStream data = iCouponService.exportCouponsByIdClient(Long.parseLong(aes.decrypt(key, idClient)));
 
         Map<String, Object> emailProps2 = new HashMap<>();
-        emailProps2.put("internalreference", idClient);
+        emailProps2.put("internalreference", Long.parseLong(aes.decrypt(key, idClient)));
         emailProps2.put("HttpHeaders", client.getCompleteName());
-        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, ApplicationConstant.SUBJECT_EMAIL_EXPORT_COUPONS_EXCEL, ApplicationConstant.TEMPLATE_EMAIL_EXPORT_COUPON_EXCEL, data.readAllBytes(), "export-coupons-" + idClient + ".xlsx", "application/vnd.ms-excel"));
+        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, ApplicationConstant.SUBJECT_EMAIL_EXPORT_COUPONS_EXCEL, ApplicationConstant.TEMPLATE_EMAIL_EXPORT_COUPON_EXCEL, data.readAllBytes(), "export-coupons-" + aes.decrypt(key, idClient) + ".xlsx", "application/vnd.ms-excel"));
         log.info("Email send successfull for user: " + client.getEmail());
 
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=export-coupons-" + idClient + ".xlsx");
+        headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=export-coupons-" + aes.decrypt(key, idClient) + ".xlsx");
         headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
 
         return ResponseEntity.ok().headers(headers).body(data.readAllBytes());
@@ -331,6 +331,10 @@ public class CouponRest {
     @GetMapping("/station/{idStation}")
     public ResponseEntity<?> getCouponsByIdStation(@PathVariable String idStation,
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)              @RequestParam(required = false, value = "date", defaultValue = "") LocalDate date,
+                                                               @RequestParam(required = false, value = "serialnumber") String serialNumber,
+                                                               @RequestParam(required = false, value = "client") String clientName,
+                                                               @RequestParam(required = false, value = "status") String status,
+                                                               @RequestParam(required = false, value = "type") String type,
                                                                 @RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                                                 @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                                                 @RequestParam(required = false, defaultValue = "idStation") String sort,
@@ -345,7 +349,7 @@ public class CouponRest {
 //            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.NOT_FOUND,
 //                    messageSource.getMessage("messages.coupon_exists", null, LocaleContextHolder.getLocale())));
 //        }
-        Page<ResponseCouponDTO> cartons = iCouponService.getCouponsByIdStation(Long.parseLong(sn), date,
+        Page<ResponseCouponDTO> cartons = iCouponService.getCouponsByIdStation(Long.parseLong(sn), date, serialNumber, clientName, status, type,
                 Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         jsonMapper.registerModule(new JavaTimeModule());
         Object json = jsonMapper.writeValueAsString(cartons);

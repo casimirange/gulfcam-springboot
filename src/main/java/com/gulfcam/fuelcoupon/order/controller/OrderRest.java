@@ -256,12 +256,12 @@ public class OrderRest {
         emailProps.put("payementMethode", (createOrderDTO.getIdPaymentMethod() == null)? "":createOrderDTO.getIdPaymentMethod()+ " - "+paymentMethod.getDesignation());
 
         if(emailToTresury != null){
-            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, emailToTresury, mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_NEW_ORDER+internalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_ORDER));
+            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, emailToTresury, mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_NEW_ORDER+Long.parseLong(aes.decrypt(key, internalReference.toString())), ApplicationConstant.TEMPLATE_EMAIL_NEW_ORDER));
             log.info("Email  send successfull for user: " + emailToTresury);
         }
 
         if(emailToStore != null){
-            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, emailToStore, mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_NEW_ORDER+internalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_ORDER));
+            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, emailToStore, mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_NEW_ORDER+Long.parseLong(aes.decrypt(key, internalReference.toString())), ApplicationConstant.TEMPLATE_EMAIL_NEW_ORDER));
             log.info("Email  send successfull for user: " + emailToStore);
         }
 
@@ -394,7 +394,7 @@ public class OrderRest {
         }
         StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.ACCEPTED).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.ACCEPTED +  "  not found"));
         TypeDocument typeDocument = iTypeDocumentRepo.findByName(ETypeDocument.INVOICE).orElseThrow(()-> new ResourceNotFoundException("Statut :  "  +  ETypeDocument.INVOICE +  "  not found"));
-//        String fileName = iDocumentStorageService.storeFile(file, InternalReference, docType, typeDocument);
+        String fileName = iDocumentStorageService.storeFile(file, Long.parseLong(aes.decrypt(key, InternalReference)), docType, typeDocument);
         String fileDownloadUri = api_base_url+"/api/v1.0/order/file/" + aes.decrypt(key, InternalReference) + "/downloadFile?type=invoice&docType=" + docType;
         order.setLinkInvoice(fileDownloadUri);
         order.setStatus(statusOrder);
@@ -426,12 +426,12 @@ public class OrderRest {
         List<Users> usersList = iUserService.getUsersByIdStore(order.getIdStore());
         for (Users user : usersList) {
             if (user.getTypeAccount().getName() == ETypeAccount.TREASURY) {
-                emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_MODIFY_ORDER+InternalReference+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_MODIFY_ORDER));
+                emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_MODIFY_ORDER+Long.parseLong(aes.decrypt(key, InternalReference))+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_MODIFY_ORDER));
                 log.info("Email  send successfull for user: " + user.getEmail());
             }
 
             if (user.getTypeAccount().getName() == ETypeAccount.SALES_MANAGER) {
-                emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_MODIFY_ORDER+InternalReference+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_MODIFY_ORDER));
+                emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_MODIFY_ORDER+Long.parseLong(aes.decrypt(key, InternalReference))+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_MODIFY_ORDER));
                 log.info("Email  send successfull for user: " + user.getEmail());
             }
         }
@@ -535,12 +535,12 @@ public class OrderRest {
             if (contentType == null) {
                 contentType = "application/octet-stream";
             }
-            jsonMapper.registerModule(new JavaTimeModule());
-            Object json = jsonMapper.writeValueAsString(resource);
-            JSONObject cr = aes.encryptObject( key, json);
+//            jsonMapper.registerModule(new JavaTimeModule());
+//            Object json = jsonMapper.writeValueAsString(resource);
+//            JSONObject cr = aes.encryptObject( key, json);
             return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                    .body(cr);
+                    .body(resource);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("File not found");
         }
@@ -582,12 +582,12 @@ public class OrderRest {
         List<Users> usersList = iUserService.getUsersByIdStore(order.getIdStore());
         for (Users user : usersList) {
             if (user.getTypeAccount().getName() == ETypeAccount.MANAGER_SPACES_2) {
-                emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_MODIFY_ORDER+InternalReference+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_MODIFY_ORDER));
+                emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_MODIFY_ORDER+Long.parseLong(aes.decrypt(key, InternalReference))+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_MODIFY_ORDER));
                 log.info("Email  send successfull for user: " + user.getEmail());
             }
 
             if (user.getTypeAccount().getName() == ETypeAccount.SALES_MANAGER) {
-                emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_MODIFY_ORDER+InternalReference+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_MODIFY_ORDER));
+                emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_MODIFY_ORDER+Long.parseLong(aes.decrypt(key, InternalReference))+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_MODIFY_ORDER));
                 log.info("Email  send successfull for user: " + user.getEmail());
             }
         }
@@ -637,10 +637,10 @@ public class OrderRest {
         emailProps.put("payementMethode", (order.getIdPaymentMethod() == null)? "":order.getIdPaymentMethod()+ " - "+iPaymentMethodService.getByInternalReference(order.getIdPaymentMethod()).get().getDesignation());
 
         Users commercialAttache = iUserService.getByInternalReference(Long.parseLong(aes.decrypt(key, idCommercialAttache)));
-        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, commercialAttache.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_ORDER+InternalReference+" - "+EStatusOrder.ORDER_CANCEL, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_ORDER));
+        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, commercialAttache.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_ORDER+Long.parseLong(aes.decrypt(key, InternalReference))+" - "+EStatusOrder.ORDER_CANCEL, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_ORDER));
         log.info("Email  send successfull for user: " + commercialAttache.getEmail());
 
-        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_ORDER+InternalReference+" - "+EStatusOrder.ORDER_CANCEL, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_ORDER));
+        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_ORDER+Long.parseLong(aes.decrypt(key, InternalReference))+" - "+EStatusOrder.ORDER_CANCEL, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_ORDER));
         log.info("Email  send successfull for user: " + client.getEmail());
         jsonMapper.registerModule(new JavaTimeModule());
         Object json = jsonMapper.writeValueAsString(order);
@@ -709,8 +709,8 @@ public class OrderRest {
         }
         StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.CLOSED).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.CLOSED +  "  not found"));
         TypeDocument typeDocument = iTypeDocumentRepo.findByName(ETypeDocument.DELIVERY).orElseThrow(()-> new ResourceNotFoundException("Statut :  "  +  ETypeDocument.DELIVERY +  "  not found"));
-//        String fileName = iDocumentStorageService.storeFile(file, InternalReference, "pdf", typeDocument);
-        String fileDownloadUri = api_base_url+"/api/v1.0/order/file/" + InternalReference + "/downloadFile?type=delivery&docType=pdf";
+        String fileName = iDocumentStorageService.storeFile(file, Long.parseLong(aes.decrypt(key, InternalReference)), "pdf", typeDocument);
+        String fileDownloadUri = api_base_url+"/api/v1.0/order/file/" + Long.parseLong(aes.decrypt(key, InternalReference)) + "/downloadFile?type=delivery&docType=pdf";
         order.setLinkDelivery(fileDownloadUri);
         order.setStatus(statusOrder);
         order.setUpdateAt(LocalDateTime.now());
@@ -731,7 +731,7 @@ public class OrderRest {
         List<Users> usersList = iUserService.getUsersByIdStore(order.getIdStore());
         for (Users user : usersList) {
             if (user.getTypeAccount().getName() == ETypeAccount.SALES_MANAGER) {
-                emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_MODIFY_ORDER+InternalReference+" - "+EStatusOrder.CLOSED, ApplicationConstant.TEMPLATE_EMAIL_MODIFY_ORDER));
+                emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_MODIFY_ORDER+Long.parseLong(aes.decrypt(key, InternalReference))+" - "+EStatusOrder.CLOSED, ApplicationConstant.TEMPLATE_EMAIL_MODIFY_ORDER));
                 log.info("Email  send successfull for user: " + user.getEmail());
             }
         }
@@ -741,7 +741,7 @@ public class OrderRest {
             Map<String, Object> emailProps2 = new HashMap<>();
             emailProps2.put("Internalreference", Long.parseLong(aes.decrypt(key, InternalReference)));
             emailProps2.put("completename", client.getCompleteName());
-            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, ApplicationConstant.SUBJECT_EMAIL_NEW_FACTURE+InternalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_FACTURE, data));
+            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, ApplicationConstant.SUBJECT_EMAIL_NEW_FACTURE+Long.parseLong(aes.decrypt(key, InternalReference)), ApplicationConstant.TEMPLATE_EMAIL_NEW_FACTURE, data));
             log.info("Email send successfull for user: " + client.getEmail());
         }
 
@@ -765,12 +765,12 @@ public class OrderRest {
         Map<String, Object> emailProps2 = new HashMap<>();
         emailProps2.put("Internalreference", Long.parseLong(aes.decrypt(key, idClient)));
         emailProps2.put("CompleteName", client.getCompleteName());
-        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, ApplicationConstant.SUBJECT_EMAIL_EXPORT_ORDERS_EXCEL, ApplicationConstant.TEMPLATE_EMAIL_EXPORT_ORDER_EXCEL, data.readAllBytes(),"export-commandes-" + idClient + ".xlsx", "application/vnd.ms-excel"));
+        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, ApplicationConstant.SUBJECT_EMAIL_EXPORT_ORDERS_EXCEL, ApplicationConstant.TEMPLATE_EMAIL_EXPORT_ORDER_EXCEL, data.readAllBytes(),"export-commandes-" + aes.decrypt(key, idClient) + ".xlsx", "application/vnd.ms-excel"));
         log.info("Email send successfull for user: " + client.getEmail());
 
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=export-commandes-" + idClient + ".xlsx");
+        headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=export-commandes-" + aes.decrypt(key, idClient) + ".xlsx");
         headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
 
         return ResponseEntity.ok().headers(headers).body(data.readAllBytes());

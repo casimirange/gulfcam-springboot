@@ -18,7 +18,7 @@ public interface ICouponService {
     List<Coupon> getCouponsByIdRequestOpposition(Long idRequestOpposition);
     List<Coupon> getCouponsByIdCreditNote(Long idCreditNote);
     ByteArrayInputStream exportCouponsByIdClient(Long idClient);
-    Page<ResponseCouponDTO> getCouponsByIdStation(Long idStation, LocalDate period, int page, int size, String sort, String order);
+    Page<ResponseCouponDTO> getCouponsByIdStation(Long idStation, LocalDate period, String seialNumber, String clientName, String status, String type, int page, int size, String sort, String order);
     Page<ResponseCouponDTO> getCouponsByIdClient(Long idClient, int page, int size, String sort, String order);
     Page<ResponseCouponDTO> getCouponsByIdNotebook(Long idNotebook, int page, int size, String sort, String order);
     List<Coupon> getCouponsByIdNotebook(Long idNotebook);

@@ -15,5 +15,5 @@ public class CreateTypeVoucherDTO {
 
     @Schema(description = "Valeur monétaire (1000, 5000, 3000)")
     @NotNull(message = "{amount.required}")
-    private float amount;
+    private String amount;
 }

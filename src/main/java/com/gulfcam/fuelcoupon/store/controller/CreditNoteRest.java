@@ -408,10 +408,13 @@ public class CreditNoteRest {
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @GetMapping("/station/{idStation}")
     public ResponseEntity<?> getCreditNotesByIdStation(@PathVariable String idStation,@RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
-                                                      @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
+                                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)            @RequestParam(required = false, value = "date") LocalDate date,
+                                                       @RequestParam(required = false, value = "status") String status,
+                                                       @RequestParam(required = false, value = "internalRef") String ref,
+                                                       @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                                       @RequestParam(required = false, defaultValue = "id") String sort,
                                                       @RequestParam(required = false, defaultValue = "desc") String order) throws JsonProcessingException {
-        Page<ResponseCreditNoteDTO> list = iCreditNoteService.getCreditNotesByIdStation(Long.parseLong(aes.decrypt(key, idStation)), Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
+        Page<ResponseCreditNoteDTO> list = iCreditNoteService.getCreditNotesByIdStation(Long.parseLong(aes.decrypt(key, idStation)), status, ref, date, Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         jsonMapper.registerModule(new JavaTimeModule());
         Object json = jsonMapper.writeValueAsString(list);
         JSONObject cr = aes.encryptObject( key, json);

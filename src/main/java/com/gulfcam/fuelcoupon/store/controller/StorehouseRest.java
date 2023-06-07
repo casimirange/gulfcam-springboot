@@ -43,6 +43,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @Tag(name = "Entrepôt")
@@ -111,8 +113,21 @@ public class StorehouseRest {
         storehouse.setStatus(status);
 
         iStorehouseService.createStorehouse(storehouse);
+        ResponseStorehouseDTO responseStorehouseDTO = new ResponseStorehouseDTO();
+
+        store = iStoreService.getByInternalReference(storehouse.getIdStore()).get();
+
+            responseStorehouseDTO.setId(storehouse.getId());
+            responseStorehouseDTO.setStore(store);
+            responseStorehouseDTO.setStatus(storehouse.getStatus());
+            responseStorehouseDTO.setCreateAt(storehouse.getCreateAt());
+            responseStorehouseDTO.setInternalReference(storehouse.getInternalReference());
+            responseStorehouseDTO.setName(storehouse.getName());
+            responseStorehouseDTO.setType(storehouse.getType());
+            responseStorehouseDTO.setUpdateAt(storehouse.getUpdateAt());
+            responseStorehouseDTO.setLocalisationStore((store != null)? store.getLocalization(): "");
         jsonMapper.registerModule(new JavaTimeModule());
-        Object json = jsonMapper.writeValueAsString(storehouse);
+        Object json = jsonMapper.writeValueAsString(responseStorehouseDTO);
         JSONObject cr = aes.encryptObject( key, json);
         return ResponseEntity.ok(cr);
     }
@@ -145,9 +160,21 @@ public class StorehouseRest {
         storehouse.setName(aes.decrypt(key, createStorehouseDTO.getName()));
 
         iStorehouseService.createStorehouse(storehouse);
+        ResponseStorehouseDTO responseStorehouseDTO = new ResponseStorehouseDTO();
 
+        store = iStoreService.getByInternalReference(storehouse.getIdStore()).get();
+
+        responseStorehouseDTO.setId(storehouse.getId());
+        responseStorehouseDTO.setStore(store);
+        responseStorehouseDTO.setStatus(storehouse.getStatus());
+        responseStorehouseDTO.setCreateAt(storehouse.getCreateAt());
+        responseStorehouseDTO.setInternalReference(storehouse.getInternalReference());
+        responseStorehouseDTO.setName(storehouse.getName());
+        responseStorehouseDTO.setType(storehouse.getType());
+        responseStorehouseDTO.setUpdateAt(storehouse.getUpdateAt());
+        responseStorehouseDTO.setLocalisationStore((store != null)? store.getLocalization(): "");
         jsonMapper.registerModule(new JavaTimeModule());
-        Object json = jsonMapper.writeValueAsString(storehouse);
+        Object json = jsonMapper.writeValueAsString(responseStorehouseDTO);
         JSONObject cr = aes.encryptObject( key, json);
         return ResponseEntity.ok(cr);
     }
@@ -226,8 +253,9 @@ public class StorehouseRest {
     public ResponseEntity<?> getAllStorehouses(@RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                              @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                              @RequestParam(required = false, defaultValue = "id") String sort,
+                                             @RequestParam(required = false, value = "store" ) String idStore,
                                              @RequestParam(required = false, defaultValue = "desc") String order) throws JsonProcessingException {
-        Page<ResponseStorehouseDTO> list = iStorehouseService.getAllStorehouses(Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
+        Page<ResponseStorehouseDTO> list = iStorehouseService.getAllStorehouses(aes.decrypt(key, idStore), Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         jsonMapper.registerModule(new JavaTimeModule());
         Object json = jsonMapper.writeValueAsString(list);
         JSONObject cr = aes.encryptObject( key, json);

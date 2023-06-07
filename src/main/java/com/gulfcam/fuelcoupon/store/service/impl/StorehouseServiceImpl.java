@@ -12,9 +12,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -39,9 +41,18 @@ public class StorehouseServiceImpl implements IStorehouseService {
     }
 
     @Override
-    public Page<ResponseStorehouseDTO> getAllStorehouses(int page, int size, String sort, String order) {
+    public Page<ResponseStorehouseDTO> getAllStorehouses(String idStore, int page, int size, String sort, String order) {
+        Specification<Storehouse> specification = ((root, query, criteriaBuilder) -> {
 
-        Page<Storehouse> storehouses = iStorehouseRepo.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (idStore != null && !idStore.isEmpty()) {
+                predicates.add(criteriaBuilder.equal(criteriaBuilder.lower(root.get("idStore")), Long.parseLong(idStore)));
+            }
+            return criteriaBuilder.and(predicates.toArray(new javax.persistence.criteria.Predicate[0]));
+        });
+
+        Page<Storehouse> storehouses = iStorehouseRepo.findAll(specification, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort)));
         ResponseStorehouseDTO responseStorehouseDTO;
         List<ResponseStorehouseDTO> responseStorehouseDTOList = new ArrayList<>();
 

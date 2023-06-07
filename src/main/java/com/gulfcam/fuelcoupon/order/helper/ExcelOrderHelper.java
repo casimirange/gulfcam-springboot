@@ -18,7 +18,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class ExcelOrderHelper {
     public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    static String[] HEADERs = { "Reference", "Reférence du client", "Nom du client", "Localisation du magasin" , "Nom du reponsable de la commande"  , "Nom du Gestionnaire espace 2" , "Montant Total Net" , "Montant Total TTC" , "Taxe" , "Temps de livraison" , "Méthoe epaiement" , "Reférence du paiement" , "Description" , "Date de création", "Statut" };
+    static String[] HEADERs = { "Reférence", "Reférence du client", "Nom du client", "Localisation du magasin" , "Nom du reponsable de la commande"  , "Nom du Gestionnaire espace 2" , "Montant Total Net" , "Montant Total TTC" , "Taxe" , "Temps de livraison" , "Méthoe epaiement" , "Reférence du paiement" , "Description" , "Date de création", "Statut" };
     static String SHEET = "Commandes";
 
 
