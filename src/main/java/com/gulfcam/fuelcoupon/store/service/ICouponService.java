@@ -14,6 +14,7 @@ public interface ICouponService {
 
     Page<ResponseCouponDTO> getAllCoupons(int page, int size, String sort, String order);
     Page<ResponseCouponDTO> filtres(String serialNumber, String statusName, String clientName, String type, String stationName, int page, int size, String sort, String order);
+    Page<ResponseCouponDTO> couponNotHaveCreditNote(String idStation, int page, int size, String sort, String order);
     Page<ResponseCouponDTO> filterCoupons(String serialNumber, String statusName, int page, int size, String sort, String order);
     List<Coupon> getCouponsByIdRequestOpposition(Long idRequestOpposition);
     List<Coupon> getCouponsByIdCreditNote(Long idCreditNote);

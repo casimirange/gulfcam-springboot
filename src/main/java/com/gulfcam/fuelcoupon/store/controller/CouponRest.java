@@ -653,6 +653,28 @@ public class CouponRest {
             @ApiResponse(responseCode = "404", description = "Coupon not found", content = @Content(mediaType = "Application/Json")),
             @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
+    @GetMapping("/station/notCreditNote")
+    public ResponseEntity<?> getCouponByStationNotHaveCreditNote(@RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
+                                           @RequestParam(required = true, value = "station") String idStation,
+                                           @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
+                                           @RequestParam(required = false, defaultValue = "id") String sort,
+                                           @RequestParam(required = false, defaultValue = "desc") String order) throws JsonProcessingException {
+        Page<ResponseCouponDTO> list = iCouponService.couponNotHaveCreditNote(aes.decrypt(key, idStation), Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
+        jsonMapper.registerModule(new JavaTimeModule());
+        Object json = jsonMapper.writeValueAsString(list);
+        JSONObject cr = aes.encryptObject( key, json);
+        return ResponseEntity.ok(cr);
+    }
+
+    @Parameters(value = {
+            @Parameter(name = "sort", schema = @Schema(allowableValues = {"id", "createdAt"})),
+            @Parameter(name = "order", schema = @Schema(allowableValues = {"asc", "desc"}))})
+    @Operation(summary = "Filtrer la Liste des Coupons", tags = "Coupon", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "404", description = "Coupon not found", content = @Content(mediaType = "Application/Json")),
+            @ApiResponse(responseCode = "401", description = "Full authentication is required to access this resource", content = @Content(mediaType = "Application/Json"))})
+    @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
     @GetMapping("/filter")
     public ResponseEntity<?> filtrerCoupons(@RequestParam(required = false, value = "page", defaultValue = "0") String pageParam,
                                            @RequestParam(required = false, value = "serialnumber") String serialNumber,

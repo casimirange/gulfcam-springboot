@@ -1,7 +1,10 @@
 package com.gulfcam.fuelcoupon;
 
 
+import com.gulfcam.fuelcoupon.cryptage.AESUtil;
 import com.gulfcam.fuelcoupon.order.entity.DocumentStorageProperties;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -18,10 +21,18 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @EnableConfigurationProperties({DocumentStorageProperties.class})
 @Configuration
 @EnableAsync
+@Slf4j
 public class FuelcouponApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(FuelcouponApplication.class, args);
+
+		AESUtil aes = new AESUtil();
+		String key = "0e7cef307ba3195eef26fe5c1c9497f5";
+		String login = "13563ea8f55256881cf8d142ea7970be763d0960d55f60ca20d3f4de56654bc11ce93ab414310fb887e715687ace2688eZm2L nVfmg5B ZmdwuAhA==";
+		String pwd = "Hostire@2022";
+
+		log.info("login décrypté: " + aes.decrypt(key, login));
 	}
 
 	@Bean

@@ -256,12 +256,12 @@ public class OrderRest {
         emailProps.put("payementMethode", (createOrderDTO.getIdPaymentMethod() == null)? "":createOrderDTO.getIdPaymentMethod()+ " - "+paymentMethod.getDesignation());
 
         if(emailToTresury != null){
-            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, emailToTresury, mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_NEW_ORDER+Long.parseLong(aes.decrypt(key, internalReference.toString())), ApplicationConstant.TEMPLATE_EMAIL_NEW_ORDER));
+            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, emailToTresury, mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_NEW_ORDER+ internalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_ORDER));
             log.info("Email  send successfull for user: " + emailToTresury);
         }
 
         if(emailToStore != null){
-            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, emailToStore, mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_NEW_ORDER+Long.parseLong(aes.decrypt(key, internalReference.toString())), ApplicationConstant.TEMPLATE_EMAIL_NEW_ORDER));
+            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, emailToStore, mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_NEW_ORDER+ internalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_ORDER));
             log.info("Email  send successfull for user: " + emailToStore);
         }
 
@@ -618,7 +618,7 @@ public class OrderRest {
         Order order = iOrderService.getByInternalReference(Long.parseLong(aes.decrypt(key, InternalReference))).get();
         Client client = iClientService.getClientByInternalReference(order.getIdClient()).get();
 
-        StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.ORDER_CANCEL).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.ORDER_CANCEL +  "  not found"));
+        StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.CANCELED).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.CANCELED +  "  not found"));
         order.setStatus(statusOrder);
         order.setUpdateAt(LocalDateTime.now());
         order.setIdCommercialAttache(Long.parseLong(aes.decrypt(key, idCommercialAttache)));
@@ -633,14 +633,14 @@ public class OrderRest {
         emailProps.put("canal", order.getChannel());
         emailProps.put("netAmount", order.getNetAggregateAmount());
         emailProps.put("ttcAmount", order.getTTCAggregateAmount());
-        emailProps.put("status", EStatusOrder.ORDER_CANCEL);
+        emailProps.put("status", EStatusOrder.CANCELED);
         emailProps.put("payementMethode", (order.getIdPaymentMethod() == null)? "":order.getIdPaymentMethod()+ " - "+iPaymentMethodService.getByInternalReference(order.getIdPaymentMethod()).get().getDesignation());
 
         Users commercialAttache = iUserService.getByInternalReference(Long.parseLong(aes.decrypt(key, idCommercialAttache)));
-        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, commercialAttache.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_ORDER+Long.parseLong(aes.decrypt(key, InternalReference))+" - "+EStatusOrder.ORDER_CANCEL, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_ORDER));
+        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, commercialAttache.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_ORDER+Long.parseLong(aes.decrypt(key, InternalReference))+" - "+EStatusOrder.CANCELED, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_ORDER));
         log.info("Email  send successfull for user: " + commercialAttache.getEmail());
 
-        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_ORDER+Long.parseLong(aes.decrypt(key, InternalReference))+" - "+EStatusOrder.ORDER_CANCEL, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_ORDER));
+        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_ORDER+Long.parseLong(aes.decrypt(key, InternalReference))+" - "+EStatusOrder.CANCELED, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_ORDER));
         log.info("Email  send successfull for user: " + client.getEmail());
         jsonMapper.registerModule(new JavaTimeModule());
         Object json = jsonMapper.writeValueAsString(order);
@@ -661,7 +661,7 @@ public class OrderRest {
             Order order = iOrderService.getByInternalReference(cancelMultiOrderDTO.getOrders().get(i)).get();
             Client client = iClientService.getClientByInternalReference(order.getIdClient()).get();
 
-            StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.ORDER_CANCEL).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.ORDER_CANCEL +  "  not found"));
+            StatusOrder statusOrder = iStatusOrderRepo.findByName(EStatusOrder.CANCELED).orElseThrow(()-> new ResourceNotFoundException("Statut de la commande:  "  +  EStatusOrder.CANCELED +  "  not found"));
             order.setStatus(statusOrder);
             order.setUpdateAt(LocalDateTime.now());
             iOrderService.createOrder(order);
@@ -674,10 +674,10 @@ public class OrderRest {
             emailProps.put("canal", order.getChannel());
             emailProps.put("netAmount", order.getNetAggregateAmount());
             emailProps.put("ttcAmount", order.getTTCAggregateAmount());
-            emailProps.put("status", EStatusOrder.ORDER_CANCEL);
+            emailProps.put("status", EStatusOrder.CANCELED);
             emailProps.put("payementMethode", (order.getIdPaymentMethod() == null)? "":order.getIdPaymentMethod()+ " - "+iPaymentMethodService.getByInternalReference(order.getIdPaymentMethod()).get().getDesignation());
 
-            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_MULTI_ORDER+cancelMultiOrderDTO.getOrders().get(i)+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_ORDER));
+            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_MULTI_ORDER+cancelMultiOrderDTO.getOrders().get(i)+" - "+EStatusOrder.CANCELED, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_ORDER));
             log.info("Email  send successfull for user: " + client.getEmail());
 
         }
@@ -685,7 +685,7 @@ public class OrderRest {
         Map<String, Object> emailProps = new HashMap<>();
         emailProps.put("order", cancelMultiOrderDTO.getOrders());
         Users commercialAttache = iUserService.getByInternalReference(cancelMultiOrderDTO.getIdCommercialAttache());
-        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, commercialAttache.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_MULTI_ORDER+" - "+EStatusOrder.ORDER_CANCEL, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_MULTI_ORDER));
+        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, commercialAttache.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_CANCEL_MULTI_ORDER+" - "+EStatusOrder.CANCELED, ApplicationConstant.TEMPLATE_EMAIL_CANCEL_MULTI_ORDER));
         log.info("Email  send successfull for user: " + commercialAttache.getEmail());
 
         return ResponseEntity.ok().body(new MessageResponseDto(HttpStatus.OK, " Les commandes ont été annulé avec succèss !"));
