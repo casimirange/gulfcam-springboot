@@ -127,6 +127,7 @@ stage('Deploy on gulfcam dev server'){
          }
          post{
             always{
+               deleteDir()
                emailext to: "$RECIPIENTS",
                subject: "${env.JOB_NAME}:${currentBuild.currentResult}",
                body: "${currentBuild.currentResult}: Job ${env.JOB_NAME} is ${currentBuild.currentResult}."
