@@ -254,8 +254,9 @@ public class StorehouseRest {
                                              @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                              @RequestParam(required = false, defaultValue = "id") String sort,
                                              @RequestParam(required = false, value = "store" ) String idStore,
+                                             @RequestParam(required = false, value = "type" ) String type,
                                              @RequestParam(required = false, defaultValue = "desc") String order) throws JsonProcessingException {
-        Page<ResponseStorehouseDTO> list = iStorehouseService.getAllStorehouses(aes.decrypt(key, idStore), Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
+        Page<ResponseStorehouseDTO> list = iStorehouseService.getAllStorehouses(aes.decrypt(key, idStore), type, Integer.parseInt(pageParam),  Integer.parseInt(sizeParam), sort, order);
         jsonMapper.registerModule(new JavaTimeModule());
         Object json = jsonMapper.writeValueAsString(list);
         JSONObject cr = aes.encryptObject( key, json);

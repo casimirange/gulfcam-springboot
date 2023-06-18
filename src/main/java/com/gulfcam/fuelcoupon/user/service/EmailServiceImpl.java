@@ -3,7 +3,10 @@ package com.gulfcam.fuelcoupon.user.service;
 import com.gulfcam.fuelcoupon.user.dto.EmailDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -11,8 +14,11 @@ import org.springframework.web.multipart.MultipartFile;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
+import javax.activation.DataSource;
 import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
+import java.io.File;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 @Service
@@ -24,6 +30,9 @@ public class EmailServiceImpl implements IEmailService {
 
 	@Autowired
 	private SpringTemplateEngine templateEngine;
+
+	@Autowired
+	ApplicationContext appContext;
 
 	@Override
 	public void sendEmail(EmailDto emailDto) {

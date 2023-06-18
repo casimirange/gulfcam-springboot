@@ -217,8 +217,8 @@ public class OrderRest {
 //        order.setIdSalesManager(createOrderDTO.getIdSalesManager());
         order.setIdCommercialAttache(Long.parseLong(aes.decrypt(key, createOrderDTO.getIdCommercialAttache().toString())));
         order.setChannel(aes.decrypt(key, createOrderDTO.getChannel()));
-        order.setDescription(createOrderDTO.getDescription() != null ? aes.decrypt(key, createOrderDTO.getDeliveryTime().toString()) :"");
-        order.setDeliveryTime(createOrderDTO.getDeliveryTime() != null ? aes.decrypt(key, createOrderDTO.getDeliveryTime().toString()) :"");
+        order.setDescription(createOrderDTO.getDescription() != null ? aes.decrypt(key, createOrderDTO.getDescription()) :"");
+        order.setDeliveryTime(createOrderDTO.getDeliveryTime() != null ? aes.decrypt(key, createOrderDTO.getDeliveryTime()) :"");
 //        order.setIdPaymentMethod(createOrderDTO.getIdPaymentMethod());
         order.setNetAggregateAmount(Integer.parseInt(aes.decrypt(key, createOrderDTO.getNetAggregateAmount()+"")));
         order.setTTCAggregateAmount(Integer.parseInt(aes.decrypt(key, createOrderDTO.getTTCAggregateAmount()+"")));
@@ -248,11 +248,11 @@ public class OrderRest {
         Map<String, Object> emailProps = new HashMap<>();
         emailProps.put("internalReferenceOrder", internalReference);
         emailProps.put("internalReferenceClient", ClientReference);
-        emailProps.put("internalReferenceStore", createOrderDTO.getIdStore());
-        emailProps.put("delivryTime", createOrderDTO.getDeliveryTime());
-        emailProps.put("canal", createOrderDTO.getChannel());
-        emailProps.put("netAmount", createOrderDTO.getNetAggregateAmount());
-        emailProps.put("ttcAmount", createOrderDTO.getTTCAggregateAmount());
+        emailProps.put("internalReferenceStore", aes.decrypt(key, createOrderDTO.getIdStore()));
+        emailProps.put("delivryTime", createOrderDTO.getDeliveryTime() != null ? aes.decrypt(key, createOrderDTO.getDeliveryTime()) :"");
+        emailProps.put("canal",aes.decrypt(key,  createOrderDTO.getChannel()));
+        emailProps.put("netAmount", aes.decrypt(key, createOrderDTO.getNetAggregateAmount()));
+        emailProps.put("ttcAmount", aes.decrypt(key, createOrderDTO.getTTCAggregateAmount()));
         emailProps.put("payementMethode", (createOrderDTO.getIdPaymentMethod() == null)? "":createOrderDTO.getIdPaymentMethod()+ " - "+paymentMethod.getDesignation());
 
         if(emailToTresury != null){

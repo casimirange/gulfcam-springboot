@@ -41,13 +41,17 @@ public class StorehouseServiceImpl implements IStorehouseService {
     }
 
     @Override
-    public Page<ResponseStorehouseDTO> getAllStorehouses(String idStore, int page, int size, String sort, String order) {
+    public Page<ResponseStorehouseDTO> getAllStorehouses(String idStore, String type, int page, int size, String sort, String order) {
         Specification<Storehouse> specification = ((root, query, criteriaBuilder) -> {
 
             List<Predicate> predicates = new ArrayList<>();
 
             if (idStore != null && !idStore.isEmpty()) {
                 predicates.add(criteriaBuilder.equal(criteriaBuilder.lower(root.get("idStore")), Long.parseLong(idStore)));
+            }
+
+            if (type != null && !type.isEmpty()) {
+                predicates.add(criteriaBuilder.equal(criteriaBuilder.lower(root.get("type")), type.toLowerCase()));
             }
             return criteriaBuilder.and(predicates.toArray(new javax.persistence.criteria.Predicate[0]));
         });

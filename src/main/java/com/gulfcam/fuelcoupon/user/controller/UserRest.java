@@ -386,7 +386,7 @@ public class UserRest {
 	@Operation(summary = "Liste des utilisateurs par type de compte", tags = "users", responses = {
 			@ApiResponse(responseCode = "200", content = @Content(mediaType = "Application/Json")),
 			@ApiResponse(responseCode = "404", description = "File not found", content = @Content(mediaType = "Application/Json")), })
-	@PreAuthorize("hasRole('SUPERADMIN') or hasRole('ADMIN') or hasRole('DIRECTOR') or hasRole('AGENT')")
+	@PreAuthorize("hasRole('SUPERADMIN') or hasRole('ADMIN') or hasRole('USER') or hasRole('AGENT')")
 	@GetMapping("/typeaccount/{typeAccount}")
 	public ResponseEntity<?> getUsersByTypeAccount(@PathVariable String typeAccount) throws JsonProcessingException {
 		TypeAccount typeAccount1 = iTypeAccountRepository.findByName(ETypeAccount.valueOf(typeAccount.toUpperCase())).get();

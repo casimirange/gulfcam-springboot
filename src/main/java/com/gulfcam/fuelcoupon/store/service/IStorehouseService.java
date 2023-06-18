@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface IStorehouseService {
 
-    Page<ResponseStorehouseDTO> getAllStorehouses(String idStore, int page, int size, String sort, String order);
+    Page<ResponseStorehouseDTO> getAllStorehouses(String idStore, String type, int page, int size, String sort, String order);
     Page<Storehouse> getStorehousesByIdStore(Long idStore, int page, int size, String sort, String order);
     Optional<Storehouse> getStorehouseById(Long id);
     List<ResponseStoreHouseGroupDTO> groupeNoteBookByInternalReference(Long internelReference);

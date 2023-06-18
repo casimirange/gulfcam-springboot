@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
+import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,6 +18,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 @SpringBootApplication
 @EnableConfigurationProperties({DocumentStorageProperties.class})
@@ -27,12 +32,15 @@ public class FuelcouponApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(FuelcouponApplication.class, args);
 
-		AESUtil aes = new AESUtil();
-		String key = "0e7cef307ba3195eef26fe5c1c9497f5";
-		String login = "13563ea8f55256881cf8d142ea7970be763d0960d55f60ca20d3f4de56654bc11ce93ab414310fb887e715687ace2688eZm2L nVfmg5B ZmdwuAhA==";
-		String pwd = "Hostire@2022";
+//		AESUtil aesUtil = new AESUtil();
+//		String key = "0e7cef307ba3195eef26fe5c1c9497f5";
+//
+//		String idCarton = "6F9FC9048656CD3BDD46E8C68B3B3594E0AE37E934D18932295FAEF0D4EB1A3CDEF73D56466E363117B1199B3B21852EcS+eyYCeUIuKbI5PMdkhmg==";
+//		String idStoreHouseSell = "0ABD07CC626B20DB06F7783EBDAE62A790A7B98D6FDD2C136AF0EBE762F0314B751EA71D7BDC9EEF4C1E994B823B0703mxJV4N60aPVSJL3hknjNJA==";
+//
+//		log.info("idCarton: "+aesUtil.decrypt(key, idCarton));
+//		log.info("idS: "+aesUtil.decrypt(key, idStoreHouseSell));
 
-		log.info("login décrypté: " + aes.decrypt(key, login));
 	}
 
 	@Bean
@@ -54,6 +62,17 @@ public class FuelcouponApplication {
 		mapper.registerModule(new JavaTimeModule());
 		mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 		return mapper;
+	}
+
+	@Bean
+	public WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> webServerFactoryCustomizer(){
+		return factory -> {
+			try {
+				factory.setAddress(InetAddress.getByName("0.0.0.0"));
+			} catch (UnknownHostException e) {
+				throw new RuntimeException(e);
+			}
+		};
 	}
 
 }

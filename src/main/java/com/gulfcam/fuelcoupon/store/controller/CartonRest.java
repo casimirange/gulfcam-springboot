@@ -7,13 +7,11 @@ import com.gulfcam.fuelcoupon.authentication.dto.MessageResponseDto;
 import com.gulfcam.fuelcoupon.authentication.service.JwtUtils;
 import com.gulfcam.fuelcoupon.cryptage.AESUtil;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
-import com.gulfcam.fuelcoupon.order.entity.TypeVoucher;
 import com.gulfcam.fuelcoupon.order.service.ITypeVoucherService;
 import com.gulfcam.fuelcoupon.store.dto.CreateCartonDTO;
 import com.gulfcam.fuelcoupon.store.dto.ResponseCartonDTO;
+import com.gulfcam.fuelcoupon.store.dto.SupplyCartonDTO;
 import com.gulfcam.fuelcoupon.store.entity.Carton;
-import com.gulfcam.fuelcoupon.store.entity.Coupon;
-import com.gulfcam.fuelcoupon.store.entity.Notebook;
 import com.gulfcam.fuelcoupon.store.entity.Storehouse;
 import com.gulfcam.fuelcoupon.store.repository.ICartonRepo;
 import com.gulfcam.fuelcoupon.store.service.ICartonService;
@@ -36,7 +34,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
-import org.apache.maven.lifecycle.internal.LifecycleStarter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -47,14 +44,12 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -188,25 +183,26 @@ public class CartonRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
     @PostMapping("/supply")
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> orderSupply(@RequestParam("idCarton") String idCarton, @RequestParam("idStoreHouseSell") String idStoreHouseSell) throws JsonProcessingException {
+//    public ResponseEntity<?> orderSupply(@RequestBody SupplyCartonDTO supplyCartonDTO @RequestParam("idCarton") String idCarton, @RequestParam("idStoreHouseSell") String idStoreHouseSell) throws JsonProcessingException {
+    public ResponseEntity<?> orderSupply(@RequestBody SupplyCartonDTO supplyCartonDTO ) throws JsonProcessingException {
 
         Users storeKeeper = new Users();
         Storehouse storehouse = new Storehouse();
 
 
-        if (idStoreHouseSell != null) {
-            if(!iStorehouseService.getByInternalReference(Long.parseLong(aes.decrypt(key, idStoreHouseSell))).isPresent())
+        if (supplyCartonDTO.getIdStoreHouseSell() != null) {
+            if(!iStorehouseService.getByInternalReference(Long.parseLong(aes.decrypt(key, supplyCartonDTO.getIdStoreHouseSell()))).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.storehouse_exists", null, LocaleContextHolder.getLocale())));
-            storehouse = iStorehouseService.getByInternalReference(Long.parseLong(aes.decrypt(key, idStoreHouseSell))).get();
+            storehouse = iStorehouseService.getByInternalReference(Long.parseLong(aes.decrypt(key, supplyCartonDTO.getIdStoreHouseSell()))).get();
 
         }
 
-        if (!iCartonService.getByInternalReference(Long.parseLong(aes.decrypt(key, idCarton))).isPresent()) {
+        if (!iCartonService.getByInternalReference(Long.parseLong(aes.decrypt(key, supplyCartonDTO.getIdCarton()))).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.carton_exists", null, LocaleContextHolder.getLocale())));
         }
-        Carton carton = iCartonService.getByInternalReference(Long.parseLong(aes.decrypt(key, idCarton))).get();
+        Carton carton = iCartonService.getByInternalReference(Long.parseLong(aes.decrypt(key, supplyCartonDTO.getIdCarton()))).get();
 
         if (carton.getStatus().getName() == EStatus.DISABLED) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
