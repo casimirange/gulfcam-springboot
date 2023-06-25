@@ -7,9 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,7 +29,7 @@ import java.net.UnknownHostException;
 @Configuration
 @EnableAsync
 @Slf4j
-public class FuelcouponApplication {
+public class FuelcouponApplication extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {
 		SpringApplication.run(FuelcouponApplication.class, args);
@@ -41,6 +43,11 @@ public class FuelcouponApplication {
 //		log.info("idCarton: "+aesUtil.decrypt(key, idCarton));
 //		log.info("idS: "+aesUtil.decrypt(key, idStoreHouseSell));
 
+	}
+
+	@Override
+	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+		return application.sources(FuelcouponApplication.class);
 	}
 
 	@Bean

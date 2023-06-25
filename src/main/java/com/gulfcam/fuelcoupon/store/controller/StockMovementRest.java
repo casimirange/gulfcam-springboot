@@ -130,11 +130,11 @@ public class StockMovementRest {
 
         Store storeTo = iStoreService.getByInternalReference(storehouse.getIdStore()).get();
 
-        for (String item: createStockMovementDTO.getListCartons()){
-            if(!iCartonService.getByInternalReference(Long.parseLong(aes.decrypt(key, item))).isPresent())
+//        for (String item: createStockMovementDTO.getListCartons()){
+            if(!iCartonService.getByInternalReference(Long.parseLong(aes.decrypt(key, createStockMovementDTO.getListCartons()))).isPresent())
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.carton_exists", null, LocaleContextHolder.getLocale())));
-            Carton carton = iCartonService.getByInternalReference(Long.parseLong(aes.decrypt(key, item))).get();
+            Carton carton = iCartonService.getByInternalReference(Long.parseLong(aes.decrypt(key, createStockMovementDTO.getListCartons()))).get();
 
             Storehouse storehouse1 = iStorehouseService.getByInternalReference(carton.getIdStoreHouse()).get();
             StockMovement stockMovement = new StockMovement();
@@ -179,10 +179,10 @@ public class StockMovementRest {
 
             iItemService.createItem(item2);
 
-        }
+//        }
 
         Map<String, Object> emailProps = new HashMap<>();
-        emailProps.put("quantityCarton", createStockMovementDTO.getListCartons().size());
+        emailProps.put("quantityCarton", 1);
         emailProps.put("typevoucher", typeVoucher.getAmount());
         emailProps.put("storehouseStockage", storehouse.getInternalReference()+" - "+storehouse.getType()+" - "+storehouse.getName());
 

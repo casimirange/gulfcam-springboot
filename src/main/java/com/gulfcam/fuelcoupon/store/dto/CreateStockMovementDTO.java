@@ -22,6 +22,6 @@ public class CreateStockMovementDTO {
 
     @Schema(description = "Liste de cartons a ")
     @NotNull(message = "{carton.required}")
-    private List<String> listCartons ;
+    private String listCartons ;
 
 }
