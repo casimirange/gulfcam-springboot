@@ -597,7 +597,7 @@ public class OrderRest {
             Map<String, Object> emailProps2 = new HashMap<>();
             emailProps2.put("Internalreference", Long.parseLong(aes.decrypt(key, InternalReference)));
             emailProps2.put("completename", client.getCompleteName());
-            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, ApplicationConstant.SUBJECT_EMAIL_NEW_RECEIVED+InternalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_RECEIVED, data));
+            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, ApplicationConstant.SUBJECT_EMAIL_NEW_RECEIVED+Long.parseLong(aes.decrypt(key, InternalReference)), ApplicationConstant.TEMPLATE_EMAIL_NEW_RECEIVED, data));
             log.info("Email send successfull for user: " + client.getEmail());
         }
         jsonMapper.registerModule(new JavaTimeModule());

@@ -213,7 +213,7 @@ public class RequestOppositionRest {
             @ApiResponse(responseCode = "403", description = "Forbidden : accès refusé", content = @Content(mediaType = "Application/Json")),})
     @PostMapping("/{internalReference}")
     @PreAuthorize("hasAnyRole('SUPERADMIN','ADMIN','AGENT','USER')")
-    public ResponseEntity<?> validRequestOpposition(@PathVariable String internalReference) {
+    public ResponseEntity<?> validRequestOpposition(@PathVariable String internalReference, @RequestParam(name = "manager") String idSalesManager) {
 
         if (!iRequestOppositionService.getByInternalReference(Long.parseLong(aes.decrypt(key, internalReference))).isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
@@ -225,6 +225,7 @@ public class RequestOppositionRest {
         Coupon coupon = new Coupon();
         Ticket ticket;
         ResponseCouponMailDTO responseCouponMailDTO;
+        requestOpposition.setIdSalesManager(Long.parseLong(aes.decrypt(key, idSalesManager)));
 
         requestOpposition.setUpdateAt(LocalDateTime.now());
         Status status = iStatusRepo.findByName(EStatus.ACTIVATED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.ACTIVATED +  "  not found"));

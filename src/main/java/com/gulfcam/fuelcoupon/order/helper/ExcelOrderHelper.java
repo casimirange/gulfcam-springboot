@@ -18,7 +18,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class ExcelOrderHelper {
     public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    static String[] HEADERs = { "Reférence", "Reférence du client", "Nom du client", "Localisation du magasin" , "Nom du reponsable de la commande"  , "Nom du Gestionnaire espace 2" , "Montant Total Net" , "Montant Total TTC" , "Taxe" , "Temps de livraison" , "Méthoe epaiement" , "Reférence du paiement" , "Description" , "Date de création", "Statut" };
+    static String[] HEADERs = { "Reférence Commande", "Reférence du client", "Nom du client", "Localisation du magasin" , "Nom du reponsable de la commande" , "Montant" , "Temps de livraison" , "Méthode de paiement" , "Reférence du paiement" , "Description" , "Date de création", "Statut Commande" };
     static String SHEET = "Commandes";
 
 
@@ -42,20 +42,20 @@ public class ExcelOrderHelper {
                 Row row = sheet.createRow(rowIdx++);
 
                 row.createCell(0).setCellValue(order.getInternalReference());
-                row.createCell(1).setCellValue((order.getClientReference() != null)? order.getClientReference(): order.getClient().getInternalReference()+"");
+                row.createCell(1).setCellValue(order.getClient().getInternalReference());
                 row.createCell(2).setCellValue(order.getClient().getCompleteName());
                 row.createCell(3).setCellValue(order.getLocalisation());
-                row.createCell(4).setCellValue((order.getManagerOrder() != null)? order.getManagerOrder().getFirstName()+" "+order.getManagerOrder().getLastName(): " ");
-                row.createCell(5).setCellValue((order.getSpaceManager2() != null)? order.getSpaceManager2().getFirstName()+" "+order.getSpaceManager2().getLastName(): " ");
-                row.createCell(6).setCellValue(order.getNetAggregateAmount());
-                row.createCell(7).setCellValue(order.getTTCAggregateAmount());
-                row.createCell(8).setCellValue(order.getTax());
-                row.createCell(9).setCellValue(order.getDeliveryTime());
-                row.createCell(10).setCellValue((order.getPaymentMethod() != null)? order.getPaymentMethod().getDesignation(): " ");
-                row.createCell(11).setCellValue(order.getPaymentReference());
-                row.createCell(12).setCellValue(order.getDescription());
-                row.createCell(13).setCellValue(dateFor.format(Date.from(order.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant())).toString());
-                row.createCell(14).setCellValue(order.getStatus().getName().toString());
+                row.createCell(4).setCellValue((order.getCommercialAttache()!= null)? order.getCommercialAttache().getFirstName()+" "+order.getCommercialAttache().getLastName(): " ");
+//                row.createCell(5).setCellValue((order.getSpaceManager2() != null)? order.getSpaceManager2().getFirstName()+" "+order.getSpaceManager2().getLastName(): " ");
+                row.createCell(5).setCellValue(order.getNetAggregateAmount());
+//                row.createCell(7).setCellValue(order.getTTCAggregateAmount());
+//                row.createCell(8).setCellValue(order.getTax());
+                row.createCell(6).setCellValue(order.getDeliveryTime());
+                row.createCell(7).setCellValue((order.getPaymentMethod() != null)? order.getPaymentMethod().getDesignation(): " ");
+                row.createCell(8).setCellValue(order.getPaymentReference());
+                row.createCell(9).setCellValue(order.getDescription());
+                row.createCell(10).setCellValue(dateFor.format(Date.from(order.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant())).toString());
+                row.createCell(11).setCellValue(order.getStatus().getName().toString());
             }
 
             workbook.write(out);

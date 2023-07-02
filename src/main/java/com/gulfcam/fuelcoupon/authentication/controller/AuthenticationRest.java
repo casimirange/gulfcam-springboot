@@ -10,6 +10,7 @@ import com.gulfcam.fuelcoupon.authentication.service.UserDetailsImpl;
 import com.gulfcam.fuelcoupon.cryptage.AESUtil;
 import com.gulfcam.fuelcoupon.globalConfiguration.ApplicationConstant;
 import com.gulfcam.fuelcoupon.store.entity.Store;
+import com.gulfcam.fuelcoupon.store.service.IStationService;
 import com.gulfcam.fuelcoupon.store.service.IStoreService;
 import com.gulfcam.fuelcoupon.user.dto.*;
 import com.gulfcam.fuelcoupon.user.entity.*;
@@ -84,6 +85,9 @@ public class AuthenticationRest {
 
     @Autowired
     IStoreService iStoreService;
+
+    @Autowired
+    IStationService iStationService;
 
     @Autowired
     private IRoleUserRepo roleRepo;
@@ -400,6 +404,11 @@ public class AuthenticationRest {
             String uid = users.getInternalReference().toString();
             String id = users.getUserId().toString();
             String email = users.getEmail();
+//            String idStation = "";
+//            if (users.getTypeAccount().getName().equals(ETypeAccount.MANAGER_STATION)){
+//                idStation = iStationService.filtres(null, null, null, users.getInternalReference().toString(), 0, 0, "", "")
+//                        .getContent().get(0).getInternalReference().toString();
+//            }
             userRepo.save(users);
             log.info("user " + users.getOtpCode() + " authenticated");
             log.info("user_otp_code" + users.getOtpCode() + "otpCodeCreatedAt:" + users.getOtpCodeCreatedAT());
