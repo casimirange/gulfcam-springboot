@@ -8,17 +8,18 @@ public class ApplicationConstant {
 
     public static final String SUBJECT_EMAIL_PAY = "GulfCam - Accès espace membres";
 
-    public static final String SUBJECT_EMAIL_OPT = "GulfCam - Code OTP";
+    public static final String SUBJECT_EMAIL_OPT = "Code de vérification OTP";
 
-    public static final String SUBJECT_EMAIL_NEW_USER = "GulfCam - Bienvenue";
+    public static final String SUBJECT_EMAIL_NEW_USER = "Bienvenue sur Gestion Coupons";
 
-    public static final String SUBJECT_EMAIL_NEW_ORDER = "GulfCam - Nouvelle Commande : #Ref";
+//    public static final String SUBJECT_EMAIL_NEW_ORDER = "GulfCam - Nouvelle Commande : #Ref";
+    public static final String SUBJECT_EMAIL_NEW_ORDER = "Nouvelle commande en attente de traitement : #Ref";
 
-    public static final String SUBJECT_EMAIL_ORDER_STOCKAGE = "GulfCam - Ordre de stockage";
+    public static final String SUBJECT_EMAIL_ORDER_STOCKAGE = "Confirmation de la commande de stockage de coupons";
 
-    public static final String SUBJECT_EMAIL_ORDER_SUPPLY = "GulfCam - Ordre d'approvisionnement";
+    public static final String SUBJECT_EMAIL_ORDER_SUPPLY = "Confirmation de commande d'approvisionnement en coupons";
 
-    public static final String SUBJECT_EMAIL_ORDER_TRANSFER= "GulfCam - Ordre de de transfert de cartons";
+    public static final String SUBJECT_EMAIL_ORDER_TRANSFER= "Ordre de transfert de vos coupons";
 
     public static final String SUBJECT_EMAIL_DEMANDE_OPPOSITION= "GulfCam - Demande d'opposition";
 
@@ -28,15 +29,15 @@ public class ApplicationConstant {
 
     public static final String SUBJECT_EMAIL_VALID_CREDIT_NOTE= "GulfCam - Validation d'une note de crédit ";
 
-    public static final String SUBJECT_EMAIL_MODIFY_ORDER = "GulfCam - Modification de la Commande : #Ref";
+    public static final String SUBJECT_EMAIL_MODIFY_ORDER = "Votre commande a été modifiée : #Ref";
 
     public static final String SUBJECT_EMAIL_CANCEL_ORDER = "GulfCam - Annulation de la Commande : #Ref";
 
     public static final String SUBJECT_EMAIL_CANCEL_MULTI_ORDER = "GulfCam - Annulation en lots des Commandes ";
 
-    public static final String SUBJECT_EMAIL_NEW_INVOICE = "GulfCam - Nouvelle Proforma : #Ref";
+    public static final String SUBJECT_EMAIL_NEW_INVOICE = "Facture pro-forma pour votre commande de coupons : #Ref";
 
-    public static final String SUBJECT_EMAIL_NEW_INVOICE2 = "GulfCam - Nouvelle Préfacture : #Ref";
+    public static final String SUBJECT_EMAIL_NEW_INVOICE2 = "Facture préfacture pour votre commande de coupons : #Ref";
 
     public static final String SUBJECT_EMAIL_EXPORT_ORDERS_EXCEL = "GulfCam - Liste des commandes";
 

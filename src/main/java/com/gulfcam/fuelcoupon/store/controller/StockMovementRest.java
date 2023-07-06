@@ -135,7 +135,7 @@ public class StockMovementRest {
                 return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                         messageSource.getMessage("messages.carton_exists", null, LocaleContextHolder.getLocale())));
             Carton carton = iCartonService.getByInternalReference(Long.parseLong(aes.decrypt(key, createStockMovementDTO.getListCartons()))).get();
-
+            Users users = iUserService.getByInternalReference(carton.getIdSpaceManager1());
             Storehouse storehouse1 = iStorehouseService.getByInternalReference(carton.getIdStoreHouse()).get();
             StockMovement stockMovement = new StockMovement();
             stockMovement.setInternalReference(jwtUtils.generateInternalReference());
@@ -182,9 +182,11 @@ public class StockMovementRest {
 //        }
 
         Map<String, Object> emailProps = new HashMap<>();
+        emailProps.put("internalRef", stockMovement.getInternalReference());
         emailProps.put("quantityCarton", 1);
+        emailProps.put("users", users.getFirstName());
         emailProps.put("typevoucher", typeVoucher.getAmount());
-        emailProps.put("storehouseStockage", storehouse.getInternalReference()+" - "+storehouse.getType()+" - "+storehouse.getName());
+        emailProps.put("storehouseStockage", storehouse.getName());
 
         if(createStockMovementDTO.getIdSpaceManager1() != null){
             Users storeKeeper = iUserService.getByInternalReference(Long.parseLong(aes.decrypt(key, createStockMovementDTO.getIdSpaceManager1())));

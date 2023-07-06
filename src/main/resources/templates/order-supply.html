@@ -137,8 +137,8 @@
                 <tr>
                     <td bgcolor="#ffffff" align="left"
                         style="padding: 20px 30px 40px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 400; line-height: 25px;">
-                        <p style="margin: 0;">Bonjour Mrs/Mme<br>
-                            Un nouveau carton a été enregistré dans le système
+                        <p style="margin: 0;">Cher <strong th:text="${users}"></strong><br>
+                            Nous vous remercions pour votre récente commande de coupons. Nous avons confirmé votre commande et commencerons à vous l’expédier le plus tôt possible.
                         </p>
                     </td>
                 </tr>
@@ -163,19 +163,19 @@
                         </tr>
                         <tr>
                             <td style='text-align:center;' class='mobile-center body-padding w320'>
-                                <strong th:text="${carton}">
+                                <strong th:text="${carton}"></strong>
                             </td>
                             <td style='text-align:left;' class='mobile-center body-padding w320'>
-                                <strong th:text="${quantityCarton}">
+                                <strong th:text="${quantityCarton}"></strong>
                             </td>
                             <td style='text-align:left;' class='mobile-center body-padding w320'>
-                                <strong th:text="${typevoucher}">
+                                <strong th:text="${typevoucher}"></strong>
                             </td>
                             <td style='text-align:left;' class='mobile-center body-padding w320'>
-                                <strong th:text="${quantityNotebook}">
+                                <strong th:text="${quantityNotebook}"></strong>
                             </td>
                             <td style='text-align:left;' class='mobile-center body-padding w320'>
-                                <strong th:text="${quantityCoupon}">
+                                <strong th:text="${quantityCoupon}"></strong>
                             </td>
                         </tr>
                     </table>
@@ -188,15 +188,15 @@
                                Magasin
                             </td>
                             <td style='font-size: 11px; text-align:center;' class='mobile-center body-padding w320'>
-                                Entrepôt
+                                Espace
                             </td>
                         </tr>
                         <tr>
                             <td style='text-align:left;' class='mobile-center body-padding w320'>
-                                <strong th:text="${store}">
+                                <strong th:text="${store}"></strong>
                             </td>
                             <td style='text-align:left;' class='mobile-center body-padding w320'>
-                                <strong th:text="${storehouse}">
+                                <strong th:text="${storehouse}"></strong>
                             </td>
                         </tr>
                     </table>
@@ -206,39 +206,38 @@
                     <td bgcolor="#ffffff" align="left"
                         style="padding: 0px 30px 20px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 400; line-height: 25px;">
                         <p style="margin: 10;">
-                            Si vous avez des questions, n'hesitez pas à nous contacter sur cet e-mail en dessous de la
-                            page. Nous sommes toujours ravis de vous aider.</p>
+                            Nous vous remercions de votre confiance !</p>
                     </td>
                 </tr>
-                <tr>
-                    <td bgcolor="#ffffff" align="left"
-                        style="padding: 0px 30px 40px 30px; border-radius: 0px 0px 4px 4px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 400; line-height: 25px;">
-                        <p style="margin: 0;">Nos salutations,<br>GULFCAM Team</p>
-                    </td>
-                </tr>
+<!--                <tr>-->
+<!--                    <td bgcolor="#ffffff" align="left"-->
+<!--                        style="padding: 0px 30px 40px 30px; border-radius: 0px 0px 4px 4px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 400; line-height: 25px;">-->
+<!--                        <p style="margin: 0;">Nos salutations,<br>GULFCAM Team</p>-->
+<!--                    </td>-->
+<!--                </tr>-->
             </table>
         </td>
     </tr>
-    <tr>
-        <td bgcolor="#f4f4f4" align="center" style="padding: 30px 10px 0px 10px;">
-            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
-                <tr>
-                    <td bgcolor="#FFECD1" align="center"
-                        style="padding: 30px 30px 30px 30px; border-radius: 4px 4px 4px 4px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 400; line-height: 25px;">
-                        <div class="col-md-12" style="text-align: center;">
-                            <a href="#"><img src="cid:facebook" style="width: 40px;height: auto"></a>
-                            <a style="padding-left: 30px" href="#"><img src="cid:twetter"
-                                                                        style="width: 40px;height: auto"></a>
-                            <a style="padding-left: 30px" href="#"><img src="cid:instagram"
-                                                                        style="width: 40px;height: auto"></a>
-                            <a style="padding-left: 30px;" href="#"><img src="cid:youtube"
-                                                                         style="width: 40px;height: auto"></a>
-                        </div>
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>
+<!--    <tr>-->
+<!--        <td bgcolor="#f4f4f4" align="center" style="padding: 30px 10px 0px 10px;">-->
+<!--            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">-->
+<!--                <tr>-->
+<!--                    <td bgcolor="#FFECD1" align="center"-->
+<!--                        style="padding: 30px 30px 30px 30px; border-radius: 4px 4px 4px 4px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 400; line-height: 25px;">-->
+<!--                        <div class="col-md-12" style="text-align: center;">-->
+<!--                            <a href="#"><img src="cid:facebook" style="width: 40px;height: auto"></a>-->
+<!--                            <a style="padding-left: 30px" href="#"><img src="cid:twetter"-->
+<!--                                                                        style="width: 40px;height: auto"></a>-->
+<!--                            <a style="padding-left: 30px" href="#"><img src="cid:instagram"-->
+<!--                                                                        style="width: 40px;height: auto"></a>-->
+<!--                            <a style="padding-left: 30px;" href="#"><img src="cid:youtube"-->
+<!--                                                                         style="width: 40px;height: auto"></a>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                </tr>-->
+<!--            </table>-->
+<!--        </td>-->
+<!--    </tr>-->
     <tr>
         <td bgcolor="#f4f4f4" align="center" style="padding: 0px 10px 0px 10px;">
             <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
@@ -246,7 +245,7 @@
                     <td bgcolor="#f4f4f4" align="left"
                         style="padding: 0px 30px 30px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 400; line-height: 18px;">
                         <br>
-                        <p style="margin: 0;">© 2022 support@gulfcam.com. All Rights Reserved</p>
+                        <p style="margin: 0;">© 2023, Tous droits Réservés</p>
                     </td>
                 </tr>
             </table>

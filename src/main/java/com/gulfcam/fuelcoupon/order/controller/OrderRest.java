@@ -236,7 +236,7 @@ public class OrderRest {
         String emailToStore = "";
 
         for (Users user : usersList) {
-            if (user.getTypeAccount().getName() == ETypeAccount.TREASURY) {
+            if (user.getTypeAccount().getName() == ETypeAccount.TREASURY && Objects.equals(user.getIdStore(), order.getIdStore())) {
                 emailToTresury = user.getEmail();
             }
         }
@@ -244,7 +244,12 @@ public class OrderRest {
         if(createOrderDTO.getIdCommercialAttache() != null){
             emailToStore += commercialAttache.getEmail();
         }
-        String ClientReference = createOrderDTO.getIdClient()+" - "+client.getEmail()+" - "+client.getCompleteName()+" - "+client.getCompanyName();
+
+        if(createOrderDTO.getIdCommercialAttache() != null){
+            emailToStore += commercialAttache.getEmail();
+        }
+//        String ClientReference = createOrderDTO.getIdClient()+" - "+client.getEmail()+" - "+client.getCompleteName()+" - "+client.getCompanyName();
+        String ClientReference = client.getCompleteName();
         Map<String, Object> emailProps = new HashMap<>();
         emailProps.put("internalReferenceOrder", internalReference);
         emailProps.put("internalReferenceClient", ClientReference);
@@ -426,15 +431,23 @@ public class OrderRest {
         List<Users> usersList = iUserService.getUsersByIdStore(order.getIdStore());
         for (Users user : usersList) {
             if (user.getTypeAccount().getName() == ETypeAccount.TREASURY) {
+                emailProps.put("firstname", user.getFirstName());
                 emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_MODIFY_ORDER+Long.parseLong(aes.decrypt(key, InternalReference))+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_MODIFY_ORDER));
                 log.info("Email  send successfull for user: " + user.getEmail());
             }
 
             if (user.getTypeAccount().getName() == ETypeAccount.SALES_MANAGER) {
+                emailProps.put("firstname", user.getFirstName());
                 emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, user.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_MODIFY_ORDER+Long.parseLong(aes.decrypt(key, InternalReference))+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_MODIFY_ORDER));
                 log.info("Email  send successfull for user: " + user.getEmail());
             }
         }
+
+//        if (client.getEmail().length() !=0){
+//            emailProps.put("firstname", client.getCompleteName());
+//            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_MODIFY_ORDER+Long.parseLong(aes.decrypt(key, InternalReference))+" - "+EStatusOrder.ACCEPTED, ApplicationConstant.TEMPLATE_EMAIL_MODIFY_ORDER));
+//            log.info("Email send successfull for client: " + client.getEmail());
+//        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=received-" + order.getClientReference() + ".pdf");
@@ -989,6 +1002,7 @@ public class OrderRest {
         }
         Map<String, Object> emailProps2 = new HashMap<>();
         emailProps2.put("Internalreference", Long.parseLong(aes.decrypt(key, internalReference)));
+        emailProps2.put("amount", order.getTTCAggregateAmount() +" Fcfa");
         emailProps2.put("TypeDocument", testTypeDocument? "PREFACTURE":"PROFORMA");
         emailProps2.put("CompleteName", client.getCompleteName());
         emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, testTypeDocument ? ApplicationConstant.SUBJECT_EMAIL_NEW_INVOICE2+internalReference: ApplicationConstant.SUBJECT_EMAIL_NEW_INVOICE+internalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_INVOICE, data));

@@ -228,6 +228,7 @@ public class AuthenticationRest {
 
             Map<String, Object> emailProps = new HashMap<>();
             emailProps.put("code", code);
+            emailProps.put("firstname", userUpdate.getFirstName());
             emailProps.put("telephone", telephone);
             emailProps.put("email", email);
 
