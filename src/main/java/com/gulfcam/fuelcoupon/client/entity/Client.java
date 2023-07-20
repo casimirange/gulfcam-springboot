@@ -38,7 +38,7 @@ public class Client {
     @Email
     private String email;
 
-    @Column(unique = true,nullable = true)
+    @Column(unique = false,nullable = true)
     private String niu;
 
     private String RCCM;

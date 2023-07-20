@@ -31,6 +31,10 @@ public class ResponseCouponDTO {
 
     private Client client;
 
+    private Long idPompiste;
+
+    private String pompisteName;
+
     private Long idRequestOpposition;
 
     private RequestOpposition requestOpposition;

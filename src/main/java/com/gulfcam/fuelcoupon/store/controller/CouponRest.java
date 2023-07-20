@@ -471,6 +471,7 @@ public class CouponRest {
         Status status = iStatusRepo.findByName(EStatus.USED).orElseThrow(()-> new ResourceNotFoundException("Statut:  "  +  EStatus.USED +  "  not found"));
         coupon.setStatus(status);
         coupon.setIdStation(Long.parseLong(aes.decrypt(key, acceptCouponDTO.getIdStation().toString())));
+        coupon.setIdPompist(Long.parseLong(aes.decrypt(key, acceptCouponDTO.getIdPompist().toString())));
         coupon.setUpdateAt(LocalDateTime.now());
         coupon.setProductionDate(acceptCouponDTO.getProductionDate());
         coupon.setModulo(Integer.parseInt(aes.decrypt(key, acceptCouponDTO.getModulo()+"")));

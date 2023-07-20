@@ -316,11 +316,11 @@ public class AuthenticationRest {
         UserResDto userResDto = modelMapper.map(u, UserResDto.class);
         userResDto.setStore(store);
         Map<String, Object> emailProps = new HashMap<>();
-        emailProps.put("firstname", userAddDto.getFirstName());
-        emailProps.put("lastname", userAddDto.getLastName());
+        emailProps.put("firstname", aes.decrypt(key,userAddDto.getFirstName()));
+        emailProps.put("lastname", aes.decrypt(key,userAddDto.getLastName()));
 
-        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, userAddDto.getEmail(), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_NEW_USER, ApplicationConstant.TEMPLATE_EMAIL_NEW_USER));
-        log.info("Email  send successfull for user: " + userAddDto.getEmail());
+        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, aes.decrypt(key, userAddDto.getEmail()), mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_NEW_USER, ApplicationConstant.TEMPLATE_EMAIL_NEW_USER));
+        log.info("Email  send successfull for user: " + aes.decrypt(key,userAddDto.getEmail()));
 
         jsonMapper.registerModule(new JavaTimeModule());
         Object json = jsonMapper.writeValueAsString(userResDto);

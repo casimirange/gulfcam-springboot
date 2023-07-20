@@ -138,9 +138,9 @@
                     <td bgcolor="#ffffff" align="left"
                         style="padding: 20px 30px 40px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 400; line-height: 25px;">
 <!--                        <p style="margin: 0;">Bonjour <strong th:text="${firstname}"></strong><br>-->
-                        <p style="margin: 0;">Bonjour <strong th:text="${firstname}"></strong><br>
-                            Nous avons le plaisir de vous informer que de nouvelles commandes ont été passées pour les coupons que vous suivez.
-                            Nous sommes en train de traiter ces commandes et nous vous tiendrons informé(e) de leur statut dès que possible.
+                        <p style="margin: 0;">Bonjour <strong th:text="${clientName}"></strong><br>
+                            Nous avons bien reçu votre commande et nous vous confirmons que celle-ci a été traitée avec succès.
+                            Vous pouvez consulter les détails de votre commande à tout moment en vous connectant à votre compte
                         </p>
                     </td>
                 </tr>
@@ -154,10 +154,10 @@
                                 Ref. Commande
                             </td>
                             <td style='font-size: 11px; text-align:center;' class='mobile-center body-padding w320'>
-                                Magasin
+                                Ville
                             </td>
                             <td style='font-size: 11px; text-align:center;' class='mobile-center body-padding w320'>
-                                Temps de livraison
+                                Delais de livraison
                             </td>
                             <td style='font-size: 11px; text-align:center;' class='mobile-center body-padding w320'>
                                 Canal
@@ -195,7 +195,7 @@
                         </tr>
                         <tr>
                             <td style='text-align:left;' class='mobile-center body-padding w320'>
-                                <strong th:text="${netAmount}"></strong>&nbsp;Fcfa
+                                <strong th:text="${ttcAmount}"> </strong> Fcfa
                             </td>
 <!--                            <td style='text-align:left;' class='mobile-center body-padding w320'>-->
 <!--                                <strong th:text="${payementMethode}"></strong>-->

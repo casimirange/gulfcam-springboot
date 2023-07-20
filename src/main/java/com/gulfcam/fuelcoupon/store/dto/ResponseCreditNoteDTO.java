@@ -19,6 +19,7 @@ public class ResponseCreditNoteDTO {
     private Long internalReference;
 
     private List<Coupon> coupon;
+    private List<ResponseCouponDTO> coupons;
 
     private Station station;
 

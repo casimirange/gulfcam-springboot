@@ -234,6 +234,7 @@ public class OrderRest {
 
         String emailToTresury = "";
         String emailToStore = "";
+        String emailToClient = "";
 
         for (Users user : usersList) {
             if (user.getTypeAccount().getName() == ETypeAccount.TREASURY && Objects.equals(user.getIdStore(), order.getIdStore())) {
@@ -245,20 +246,22 @@ public class OrderRest {
             emailToStore += commercialAttache.getEmail();
         }
 
-        if(createOrderDTO.getIdCommercialAttache() != null){
-            emailToStore += commercialAttache.getEmail();
+        if(client.getEmail() != null){
+            emailToClient = client.getEmail();
         }
 //        String ClientReference = createOrderDTO.getIdClient()+" - "+client.getEmail()+" - "+client.getCompleteName()+" - "+client.getCompanyName();
         String ClientReference = client.getCompleteName();
         Map<String, Object> emailProps = new HashMap<>();
         emailProps.put("internalReferenceOrder", internalReference);
+        emailProps.put("clientName", client.getCompleteName());
         emailProps.put("internalReferenceClient", ClientReference);
         emailProps.put("internalReferenceStore", aes.decrypt(key, createOrderDTO.getIdStore()));
+        emailProps.put("storeName", store.getLocalization());
         emailProps.put("delivryTime", createOrderDTO.getDeliveryTime() != null ? aes.decrypt(key, createOrderDTO.getDeliveryTime()) :"");
         emailProps.put("canal",aes.decrypt(key,  createOrderDTO.getChannel()));
         emailProps.put("netAmount", aes.decrypt(key, createOrderDTO.getNetAggregateAmount()));
         emailProps.put("ttcAmount", aes.decrypt(key, createOrderDTO.getTTCAggregateAmount()));
-        emailProps.put("payementMethode", (createOrderDTO.getIdPaymentMethod() == null)? "":createOrderDTO.getIdPaymentMethod()+ " - "+paymentMethod.getDesignation());
+        emailProps.put("payementMethode", (createOrderDTO.getIdPaymentMethod() == null)? "": paymentMethod.getDesignation());
 
         if(emailToTresury != null){
             emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, emailToTresury, mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_NEW_ORDER+ internalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_ORDER));
@@ -268,6 +271,11 @@ public class OrderRest {
         if(emailToStore != null){
             emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, emailToStore, mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_NEW_ORDER+ internalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_ORDER));
             log.info("Email  send successfull for user: " + emailToStore);
+        }
+
+        if(emailToClient != null){
+            emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, emailToClient, mailReplyTo, emailProps, ApplicationConstant.SUBJECT_EMAIL_NEW_ORDER_CLIENT+ internalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_ORDER));
+            log.info("Email  send successfull for client: " + emailToClient);
         }
 
         iOrderService.createOrder(order);

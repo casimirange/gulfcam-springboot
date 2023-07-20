@@ -94,10 +94,10 @@ public class ClientRest {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.email_exists", null, LocaleContextHolder.getLocale())));
         }
-        if (!createClientDTO.getNiu().isEmpty() && iClientService.existsByNiu(aes.decrypt(key, createClientDTO.getNiu()))) {
-            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
-                    messageSource.getMessage("messages.niu_exists", null, LocaleContextHolder.getLocale())));
-        }
+//        if (!createClientDTO.getNiu().isEmpty() && iClientService.existsByNiu(aes.decrypt(key, createClientDTO.getNiu()))) {
+//            return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
+//                    messageSource.getMessage("messages.niu_exists", null, LocaleContextHolder.getLocale())));
+//        }
         if (iClientService.existsByGulfCamAccountNumber(aes.decrypt(key, createClientDTO.getGulfcamAccountNumber()))) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(HttpStatus.BAD_REQUEST,
                     messageSource.getMessage("messages.num_gulfcam_exists", null, LocaleContextHolder.getLocale())));
@@ -110,7 +110,7 @@ public class ClientRest {
         client.setCompleteName(aes.decrypt(key, createClientDTO.getCompleteName()));
         client.setPhone(aes.decrypt(key, createClientDTO.getPhone()));
         client.setRCCM(createClientDTO.getNiu().isEmpty() ? "" : aes.decrypt(key, createClientDTO.getRCCM()));
-        client.setNiu(createClientDTO.getRCCM().isEmpty() ? "" : aes.decrypt(key, createClientDTO.getNiu()));
+        client.setNiu(createClientDTO.getRCCM().isEmpty() ? null : aes.decrypt(key, createClientDTO.getNiu()));
         client.setGulfcamAccountNumber(aes.decrypt(key, createClientDTO.getGulfcamAccountNumber()));
         client.setEmail(createClientDTO.getEmail().isEmpty() ? "" : aes.decrypt(key, createClientDTO.getEmail()));
         TypeClient typeAccount = iTypeClientRepo.findByName(ETypeClient.valueOf(aes.decrypt(key, createClientDTO.getTypeClient()).toUpperCase())).orElseThrow(()-> new ResourceNotFoundException("Type de Client:  "  +  aes.decrypt(key, createClientDTO.getTypeClient()) +  "  not found"));

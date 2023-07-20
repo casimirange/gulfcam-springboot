@@ -50,6 +50,9 @@ public class Coupon {
     @Column(nullable = true, name = "id_type_voucher")
     private Long idTypeVoucher;
 
+    @Column(nullable = true, name = "id_pompist")
+    private Long idPompist;
+
     private LocalDateTime createdAt;
 
     @Column(nullable = true, name = "production_date")

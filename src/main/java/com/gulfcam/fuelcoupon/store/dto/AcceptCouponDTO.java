@@ -15,6 +15,10 @@ public class AcceptCouponDTO {
     @NotNull(message = "{station.required}")
     private String idStation;
 
+    @Schema(description = "Reference interne du pompiste")
+    @NotNull(message = "{pompist.required}")
+    private String idPompist;
+
     @Schema(description = "Modulo du coupon")
     private String modulo;
 

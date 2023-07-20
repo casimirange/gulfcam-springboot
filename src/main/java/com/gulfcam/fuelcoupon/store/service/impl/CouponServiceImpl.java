@@ -16,6 +16,7 @@ import com.gulfcam.fuelcoupon.store.repository.ICouponRepo;
 import com.gulfcam.fuelcoupon.store.repository.ICreditNoteRepo;
 import com.gulfcam.fuelcoupon.store.repository.INotebookRepo;
 import com.gulfcam.fuelcoupon.store.service.*;
+import com.gulfcam.fuelcoupon.user.service.IUserService;
 import com.gulfcam.fuelcoupon.utilities.entity.EStatus;
 import com.gulfcam.fuelcoupon.utilities.entity.Status;
 import com.gulfcam.fuelcoupon.utilities.repository.IStatusRepo;
@@ -57,6 +58,9 @@ public class CouponServiceImpl implements ICouponService {
 
     @Autowired
     IClientService iClientService;
+
+    @Autowired
+    IUserService iUserService;
     @Autowired
     ITypeVoucherService iTypeVoucherService;
     @Autowired
@@ -180,6 +184,7 @@ public class CouponServiceImpl implements ICouponService {
         List<ResponseCouponDTO> responseCouponDTOList = new ArrayList<>();
 
         for (Coupon coupon: couponList){
+            log.info("coupon pompiste {}"+coupon.getIdPompist());
             responseCouponDTO = new ResponseCouponDTO();
             responseCouponDTO.setStatus(coupon.getStatus());
             responseCouponDTO.setId(coupon.getId());
@@ -191,11 +196,13 @@ public class CouponServiceImpl implements ICouponService {
             responseCouponDTO.setIdTicket(coupon.getIdTicket());
             responseCouponDTO.setIdNotebook(coupon.getIdNotebook());
             responseCouponDTO.setIdStation(coupon.getIdStation());
+            responseCouponDTO.setIdPompiste(coupon.getIdPompist());
             responseCouponDTO.setProductionDate(coupon.getProductionDate());
             responseCouponDTO.setModulo(coupon.getModulo());
             responseCouponDTO.setUpdateAt(coupon.getUpdateAt());
             responseCouponDTO.setClient((coupon.getIdClient() == null)? null: iClientService.getClientByInternalReference(coupon.getIdClient()).get());
             responseCouponDTO.setNameClient((coupon.getIdClient() == null)? null: iClientService.getClientByInternalReference(coupon.getIdClient()).get().getCompleteName());
+            responseCouponDTO.setPompisteName((coupon.getIdPompist() == null)? null: iUserService.getByInternalReference(coupon.getIdPompist()).getFirstName());
             responseCouponDTO.setRequestOpposition((coupon.getIdRequestOpposition() == null)? null: iRequestOppositionService.getByInternalReference(coupon.getIdRequestOpposition()).get());
             responseCouponDTO.setStation((coupon.getIdStation() == null)? null: iStationService.getByInternalReference(coupon.getIdStation()).get());
             responseCouponDTO.setNameStation((coupon.getIdStation() == null)? null: iStationService.getByInternalReference(coupon.getIdStation()).get().getDesignation());
@@ -332,6 +339,8 @@ public class CouponServiceImpl implements ICouponService {
 
     @Override
     public List<Coupon> getCouponsByIdCreditNote(Long idCreditNote) {
+        List<Coupon> couponList = iCouponRepo.getCouponsByIdCreditNote(idCreditNote);
+
         return iCouponRepo.getCouponsByIdCreditNote(idCreditNote);
     }
 
@@ -419,6 +428,7 @@ public class CouponServiceImpl implements ICouponService {
             responseCouponDTO.setIdTicket(coupon.getIdTicket());
             responseCouponDTO.setIdNotebook(coupon.getIdNotebook());
             responseCouponDTO.setIdStation(coupon.getIdStation());
+            responseCouponDTO.setIdPompiste(coupon.getIdPompist());
             responseCouponDTO.setProductionDate(coupon.getProductionDate());
             responseCouponDTO.setModulo(coupon.getModulo());
             responseCouponDTO.setUpdateAt(coupon.getUpdateAt());
@@ -427,6 +437,7 @@ public class CouponServiceImpl implements ICouponService {
             responseCouponDTO.setRequestOpposition((coupon.getIdRequestOpposition() == null)? null: iRequestOppositionService.getByInternalReference(coupon.getIdRequestOpposition()).get());
             responseCouponDTO.setStation((coupon.getIdStation() == null)? null: iStationService.getByInternalReference(coupon.getIdStation()).get());
             responseCouponDTO.setNameStation((coupon.getIdStation() == null)? null: iStationService.getByInternalReference(coupon.getIdStation()).get().getDesignation());
+            responseCouponDTO.setPompisteName((coupon.getIdPompist() == null)? null: iUserService.getByInternalReference(coupon.getIdPompist()).getFirstName());
 //            responseCouponDTO.setTicket((coupon.getIdTicket() == null)? null: iTicketService.getByInternalReference(coupon.getIdTicket()).get());
             responseCouponDTO.setNotebook((coupon.getIdNotebook() == null)? null: iNotebookRepo.getNotebookByInternalReference(coupon.getIdNotebook()).get());
             responseCouponDTO.setCreditNote((coupon.getIdCreditNote() == null)? null: iCreditNoteRepo.getCreditNoteByInternalReference(coupon.getIdCreditNote()).get());

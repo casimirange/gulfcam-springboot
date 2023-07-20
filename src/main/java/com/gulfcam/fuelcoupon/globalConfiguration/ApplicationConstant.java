@@ -14,6 +14,7 @@ public class ApplicationConstant {
 
 //    public static final String SUBJECT_EMAIL_NEW_ORDER = "GulfCam - Nouvelle Commande : #Ref";
     public static final String SUBJECT_EMAIL_NEW_ORDER = "Nouvelle commande en attente de traitement : #Ref";
+    public static final String SUBJECT_EMAIL_NEW_ORDER_CLIENT = " Confirmation de votre commande : #Ref";
 
     public static final String SUBJECT_EMAIL_ORDER_STOCKAGE = "Confirmation de la commande de stockage de coupons";
 
@@ -58,6 +59,7 @@ public class ApplicationConstant {
     public static final String TEMPLATE_EMAIL_NEW_USER = "new-user";
 
     public static final String TEMPLATE_EMAIL_NEW_ORDER = "new-order";
+    public static final String TEMPLATE_EMAIL_NEW_ORDER_CLIENT = "new-order-client";
 
     public static final String TEMPLATE_EMAIL_ORDER_STOCKAGE = "order-stockage";
 
