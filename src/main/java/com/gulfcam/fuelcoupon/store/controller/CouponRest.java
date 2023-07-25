@@ -660,7 +660,7 @@ public class CouponRest {
                                            @RequestParam(required = false, value = "size", defaultValue = ApplicationConstant.DEFAULT_SIZE_PAGINATION) String sizeParam,
                                            @RequestParam(required = false, defaultValue = "id") String sort,
                                            @RequestParam(required = false, defaultValue = "desc") String order) throws JsonProcessingException {
-        Page<ResponseCouponDTO> list = iCouponService.couponNotHaveCreditNote(aes.decrypt(key, idStation), Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
+        Page<ResponseCouponDTO> list = iCouponService.couponNotHaveCreditNote(idStation, Integer.parseInt(pageParam), Integer.parseInt(sizeParam), sort, order);
         jsonMapper.registerModule(new JavaTimeModule());
         Object json = jsonMapper.writeValueAsString(list);
         JSONObject cr = aes.encryptObject( key, json);

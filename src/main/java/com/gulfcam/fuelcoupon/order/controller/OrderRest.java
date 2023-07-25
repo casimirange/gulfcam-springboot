@@ -1013,8 +1013,8 @@ public class OrderRest {
         emailProps2.put("amount", order.getTTCAggregateAmount() +" Fcfa");
         emailProps2.put("TypeDocument", testTypeDocument? "PREFACTURE":"PROFORMA");
         emailProps2.put("CompleteName", client.getCompleteName());
-        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, testTypeDocument ? ApplicationConstant.SUBJECT_EMAIL_NEW_INVOICE2+internalReference: ApplicationConstant.SUBJECT_EMAIL_NEW_INVOICE+internalReference, ApplicationConstant.TEMPLATE_EMAIL_NEW_INVOICE, data));
-        log.info("Email send successfull for user: " + client.getEmail());
+        emailService.sendEmail(new EmailDto(mailFrom, ApplicationConstant.ENTREPRISE_NAME, client.getEmail(), mailReplyTo, emailProps2, testTypeDocument ? ApplicationConstant.SUBJECT_EMAIL_NEW_INVOICE2+aes.decrypt(key, internalReference): ApplicationConstant.SUBJECT_EMAIL_NEW_INVOICE+aes.decrypt(key,internalReference), ApplicationConstant.TEMPLATE_EMAIL_NEW_INVOICE, data));
+        log.info("Email send successfull for client: " + client.getEmail());
 
 
         HttpHeaders headers = new HttpHeaders();
